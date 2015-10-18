@@ -1,0 +1,26 @@
+#Source: http://www.smart-words.org/linking-words/conjunctions.html
+#Similar to And
+also
+besides
+furthermore
+likewise
+moreover
+
+#Similar to But
+however
+nevertheless
+nonetheless
+still
+conversely
+instead
+otherwise
+rather
+
+#Similar to So
+accordingly
+consequently
+hence
+meanwhile
+then
+therefore
+thus

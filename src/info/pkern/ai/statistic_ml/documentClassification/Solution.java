@@ -27,6 +27,10 @@ public class Solution {
 	
     public static void main(String[] args) {
         /* Enter your code here. Read input from STDIN. Print output to STDOUT. Your class should be named Solution. */
+    	Random random = new Random();
+    	for (int i = 0; i < args.length - 1; i++) {
+    		System.out.println(1 + random.nextInt(8));
+		}
     }
     
     

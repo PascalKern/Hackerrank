@@ -1,0 +1,89 @@
+#Source: http://www.smart-words.org/linking-words/conjunctions.html
+#Coordinating Conjunctions
+but
+for
+nor
+or
+so
+and
+yet
+
+#Conjunctions Concession
+though
+although
+#even though
+even
+while
+
+#Conjunctions Condition
+if
+#only if
+only
+unless
+until
+#provided that
+provided
+#assuming that
+assuming
+#even if
+#in case (that)
+in
+lest
+
+#Conjunctions Comparison
+than
+#rather than
+rather
+whether
+#as much as
+as
+much
+whereas
+
+#Conjunctions Time
+after
+#as long as
+#as soon as
+before
+#by the time
+#now that
+now
+once
+since
+till
+until
+when
+whenever
+while
+ 
+#Conjunctions Reason
+because
+since
+#so that
+#in order (that)
+why
+
+#Relative Adjective
+that
+what
+whatever
+which
+whichever
+
+#Relative Pronoun
+who
+whoever
+whom
+whomever
+whose
+ 
+#Conjunctions Manner
+how
+#as though
+though
+#as if
+if
+
+#Conjunctions Place
+where
+wherever
