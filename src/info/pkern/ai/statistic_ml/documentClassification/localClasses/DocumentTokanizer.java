@@ -18,6 +18,14 @@ public class DocumentTokanizer {
 		this.text = text;
 	}
 	
+	public DocumentTokanizer() {
+		this("");
+	}
+	
+	public List<String> tokanize(String text) {
+		return tokanizeText(text);
+	}
+	
 	public void addFilter(WordFilter filter) {
 		filters.add(filter);
 		tokens = filterWords(tokens);

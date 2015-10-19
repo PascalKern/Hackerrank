@@ -18,24 +18,42 @@ public class BagOfWords {
 	private Integer numberOfWords = 0;
 	private Map<String, Integer> bagOfWords = new HashMap<>();
 	
+//	/**
+//	 * Constructs a BagOfWords with the given words as initial content.
+//	 * 
+//	 * @param words to add to this bag.
+//	 */
+//	public BagOfWords(List<String> words) {
+//		addWords(words);
+//	}
+
 	/**
-	 * Method to join two BagOfWords.
+	 * Method to join two BagOfWords. Adds the content of another bag
+	 * to this bag.
 	 * 
-	 * @param bagOfWords to join with this bag.
-	 * @return new BagOfWords instance with the words of both bags.
+	 * @param anotherBag to join with this bag.
 	 */
-	public BagOfWords add(BagOfWords bagOfWords) {
-		BagOfWords newBag = new BagOfWords();
-		for (Entry<String, Integer> entry : bagOfWords.bagOfWords.entrySet()) {
-			newBag.addWord(entry.getKey(), entry.getValue());
+	public void add(BagOfWords anotherBag) {
+		for (Entry<String, Integer> entry : anotherBag.bagOfWords.entrySet()) {
+			addWord(entry.getKey(), entry.getValue());
 		}
-		return newBag;
 	}
 	
 	/**
-	 * Adds a word to this BagOfWords
+	 * Adds a list of words to this BagOfWords.
 	 * 
-	 * @param word to add to this BagOfWords
+	 * @param words to add to this bag.
+	 */
+	public void addWords(List<String> words) {
+		for (String word : words) {
+			addWord(word);
+		}
+	}
+	
+	/**
+	 * Adds a word to this BagOfWords.
+	 * 
+	 * @param word to add to this bag.
 	 */
 	public void addWord(String word) {
 		addWord(word, 1);
@@ -46,8 +64,8 @@ public class BagOfWords {
 			bagOfWords.put(word, bagOfWords.get(word) + frequency);
 		} else {
 			bagOfWords.put(word, frequency);
+			numberOfWords++;
 		}
-		numberOfWords++;
 	}
 	
 	/**

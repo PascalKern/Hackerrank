@@ -15,33 +15,32 @@ import org.w3c.dom.stylesheets.DocumentStyle;
  * @author pkern
  *
  */
+/*
+ * TODO Remove! It's now just a wrapper for the BagOfWords! Or redesign to a
+ * return type of the DocumentTokanizer.
+ */
+@Deprecated
 public class Document {
 
-	/*
-	 * TODO Check clearer solution for this member!
-	 */
-	protected static BagOfWords vocabulary;
-	private String name = "";
-	private String documentClass;
 	protected BagOfWords wordsAndFrequence = new BagOfWords();
+
+//	/**
+//	 * Adds a list of words to this document.
+//	 * 
+//	 * @param words to be added to the documents vocabulary.
+//	 * @param learn true to train the words.
+//	 */
+//	public void read(List<String> words, boolean learn) {
+//		for (String word : words) {
+//			wordsAndFrequence.addWord(word);
+//			if (learn) {
+//				Document.vocabulary.addWord(word);
+//			}
+//		}
+//	}
 	
-	public Document(BagOfWords vocabulary) {
-		Document.vocabulary = vocabulary;
-	}
-	
-	/**
-	 * Adds a list of words to this document.
-	 * 
-	 * @param words to be added to the documents vocabulary.
-	 * @param learn true to train the words.
-	 */
-	public void read(List<String> words, boolean learn) {
-		for (String word : words) {
-			wordsAndFrequence.addWord(word);
-			if (learn) {
-				Document.vocabulary.addWord(word);
-			}
-		}
+	public BagOfWords getWordsAndFrequence() {
+		return wordsAndFrequence;
 	}
 	
 	/**
@@ -52,7 +51,8 @@ public class Document {
 	 * @param words to be added to the documents vocabulary.
 	 */
 	public void read(List<String> words) {
-		read(words, false);
+		wordsAndFrequence = new BagOfWords();
+		wordsAndFrequence.addWords(words);
 	}
 	
 	/**
@@ -62,7 +62,7 @@ public class Document {
 	 * @return new Document instance with the words of both documents.
 	 */
 	public Document add(Document otherDocument) {
-		Document newDocument = new Document(Document.vocabulary);
+		Document newDocument = new Document();
 		newDocument.wordsAndFrequence = wordsAndFrequence;
 		newDocument.wordsAndFrequence.add(otherDocument.wordsAndFrequence);
 		return newDocument;
@@ -74,7 +74,7 @@ public class Document {
 	 * @return the size (length) of this vocabulary.
 	 */
 	public Integer vocabularySize() {
-		return Document.vocabulary.size();
+		return wordsAndFrequence.size();
 	}
 	
 	/**

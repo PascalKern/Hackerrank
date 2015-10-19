@@ -1,13 +1,17 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
+/*
+ * TODO Remove extending. Replace Document with this class!
+ */
 public class DocumentClass extends Document {
 
 	private Integer numberOfDocuments = 0;
+	private final String name;
 	
-	public DocumentClass(BagOfWords vocabulary) {
-		super(vocabulary);
+	public DocumentClass(String name) {
+		this.name = name;
 	}
-
+	
 	/**
 	 * Returns the probability for a given word in this document class.
 	 * 
@@ -17,7 +21,7 @@ public class DocumentClass extends Document {
 	public Integer probability(String word) {
 		Integer vocabularySize = vocabularySize();
 		Integer sumN = 0;
-		for (Integer frequency : DocumentClass.vocabulary.getDictionaryOfThisBag().values()) {
+		for (Integer frequency : wordsAndFrequence.getDictionaryOfThisBag().values()) {
 			sumN += frequency;
 		}
 		Integer N = getFrequenceOf(word);
@@ -26,6 +30,10 @@ public class DocumentClass extends Document {
 		return result;
 	}
 	
+	public void addDocument(Document document) {
+		wordsAndFrequence.add(document.getWordsAndFrequence());
+		numberOfDocuments++;
+	}
 
 	/**
  	 * Method to join two DocumentClasses.
@@ -34,7 +42,7 @@ public class DocumentClass extends Document {
 	 * @return new DocumentClass instance with the words of both document classes.
 	 */
 	public DocumentClass add(DocumentClass otherDocumentClass) {
-		DocumentClass newDocumentClass = new DocumentClass(DocumentClass.vocabulary);
+		DocumentClass newDocumentClass = new DocumentClass(otherDocumentClass.name);
 		newDocumentClass.wordsAndFrequence = wordsAndFrequence;
 		newDocumentClass.wordsAndFrequence.add(otherDocumentClass.wordsAndFrequence);
 		newDocumentClass.numberOfDocuments = numberOfDocuments;
@@ -42,14 +50,14 @@ public class DocumentClass extends Document {
 		return newDocumentClass;
 	}
 	
-	/**
-	 * Sets the number of documents in this document class.
-	 * 
-	 * @param numberOfDocuments the number of documents.
-	 */
-	public void setNumberOfDocuments(Integer numberOfDocuments) {
-		this.numberOfDocuments = numberOfDocuments;
-	}
+//	/**
+//	 * Sets the number of documents in this document class.
+//	 * 
+//	 * @param numberOfDocuments the number of documents.
+//	 */
+//	public void setNumberOfDocuments(Integer numberOfDocuments) {
+//		this.numberOfDocuments = numberOfDocuments;
+//	}
 	
 	
 	/**
