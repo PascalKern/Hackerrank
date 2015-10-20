@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 public class BagOfWords {
 
 	private Integer numberOfWords = 0;
-	private Map<String, Integer> bagOfWords = new HashMap<>();
+	private Map<String, Integer> bagVocabulary = new HashMap<>();
 	
 //	/**
 //	 * Constructs a BagOfWords with the given words as initial content.
@@ -27,6 +27,14 @@ public class BagOfWords {
 //		addWords(words);
 //	}
 
+	public static BagOfWords mergeBags(BagOfWords bagA, BagOfWords bagB) {
+		BagOfWords mergedBag = new BagOfWords();
+		mergedBag.numberOfWords = bagA.numberOfWords;
+		mergedBag.bagVocabulary = bagA.bagVocabulary;
+		mergedBag.add(bagB);
+		return mergedBag;
+	}
+	
 	/**
 	 * Method to join two BagOfWords. Adds the content of another bag
 	 * to this bag.
@@ -34,11 +42,30 @@ public class BagOfWords {
 	 * @param anotherBag to join with this bag.
 	 */
 	public void add(BagOfWords anotherBag) {
-		for (Entry<String, Integer> entry : anotherBag.bagOfWords.entrySet()) {
+		for (Entry<String, Integer> entry : anotherBag.bagVocabulary.entrySet()) {
 			addWord(entry.getKey(), entry.getValue());
 		}
+		numberOfWords += anotherBag.numberOfWords;
 	}
-	
+
+	/**
+	 * Adds a word to this BagOfWords.
+	 * 
+	 * @param word to add to this bag.
+	 */
+	public void addWord(String word) {
+		addWord(word, 1);
+	}
+
+	public void addWord(String word, Integer frequency) {
+		if (bagVocabulary.containsKey(word)) {
+			bagVocabulary.put(word, bagVocabulary.get(word) + frequency);
+		} else {
+			bagVocabulary.put(word, frequency);
+			numberOfWords++;
+		}
+	}
+
 	/**
 	 * Adds a list of words to this BagOfWords.
 	 * 
@@ -49,23 +76,9 @@ public class BagOfWords {
 			addWord(word);
 		}
 	}
-	
-	/**
-	 * Adds a word to this BagOfWords.
-	 * 
-	 * @param word to add to this bag.
-	 */
-	public void addWord(String word) {
-		addWord(word, 1);
-	}
-	
-	private void addWord(String word, Integer frequency) {
-		if (bagOfWords.containsKey(word)) {
-			bagOfWords.put(word, bagOfWords.get(word) + frequency);
-		} else {
-			bagOfWords.put(word, frequency);
-			numberOfWords++;
-		}
+
+	public void addWordWithoutFrequency(String word) {
+		addWord(word, 0);
 	}
 	
 	/**
@@ -73,8 +86,8 @@ public class BagOfWords {
 	 * 
 	 * @return number of different words.
 	 */
-	public Integer size() {
-		return bagOfWords.size();
+	public Integer getNumberOfWords() {
+		return bagVocabulary.size();
 	}
 	
 	/**
@@ -83,18 +96,15 @@ public class BagOfWords {
 	 * @return a list of words in this bag. 
 	 */
 	public List<String> getWords() {
-		List<String> words = new ArrayList<>(bagOfWords.size());
-		words.addAll(bagOfWords.keySet());
+		List<String> words = new ArrayList<>(bagVocabulary.size());
+		words.addAll(bagVocabulary.keySet());
 		return words;
 	}
 	
-	/**
-	 * Returning the dictionary, containing the words (keys) with their frequency (values)
-	 * 
-	 * @return map as the dictionary
-	 */
-	public Map<String, Integer> getDictionaryOfThisBag() {
-		return new HashMap<String, Integer>(bagOfWords);
+	public List<Integer> getFrequences() {
+		List<Integer> frequences = new ArrayList<>(bagVocabulary.size());
+		frequences.addAll(bagVocabulary.values());
+		return frequences;
 	}
 	
 	/**
@@ -104,11 +114,21 @@ public class BagOfWords {
 	 * @return the frequency of the given word.
 	 */
 	public Integer getFrequenceOf(String word) {
-		if (bagOfWords.containsKey(word)) {
-			return bagOfWords.get(word);
+		if (bagVocabulary.containsKey(word)) {
+			return bagVocabulary.get(word);
 		} else {
 			return 0;
 		}
+	}
+
+	/**
+	 * Returning the dictionary, containing the words (keys) with their frequency (values)
+	 * 
+	 * @return map as the dictionary
+	 */
+	@Deprecated
+	public Map<String, Integer> getVocabulary() {
+		return new HashMap<String, Integer>(bagVocabulary);
 	}
 	
 }

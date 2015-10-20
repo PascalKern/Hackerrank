@@ -27,8 +27,11 @@ public class PoolTest {
 	@Test
 	public void testLearn() throws Exception {
 
-		Path learnBase = Paths.get("/Users/pkern/Google Drive/BOW/learn_and_test/learn");
-		Path testBase = Paths.get("/Users/pkern/Google Drive/BOW/learn_and_test/test");
+//		String basePath = "/Users/pkern/Google Drive/BOW";
+		String basePath = "C:/Users/pascal/Google Drive/BOW";
+		
+		Path learnBase = Paths.get(basePath + "/learn_and_test/learn");
+		Path testBase = Paths.get(basePath + "/learn_and_test/test");
 		Pool pool = new Pool();
 		
 		FileVisitor<Path> fileProcessor = new ProcessFile("txt");
@@ -37,11 +40,15 @@ public class PoolTest {
 		String fileContent;
 		for (Path file : ((ProcessFile) fileProcessor).getFiles()) {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
-			Document document = new Document();
-			document.read(Arrays.asList(fileContent.split("[\\s,\\.;:]")));
-			pool.learn(document, file.getParent().getFileName().toString());
+			BagOfWords trainBag = new BagOfWords();
+			trainBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;:]")));
+			pool.learn(trainBag, file.getParent().getFileName().toString());
 		}
 
+		System.out.println("Trained finished!");
+		System.out.println("Pool structcure {docClass = number of documents}: "+pool.getClassesWithDocumentCount());
+		System.out.println("Total words in pool: "+pool.getNumberOfWords());
+		
 		fileProcessor = new ProcessFile("txt");
 		Files.walkFileTree(testBase, fileProcessor);
 		Float probability;
@@ -50,11 +57,12 @@ public class PoolTest {
 		for (String dclass : classes) {
 			for (Path file : ((ProcessFile) fileProcessor).getFiles()) {
 				fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
-				Document document = new Document();
-				document.read(Arrays.asList(fileContent.split("\\s\\.,;:")));
-				probability = pool.probability(document, dclass);
-				Map<String, Float> probAllClasses = pool.getProbabilityForAllDocumentClasses(document);
-				System.out.println(dclass + " = " + file.getFileName().toString() + ", Probabilities: " + probAllClasses.entrySet());
+				BagOfWords testBag = new BagOfWords();
+				testBag.addWords(Arrays.asList(fileContent.split("\\s\\.,;:")));
+//				probability = pool.probability(testBag, dclass);
+				Map<String, Float> probAllClasses = pool.probability(testBag);
+//				System.out.println(dclass + " = " + file.getFileName().toString() + ", probybility: " + probability + ". Probabilities: " + probAllClasses.entrySet());
+				System.out.println(dclass + " = " + file.getFileName().toString() + ". Probabilities: " + probAllClasses.entrySet());
 			}
 		}
 		
@@ -62,6 +70,20 @@ public class PoolTest {
 		
 	}
 
+	
+	@Test
+	public void test() {
+		Float test = new Float(0);
+		System.out.println("Test: " + test);
+		test += 1;
+		System.out.println("Test: " + test);
+		test += 0.2f;
+		System.out.println("Test: " + test);
+		test *= 1;
+		System.out.println("Test: " + test);
+		test *= new Float(0.5);
+		System.out.println("Test: " + test);
+	}
 	
 	
 	
