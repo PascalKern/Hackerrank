@@ -16,8 +16,11 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.StringTokenizer;
 
 import org.junit.Test;
@@ -33,6 +36,7 @@ public class PoolTest {
 		Path learnBase = Paths.get(basePath + "/learn_and_test/learn");
 		Path testBase = Paths.get(basePath + "/learn_and_test/test");
 		Pool pool = new Pool();
+		pool.debug = true;
 		
 		FileVisitor<Path> fileProcessor = new ProcessFile("txt");
 		Files.walkFileTree(learnBase, fileProcessor);
@@ -41,35 +45,60 @@ public class PoolTest {
 		for (Path file : ((ProcessFile) fileProcessor).getFiles()) {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			BagOfWords trainBag = new BagOfWords();
-			trainBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;:]")));
+			fileContent = fileContent.replaceAll("[\"]", "");
+			trainBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':!?]")));
 			pool.learn(trainBag, file.getParent().getFileName().toString());
 		}
 
+		pool.normalizePool();
+		
 		System.out.println("Trained finished!");
 		System.out.println("Pool structcure {docClass = number of documents}: "+pool.getClassesWithDocumentCount());
 		System.out.println("Total words in pool: "+pool.getNumberOfWords());
 		
 		fileProcessor = new ProcessFile("txt");
 		Files.walkFileTree(testBase, fileProcessor);
-		Float probability;
-		List<String> classes = Arrays.asList(new String[] {"clinton",  "lawyer",  "math",  "medical",  "music",  "sex"});
 		
-		for (String dclass : classes) {
-			for (Path file : ((ProcessFile) fileProcessor).getFiles()) {
-				fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
-				BagOfWords testBag = new BagOfWords();
-				testBag.addWords(Arrays.asList(fileContent.split("\\s\\.,;:")));
+		for (Path file : ((ProcessFile) fileProcessor).getFiles()) {
+			String fileName = file.getFileName().toString();
+			String dclass = fileName.substring(0, fileName.lastIndexOf(".")).replaceAll("[0-9]", "");
+			
+			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
+			BagOfWords testBag = new BagOfWords();
+			fileContent = fileContent.replaceAll("[\"]", "");
+			testBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':]")));
 //				probability = pool.probability(testBag, dclass);
-				Map<String, Float> probAllClasses = pool.probability(testBag);
-//				System.out.println(dclass + " = " + file.getFileName().toString() + ", probybility: " + probability + ". Probabilities: " + probAllClasses.entrySet());
-				System.out.println(dclass + " = " + file.getFileName().toString() + ". Probabilities: " + probAllClasses.entrySet());
-			}
+			Map<String, Float> probAllClasses = pool.probability(testBag);
+			entriesSortedByValues(probAllClasses);
+//			System.out.println(dclass + " = " + file.getFileName().toString() + ", probybility: " + probability + ". Probabilities: " + probAllClasses.entrySet());
+//			System.out.println(dclass + " = " + file.getFileName().toString() + "; Probabilities: " + probAllClasses.entrySet());
+			System.out.println(file.getFileName().toString() + " = Probabilities: " + probAllClasses.entrySet());
 		}
 		
 		
 		
 	}
 
+	@Test
+	public void test2() {
+		Float prod = new Float(1);
+		Float r = new Float(2);
+		prod *= r;
+		assertFalse(prod.isInfinite());
+		System.out.println(prod);
+	}
+	
+	
+	@Test
+	public void test3() {
+		System.out.println(1.0f / 0.0f);
+		System.out.println(new Float("Infinity"));
+		System.out.println(Float.parseFloat("Infinity"));
+		System.out.println(new Float(0.12242519153117467336066203000015));
+		System.out.println(new Float(0.08145700457195284754830961450242));
+		System.out.println(new Float(-1f));
+	}
+	
 	
 	@Test
 	public void test() {
@@ -83,6 +112,45 @@ public class PoolTest {
 		System.out.println("Test: " + test);
 		test *= new Float(0.5);
 		System.out.println("Test: " + test);
+	}
+	
+	
+	
+	@Test
+	public void test4() {
+		Map<String, Float> probAllClasses = new HashMap<>();
+		probAllClasses.put("E", 1f);
+		probAllClasses.put("D", 2.2f);
+		probAllClasses.put("C", 0.1f);
+		probAllClasses.put("B", 0.0001f);
+		probAllClasses.put("A", 0.03f);
+		System.out.println(entriesSortedByValues(probAllClasses));
+	}
+	
+	
+	
+	
+	private <K, V extends Comparable<? super V>> List<Entry<K, V>> entriesSortedByValues(
+			Map<K, V> map) {
+		return entriesSortedByValues(map, null);
+	}
+	
+	private <K, V extends Comparable<? super V>> List<Entry<K, V>> entriesSortedByValues(Map<K, V> map, final String direction) {
+
+		List<Entry<K, V>> sortedEntries = new ArrayList<Entry<K, V>>(map.entrySet());
+
+		Collections.sort(sortedEntries, new Comparator<Entry<K, V>>() {
+			@Override
+			public int compare(Entry<K, V> e1, Entry<K, V> e2) {
+				if (direction != null && direction.equals("asc")) {
+					return e1.getValue().compareTo(e2.getValue());
+				} else {
+					return e2.getValue().compareTo(e1.getValue());
+				}
+			}
+		});
+
+		return sortedEntries;
 	}
 	
 	

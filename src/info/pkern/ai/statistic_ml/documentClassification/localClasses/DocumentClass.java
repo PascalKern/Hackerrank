@@ -97,6 +97,14 @@ public class DocumentClass {
 	public String getName() {
 		return name;
 	}
+
+	public Integer getSumOfFrequencies() {
+		return classVocabulary.getSumOfFrequencies();
+	}
+
+	public void normalizeBag(List<String> words) {
+		classVocabulary.normalizeBag(words);
+	}
 	
 //	/**
 //	 * Sets the number of documents in this document class.

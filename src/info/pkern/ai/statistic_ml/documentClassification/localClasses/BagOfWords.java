@@ -16,6 +16,7 @@ import java.util.Map.Entry;
 public class BagOfWords {
 
 	private Integer numberOfWords = 0;
+	private Integer sumOfWordFrequencies = 0;
 	private Map<String, Integer> bagVocabulary = new HashMap<>();
 	
 //	/**
@@ -45,7 +46,7 @@ public class BagOfWords {
 		for (Entry<String, Integer> entry : anotherBag.bagVocabulary.entrySet()) {
 			addWord(entry.getKey(), entry.getValue());
 		}
-		numberOfWords += anotherBag.numberOfWords;
+//		numberOfWords += anotherBag.numberOfWords;
 	}
 
 	/**
@@ -64,6 +65,7 @@ public class BagOfWords {
 			bagVocabulary.put(word, frequency);
 			numberOfWords++;
 		}
+		sumOfWordFrequencies += frequency;
 	}
 
 	/**
@@ -105,6 +107,24 @@ public class BagOfWords {
 		List<Integer> frequences = new ArrayList<>(bagVocabulary.size());
 		frequences.addAll(bagVocabulary.values());
 		return frequences;
+	}
+	
+	public Integer getSumOfFrequencies() {
+		return sumOfWordFrequencies;
+	}
+	
+	/**
+	 * Normalizes this bag to a given set of words. After the normalization
+	 * every word within the list will be in this bag.<br/>
+	 * Any word from the list which was not part of the bag before will be
+	 * added with a frequency of 0!
+	 * 
+	 * @param words list of words to normalize with.
+	 */
+	public void normalizeBag(List<String> words) {
+		for (String word : words) {
+			addWordWithoutFrequency(word);
+		}
 	}
 	
 	/**

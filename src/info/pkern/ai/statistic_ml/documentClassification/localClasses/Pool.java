@@ -16,6 +16,8 @@ import java.util.NoSuchElementException;
  */
 public class Pool {
 
+	public boolean debug = false;
+	
 	private Map<String, DocumentClass> documentClasses = new HashMap<>();
 	private BagOfWords poolVocabulary = new BagOfWords();
 	
@@ -25,7 +27,7 @@ public class Pool {
 	 * @param docClassName name of the document class.
 	 * @return sum
 	 */
-	public Integer countOfWordsInClass(String docClassName) {
+	public Integer sumWordFrequenciesInClass(String docClassName) {
 		checkDocumentClassExists(docClassName);
 		Integer sum = 0;
 		
@@ -38,6 +40,12 @@ public class Pool {
 		return sum;
 	}
 
+	public void normalizePool() {
+		for (DocumentClass documentClass : documentClasses.values()) {
+			documentClass.normalizeBag(poolVocabulary.getWords());
+		}
+	}
+	
 	public Integer countOfWordsInClassOld(String docClassName) {
 		checkDocumentClassExists(docClassName);
 		Integer sum = 0;
@@ -79,6 +87,7 @@ public class Pool {
 		return documentClasses.keySet();
 	}
 	
+	@Deprecated
 	public Map<String, Integer> getClassesWithDocumentCount() {
 		Map<String, Integer> map = new HashMap<>();
 		for (String docClass : getClasses()) {
@@ -104,23 +113,57 @@ public class Pool {
 		Long startTime = System.nanoTime();
 		
 		DocumentClass dClass = documentClasses.get(docClassName);
-		Integer sum_dClass = countOfWordsInClass(docClassName);
+		Integer sum_dClass = sumWordFrequenciesInClass(docClassName);
 		
 		Float probability = new Float(0);
 		
 		for (DocumentClass current_dClass : documentClasses.values()) {
-			Integer sum_current_dClass = countOfWordsInClass(current_dClass.getName());				//sum_j
+			Integer sum_current_dClass = current_dClass.getSumOfFrequencies();						//sum_j
 			Float prod = new Float(1);																//prod
 			for (String word : bag.getWords()) {
 				Integer wordFrequence_dClass = 1 + dClass.getFrequenceOf(word);						//wf_dclass
 				Integer wordFrequence_current_dClass = 1 + current_dClass.getFrequenceOf(word);		//wf
-				Float r = new Float(wordFrequence_current_dClass + sum_current_dClass / (wordFrequence_dClass * sum_dClass));	//R
-				prod *= r;
+				Float r = new Float((wordFrequence_current_dClass * sum_current_dClass) / (wordFrequence_dClass * sum_dClass));	//R
+				prod = prod * r;
 				probability += prod * current_dClass.getNumberOfDocuments() / dClass.getNumberOfDocuments();
+				
+				
+				if (!probability.isInfinite()) {
+					System.out.println("============================================================================");
+					System.out.println(
+							"word = '" + word + "'" + System.lineSeparator()
+							+ "wordFrequence_dClass = " + wordFrequence_dClass + System.lineSeparator()
+							+ "sum_dClass = " + sum_dClass + System.lineSeparator()
+							+ "wordFrequence_current_dClass = " + wordFrequence_current_dClass + System.lineSeparator()
+							+ "sum_current_dClass = " + sum_current_dClass + System.lineSeparator()
+							+ "r = " + r + System.lineSeparator() + "prod = " + prod + System.lineSeparator()
+							+ "numOfDocs = " + dClass.getNumberOfDocuments() + System.lineSeparator()
+							+ "numOfDocs CurClass = " + current_dClass.getNumberOfDocuments() + System.lineSeparator()
+							+ "probability = " + 1 / probability
+							);
+				}
+				if (probability.isInfinite()) {
+					System.out.println("================================= Infinite =================================");
+					System.out.println(
+							"word = '" + word + "'" + System.lineSeparator()
+							+ "wordFrequence_dClass = " + wordFrequence_dClass + System.lineSeparator()
+							+ "sum_dClass = " + sum_dClass + System.lineSeparator()
+							+ "wordFrequence_current_dClass = " + wordFrequence_current_dClass + System.lineSeparator()
+							+ "sum_current_dClass = " + sum_current_dClass + System.lineSeparator()
+							+ "r = " + r + System.lineSeparator() + "prod = " + prod + System.lineSeparator()
+							+ "numOfDocs = " + dClass.getNumberOfDocuments() + System.lineSeparator()
+							+ "numOfDocs CurClass = " + current_dClass.getNumberOfDocuments() + System.lineSeparator()
+							+ "probability = " + 1 / probability
+							);
+					System.out.println("The calcualted probablity is Infinite! [docClass: "+docClassName+", numOfDocs: "+dClass.getNumberOfDocuments()+", numOfDocs CurClass: "+current_dClass.getNumberOfDocuments()+", word: "+word+"]");
+				}
 			}
 		}
 		
-		System.out.println((System.nanoTime() - startTime) / Math.pow(10, 6) + "ms Duration for probability calculation for dClass: " + docClassName + ", with bag of " + bag.getNumberOfWords() + " words!");
+		if (debug) {
+			System.out.println((System.nanoTime() - startTime) / Math.pow(10, 6) + "ms Duration for probability calculation for dClass: " + docClassName + ", with bag of " + bag.getNumberOfWords() + " words!");
+		}
+		
 		
 		if (probability != 0) {
 			return 1 / probability;
@@ -153,11 +196,13 @@ public class Pool {
 		Long startTime = System.nanoTime();
 		
 		for (String current_dClassName : documentClasses.keySet()) {
-			float probabilty = probability(bag, current_dClassName);
+			Float probabilty = probability(bag, current_dClassName);
 			probabilityMap.put(current_dClassName, probabilty);
 		}
 		
-		System.out.println((System.nanoTime() - startTime) / Math.pow(10, 6) + "ms Duration for probability map calculation with bag of " + bag.getNumberOfWords() + " words!");
+		if (debug) {
+			System.out.println((System.nanoTime() - startTime) / Math.pow(10, 6) + "ms Duration for probability map calculation with bag of " + bag.getNumberOfWords() + " words!");
+		}
 		
 		return probabilityMap;
 	}
