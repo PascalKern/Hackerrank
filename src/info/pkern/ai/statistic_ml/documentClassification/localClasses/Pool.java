@@ -107,13 +107,13 @@ public class Pool {
 	 * @param documentClass
 	 * @return
 	 */
-	public Float probability(BagOfWords bag, String docClassName) {
+	public Float probability(String fileName, BagOfWords bag, String docClassName) {
 		checkDocumentClassExists(docClassName);
 		
 		Long startTime = System.nanoTime();
 		
 		DocumentClass dClass = documentClasses.get(docClassName);
-		Integer sum_dClass = sumWordFrequenciesInClass(docClassName);
+		Integer sum_dClass = sumWordFrequenciesInClass(docClassName);								
 		
 		Float probability = new Float(0);
 		
@@ -125,38 +125,25 @@ public class Pool {
 				Integer wordFrequence_current_dClass = 1 + current_dClass.getFrequenceOf(word);		//wf
 				Float r = new Float((wordFrequence_current_dClass * sum_current_dClass) / (wordFrequence_dClass * sum_dClass));	//R
 				prod = prod * r;
-				probability += prod * current_dClass.getNumberOfDocuments() / dClass.getNumberOfDocuments();
 				
-				
-				if (!probability.isInfinite()) {
-					System.out.println("============================================================================");
+				if (true) {
 					System.out.println(
-							"word = '" + word + "'" + System.lineSeparator()
-							+ "wordFrequence_dClass = " + wordFrequence_dClass + System.lineSeparator()
+							fileName + ", word = '" + word + "'" + System.lineSeparator()
+							+ "wf_dclass (wordFrequence_dClass) = " + wordFrequence_dClass + System.lineSeparator()
 							+ "sum_dClass = " + sum_dClass + System.lineSeparator()
-							+ "wordFrequence_current_dClass = " + wordFrequence_current_dClass + System.lineSeparator()
-							+ "sum_current_dClass = " + sum_current_dClass + System.lineSeparator()
+							+ "wf (wordFrequence_current_dClass) = " + wordFrequence_current_dClass + System.lineSeparator()
+							+ "sum_j (sum_current_dClass) = " + sum_current_dClass + System.lineSeparator()
 							+ "r = " + r + System.lineSeparator() + "prod = " + prod + System.lineSeparator()
-							+ "numOfDocs = " + dClass.getNumberOfDocuments() + System.lineSeparator()
-							+ "numOfDocs CurClass = " + current_dClass.getNumberOfDocuments() + System.lineSeparator()
-							+ "probability = " + 1 / probability
+//							+ "(numOfDocs) = " + dClass.getNumberOfDocuments() + System.lineSeparator()
+//							+ "(numOfDocs CurClass) = " + current_dClass.getNumberOfDocuments()
+							+ "..............................."
 							);
 				}
-				if (probability.isInfinite()) {
-					System.out.println("================================= Infinite =================================");
-					System.out.println(
-							"word = '" + word + "'" + System.lineSeparator()
-							+ "wordFrequence_dClass = " + wordFrequence_dClass + System.lineSeparator()
-							+ "sum_dClass = " + sum_dClass + System.lineSeparator()
-							+ "wordFrequence_current_dClass = " + wordFrequence_current_dClass + System.lineSeparator()
-							+ "sum_current_dClass = " + sum_current_dClass + System.lineSeparator()
-							+ "r = " + r + System.lineSeparator() + "prod = " + prod + System.lineSeparator()
-							+ "numOfDocs = " + dClass.getNumberOfDocuments() + System.lineSeparator()
-							+ "numOfDocs CurClass = " + current_dClass.getNumberOfDocuments() + System.lineSeparator()
-							+ "probability = " + 1 / probability
-							);
-					System.out.println("The calcualted probablity is Infinite! [docClass: "+docClassName+", numOfDocs: "+dClass.getNumberOfDocuments()+", numOfDocs CurClass: "+current_dClass.getNumberOfDocuments()+", word: "+word+"]");
-				}
+			}
+			probability += prod * current_dClass.getNumberOfDocuments() / dClass.getNumberOfDocuments();
+			if (true) {
+				System.out.println("prob = " + probability + System.lineSeparator()
+						+ "............................................................." );
 			}
 		}
 		
@@ -166,8 +153,12 @@ public class Pool {
 		
 		
 		if (probability != 0) {
+			System.out.println("return = " + 1 / probability + System.lineSeparator()
+						+ "=====================================================================");
 			return 1 / probability;
 		} else {
+			System.out.println("return = " + -1 + System.lineSeparator()
+					+ "=====================================================================");
 			return new Float(-1f);
 		}
 		
@@ -190,13 +181,13 @@ public class Pool {
 	}
 
 	
-	public Map<String, Float> probability(BagOfWords bag) {
+	public Map<String, Float> probability(String fileName, BagOfWords bag) {
 		Map<String, Float> probabilityMap = new HashMap<>(documentClasses.size());
 		
 		Long startTime = System.nanoTime();
 		
 		for (String current_dClassName : documentClasses.keySet()) {
-			Float probabilty = probability(bag, current_dClassName);
+			Float probabilty = probability(fileName, bag, current_dClassName);
 			probabilityMap.put(current_dClassName, probabilty);
 		}
 		

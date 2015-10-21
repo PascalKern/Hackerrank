@@ -30,13 +30,13 @@ public class PoolTest {
 	@Test
 	public void testLearn() throws Exception {
 
-//		String basePath = "/Users/pkern/Google Drive/BOW";
-		String basePath = "C:/Users/pascal/Google Drive/BOW";
+		String basePath = "/Users/pkern/Google Drive/BOW";
+//		String basePath = "C:/Users/pascal/Google Drive/BOW";
 		
 		Path learnBase = Paths.get(basePath + "/learn_and_test/learn");
 		Path testBase = Paths.get(basePath + "/learn_and_test/test");
 		Pool pool = new Pool();
-		pool.debug = true;
+		pool.debug = false;
 		
 		FileVisitor<Path> fileProcessor = new ProcessFile("txt");
 		Files.walkFileTree(learnBase, fileProcessor);
@@ -68,7 +68,7 @@ public class PoolTest {
 			fileContent = fileContent.replaceAll("[\"]", "");
 			testBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':]")));
 //				probability = pool.probability(testBag, dclass);
-			Map<String, Float> probAllClasses = pool.probability(testBag);
+			Map<String, Float> probAllClasses = pool.probability(file.getFileName().toString(), testBag);
 			entriesSortedByValues(probAllClasses);
 //			System.out.println(dclass + " = " + file.getFileName().toString() + ", probybility: " + probability + ". Probabilities: " + probAllClasses.entrySet());
 //			System.out.println(dclass + " = " + file.getFileName().toString() + "; Probabilities: " + probAllClasses.entrySet());
