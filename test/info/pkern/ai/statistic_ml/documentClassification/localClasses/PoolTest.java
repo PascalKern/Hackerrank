@@ -30,8 +30,8 @@ public class PoolTest {
 	@Test
 	public void testLearn() throws Exception {
 
-		String basePath = "/Users/pkern/Google Drive/BOW";
-//		String basePath = "C:/Users/pascal/Google Drive/BOW";
+//		String basePath = "/Users/pkern/Google Drive/BOW";
+		String basePath = "C:/Users/pascal/Google Drive/BOW";
 		
 		Path learnBase = Paths.get(basePath + "/learn_and_test/learn");
 		Path testBase = Paths.get(basePath + "/learn_and_test/test");
@@ -46,7 +46,8 @@ public class PoolTest {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			BagOfWords trainBag = new BagOfWords();
 			fileContent = fileContent.replaceAll("[\"]", "");
-			trainBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':!?]")));
+			trainBag.addWords(Arrays.asList(fileContent.split("[^\\wäöüÄÖÜß]*")));
+//			trainBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':!?]")));
 			pool.learn(trainBag, file.getParent().getFileName().toString());
 		}
 
@@ -66,7 +67,8 @@ public class PoolTest {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			BagOfWords testBag = new BagOfWords();
 			fileContent = fileContent.replaceAll("[\"]", "");
-			testBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':]")));
+			testBag.addWords(Arrays.asList(fileContent.split("[^\\wäöüÄÖÜß]*")));
+//			testBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':]")));
 //				probability = pool.probability(testBag, dclass);
 			Map<String, Float> probAllClasses = pool.probability(file.getFileName().toString(), testBag);
 			entriesSortedByValues(probAllClasses);
