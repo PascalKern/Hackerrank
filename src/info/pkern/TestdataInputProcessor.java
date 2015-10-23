@@ -12,13 +12,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class TestdataInputProcessor<T extends AbstractTestData> {
+public class TestdataInputProcessor<T extends AbstractTestdata> {
 
 	private final int numberOfTests;
 	private List<T> testData;
 	
 	
-	public TestdataInputProcessor(Class<T> clazz, Scanner scanner) {
+	public TestdataInputProcessor(Class<T> clazz, InputStream in) {
+		Scanner scanner = new Scanner(in);
 		numberOfTests = readNumberOfTests(scanner);
 		testData = createTestData(clazz, scanner);
 	}

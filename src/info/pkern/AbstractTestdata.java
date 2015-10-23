@@ -7,8 +7,8 @@ import java.util.Scanner;
 /*
  * TODO Better use a interface? Use a factory method to create the instances and force the InputStream as parameter!
  */
-public abstract class AbstractTestData {
+public abstract class AbstractTestdata {
 	
-	public abstract <T extends AbstractTestData> T newInstance(Scanner scanner);
+	public abstract <T extends AbstractTestdata> T newInstance(Scanner scanner);
 	
 }
