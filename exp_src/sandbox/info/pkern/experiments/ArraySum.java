@@ -1,4 +1,4 @@
-package info.pkern.experiments;
+package sandbox.info.pkern.experiments;
 
 import java.util.Arrays;
 import java.util.Iterator;
