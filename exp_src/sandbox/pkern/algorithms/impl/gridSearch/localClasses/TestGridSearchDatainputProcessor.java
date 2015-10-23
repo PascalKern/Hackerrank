@@ -17,7 +17,7 @@ import org.junit.Test;
 
 public class TestGridSearchDatainputProcessor {
 
-	public String testData =  "2\n"
+	private String testData = "2\n"
 							+ "10 10\n"
 							+ "7283455864\n"
 							+ "6731158619\n"
@@ -65,7 +65,7 @@ public class TestGridSearchDatainputProcessor {
 //			System.out.println(charr);
 //		}
 		
-		TestdataInputProcessor<GridSearchTestData> inputProcessor = new TestdataInputProcessor<GridSearchTestData>(GridSearchTestData.class, new Scanner(in));
+		TestdataInputProcessor<GridSearchTestData> inputProcessor = new TestdataInputProcessor<GridSearchTestData>(GridSearchTestData.class, in);
 		
 		System.out.println(inputProcessor.getTestData(0).getGrid());
 		System.out.println(inputProcessor.getTestData(0).getPattern());
