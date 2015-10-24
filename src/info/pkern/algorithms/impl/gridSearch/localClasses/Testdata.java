@@ -17,6 +17,7 @@ public class Testdata extends AbstractTestdata {
 	private DataGrid grid;
 	private DataGrid pattern;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Testdata newInstance(Scanner scanner) {
 		Testdata testdata = new Testdata();

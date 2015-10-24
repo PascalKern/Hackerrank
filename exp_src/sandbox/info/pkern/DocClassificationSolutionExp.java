@@ -1,4 +1,6 @@
-package info.pkern.ai.statistic_ml.documentClassification;
+package sandbox.info.pkern;
+
+import info.pkern.ai.statistic_ml.documentClassification.Solution;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
@@ -22,7 +24,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class SolutionTest {
+public class DocClassificationSolutionExp {
 
 	private final String TRAININGS_DATA_FILE = "orig_trainingdata.txt";
 	private final Integer TESTS_COUNT = 10;
@@ -79,7 +81,15 @@ public class SolutionTest {
 	}
 	
 	
-	
+	/**
+	 * Read the traingsdata beside the {@link Solution} class and prepares some random testdata from
+	 * the read content. The testdata is written in to the source <strong>anc</strong> binary directory
+	 * of the <code>Solution</code> file. The trainingsdata beside the {@link Solution} class does <strong>not
+	 * </strong> contain the testdata afterwards. This way the test can be simulated correct like when submmissing
+	 * to Hackerrank.com where the trainingdata is also beside the Solution class.
+	 *  
+	 * @throws IOException
+	 */
 	private void prepareTestData() throws IOException {
 //		Path tempTrainingsData = Files.createTempFile("trainingsdata_documentClassification", null, PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-r--r--")));
 		Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-r--r--");

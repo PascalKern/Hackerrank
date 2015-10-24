@@ -25,7 +25,7 @@ import java.util.StringTokenizer;
 
 import org.junit.Test;
 
-public class PoolTest {
+public class PoolExp {
 
 	@Test
 	public void testLearn() throws Exception {

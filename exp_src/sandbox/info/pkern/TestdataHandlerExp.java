@@ -1,4 +1,4 @@
-package sandbox.pkern.algorithms.impl.gridSearch.localClasses;
+package sandbox.info.pkern;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -15,7 +15,7 @@ import info.pkern.algorithms.impl.gridSearch.localClasses.Testdata;
 
 import org.junit.Test;
 
-public class TestGridSearchDatainputProcessor {
+public class TestdataHandlerExp {
 
 	private String testData = "2\n"
 							+ "10 10\n"
