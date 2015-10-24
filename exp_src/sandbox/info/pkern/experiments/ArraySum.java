@@ -26,6 +26,15 @@ public class ArraySum {
 		return sum;
 	}
 	
+	/**
+	 * Calculates the sum in a <code>List</code> of integers.
+	 * <br/>
+	 * <strong>Important:</strong> this method carries the risk of a <code>StackOverflowError</code>
+	 * when the size of the List exceeds the maximal allowed Stack entries/size.
+	 * 
+	 * @param numbers list of numbers.
+	 * @return the sum of all integers in the list.
+	 */
 	private Integer sumArrayRecursive(List<Integer> numbers) {
 //		System.out.println(numbers);
 		int sum = 0;
