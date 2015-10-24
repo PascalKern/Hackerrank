@@ -1,6 +1,9 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
 import static org.junit.Assert.*;
+import info.pkern.tools.MapUtil;
+import info.pkern.tools.RecursiveSimpleFileVisitor;
+import info.pkern.tools.MapUtil.SORT_ORDER;
 
 import java.io.File;
 import java.io.FilenameFilter;
@@ -38,11 +41,11 @@ public class PoolExp {
 		Pool pool = new Pool();
 		pool.debug = false;
 		
-		FileVisitor<Path> fileProcessor = new ProcessFile("txt");
+		FileVisitor<Path> fileProcessor = new RecursiveSimpleFileVisitor("txt");
 		Files.walkFileTree(learnBase, fileProcessor);
 		
 		String fileContent;
-		for (Path file : ((ProcessFile) fileProcessor).getFiles()) {
+		for (Path file : ((RecursiveSimpleFileVisitor) fileProcessor).getFiles()) {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			BagOfWords trainBag = new BagOfWords();
 			fileContent = fileContent.replaceAll("[\"]", "");
@@ -57,10 +60,10 @@ public class PoolExp {
 		System.out.println("Pool structcure {docClass = number of documents}: "+pool.getClassesWithDocumentCount());
 		System.out.println("Total words in pool: "+pool.getNumberOfWords());
 		
-		fileProcessor = new ProcessFile("txt");
+		fileProcessor = new RecursiveSimpleFileVisitor("txt");
 		Files.walkFileTree(testBase, fileProcessor);
 		
-		for (Path file : ((ProcessFile) fileProcessor).getFiles()) {
+		for (Path file : ((RecursiveSimpleFileVisitor) fileProcessor).getFiles()) {
 			String fileName = file.getFileName().toString();
 			String dclass = fileName.substring(0, fileName.lastIndexOf(".")).replaceAll("[0-9]", "");
 			
@@ -71,7 +74,7 @@ public class PoolExp {
 //			testBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':]")));
 //				probability = pool.probability(testBag, dclass);
 			Map<String, Float> probAllClasses = pool.probability(file.getFileName().toString(), testBag);
-			entriesSortedByValues(probAllClasses);
+			MapUtil.sortByValuesDescending(probAllClasses);
 //			System.out.println(dclass + " = " + file.getFileName().toString() + ", probybility: " + probability + ". Probabilities: " + probAllClasses.entrySet());
 //			System.out.println(dclass + " = " + file.getFileName().toString() + "; Probabilities: " + probAllClasses.entrySet());
 			System.out.println(file.getFileName().toString() + " = Probabilities: " + probAllClasses.entrySet());
@@ -82,7 +85,7 @@ public class PoolExp {
 	}
 
 	@Test
-	public void test2() {
+	public void mathWithFloats() {
 		Float prod = new Float(1);
 		Float r = new Float(2);
 		prod *= r;
@@ -92,7 +95,7 @@ public class PoolExp {
 	
 	
 	@Test
-	public void test3() {
+	public void evaluateFloatInfinity() {
 		System.out.println(1.0f / 0.0f);
 		System.out.println(new Float("Infinity"));
 		System.out.println(Float.parseFloat("Infinity"));
@@ -103,7 +106,7 @@ public class PoolExp {
 	
 	
 	@Test
-	public void test() {
+	public void mathWithFloatsTwo() {
 		Float test = new Float(0);
 		System.out.println("Test: " + test);
 		test += 1;
@@ -116,74 +119,4 @@ public class PoolExp {
 		System.out.println("Test: " + test);
 	}
 	
-	
-	
-	@Test
-	public void test4() {
-		Map<String, Float> probAllClasses = new HashMap<>();
-		probAllClasses.put("E", 1f);
-		probAllClasses.put("D", 2.2f);
-		probAllClasses.put("C", 0.1f);
-		probAllClasses.put("B", 0.0001f);
-		probAllClasses.put("A", 0.03f);
-		System.out.println(entriesSortedByValues(probAllClasses));
-	}
-	
-	
-	
-	
-	private <K, V extends Comparable<? super V>> List<Entry<K, V>> entriesSortedByValues(
-			Map<K, V> map) {
-		return entriesSortedByValues(map, null);
-	}
-	
-	private <K, V extends Comparable<? super V>> List<Entry<K, V>> entriesSortedByValues(Map<K, V> map, final String direction) {
-
-		List<Entry<K, V>> sortedEntries = new ArrayList<Entry<K, V>>(map.entrySet());
-
-		Collections.sort(sortedEntries, new Comparator<Entry<K, V>>() {
-			@Override
-			public int compare(Entry<K, V> e1, Entry<K, V> e2) {
-				if (direction != null && direction.equals("asc")) {
-					return e1.getValue().compareTo(e2.getValue());
-				} else {
-					return e2.getValue().compareTo(e1.getValue());
-				}
-			}
-		});
-
-		return sortedEntries;
-	}
-	
-	
-	
-	private final class ProcessFile extends SimpleFileVisitor<Path> {
-		
-		private List<Path> files = new ArrayList<>();
-		private final String fileSuffix;
-		
-		public ProcessFile(String fileSuffix) {
-			this.fileSuffix = fileSuffix;
-		}
-		
-		public List<Path> getFiles() {
-			return files;
-		}
-		
-		@Override
-		public FileVisitResult visitFile(Path aFile, BasicFileAttributes aAttrs)
-				throws IOException {
-			String fileName = aFile.getFileName().toString();
-			if (fileName.substring(fileName.lastIndexOf(".")+1).equals(fileSuffix)) {
-				files.add(aFile);
-			}
-			return FileVisitResult.CONTINUE;
-		}
-
-		@Override
-		public FileVisitResult preVisitDirectory(Path aDir,
-				BasicFileAttributes aAttrs) throws IOException {
-			return FileVisitResult.CONTINUE;
-		}
-	}
 }
