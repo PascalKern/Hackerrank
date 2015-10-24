@@ -16,6 +16,7 @@ public class Testdata extends AbstractTestdata {
 
 	private DataGrid grid;
 	private DataGrid pattern;
+	private String exptected;
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -23,9 +24,20 @@ public class Testdata extends AbstractTestdata {
 		Testdata testdata = new Testdata();
 		testdata.grid = createGrid(scanner);
 		testdata.pattern = createGrid(scanner);
+		testdata.exptected = readExptectedResult(scanner);
 		return testdata;
 	}
 
+	@Override
+	public String getExpectedString() {
+		return exptected;
+	}
+	
+	@Override
+	public Object getExpected() {
+		return getExpectedString();
+	}
+	
 	public DataGrid getGrid() {
 		return grid;
 	}
@@ -39,6 +51,10 @@ public class Testdata extends AbstractTestdata {
 		int columns;
 		List<String> gridData;
 		try {
+			//Skip possible empty lines followed a test data block 
+			while (!scanner.hasNextInt()) {
+				scanner.nextLine();
+			}
 			rows = scanner.nextInt();
 			columns = scanner.nextInt();
 		} catch (Exception ex) {
@@ -60,6 +76,15 @@ public class Testdata extends AbstractTestdata {
 			throw new RuntimeException("Could not create rows! Error while processing input for row: " + (numberOfRows - rowCounter), ex);
 		}
 		return rows;
+	}
+
+	private String readExptectedResult(Scanner scanner) {
+		Integer numberOfResultLines = followedByExptectedResultLines(scanner);
+		if (null == numberOfResultLines) {
+			return null;
+		} else {
+			return scanner.next();
+		}
 	}
 
 }

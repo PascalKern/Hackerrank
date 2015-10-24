@@ -4,7 +4,12 @@ import static org.junit.Assert.*;
 import info.pkern.TestdataHandler;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.Test;
 
@@ -62,8 +67,24 @@ public class DataGridTest {
 		System.out.println("Test data grid 2:");
 		System.out.println("Contained: " + inputProcessor.getTestdata(1).getGrid().contains(inputProcessor.getTestdata(1).getPattern()));
 		
-		
-		
 	}
 	
+
+	@Test
+	public void testGridContainsWithDataFromFile() throws IOException {
+		Path file = Paths.get("test", getClass().getPackage().getName().replace(".", "/"), TestdataHandler.TESTDATA_FILE_NAME);
+		
+		assertTrue("The file with the testdata does not exist! [file: " + file.normalize().toAbsolutePath() +"]",
+				Files.exists(file, LinkOption.NOFOLLOW_LINKS));
+		
+		TestdataHandler<Testdata> inputHandler = new TestdataHandler<>(Testdata.class, file);
+		
+		String exptected;
+		String actual;
+		for (Testdata testdata : inputHandler.getAllTestdata()) {
+			exptected = testdata.getExpectedString();
+			actual = (testdata.getGrid().contains(testdata.getPattern()))?"YES":"NO";
+			assertEquals("Test #" + testdata.getTestNr(), actual, exptected);
+		}
+	}
 }

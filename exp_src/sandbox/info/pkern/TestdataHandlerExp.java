@@ -1,5 +1,7 @@
 package sandbox.info.pkern;
 
+import static org.junit.Assert.*;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -7,10 +9,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringReader;
+import java.net.URISyntaxException;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Scanner;
 
 import info.pkern.TestdataHandler;
+import info.pkern.algorithms.impl.gridSearch.localClasses.DataGridTest;
 import info.pkern.algorithms.impl.gridSearch.localClasses.Testdata;
 
 import org.junit.Test;
@@ -65,11 +73,29 @@ public class TestdataHandlerExp {
 //			System.out.println(charr);
 //		}
 		
-		TestdataHandler<Testdata> inputProcessor = new TestdataHandler<Testdata>(Testdata.class, in);
+		TestdataHandler<Testdata> inputHandler = new TestdataHandler<>(Testdata.class, in);
 		
-		System.out.println(inputProcessor.getTestdata(0).getGrid());
-		System.out.println(inputProcessor.getTestdata(0).getPattern());
+		System.out.println(inputHandler.getTestdata(0).getGrid());
+		System.out.println(inputHandler.getTestdata(0).getPattern());
 		
+	}
+	
+	@Test
+	public void testReadingInputWithExpectedResultsFromFile() throws IOException, URISyntaxException {
+		
+		Path file = Paths.get("test", DataGridTest.class.getPackage().getName().replace(".", "/"), "test_input.txt");
+		assertTrue(Files.exists(file, LinkOption.NOFOLLOW_LINKS));
+		
+		TestdataHandler<Testdata> inputHandler = new TestdataHandler<>(Testdata.class, file);
+		
+		System.out.println(inputHandler.getTestdata(0).getGrid());
+		System.out.println(inputHandler.getTestdata(0).getPattern());
+		System.out.println(inputHandler.getTestdata(0).containsExptectedResults());
+		System.out.println(inputHandler.getTestdata(0).getExpectedString());
+		System.out.println(inputHandler.getTestdata(1).getGrid());
+		System.out.println(inputHandler.getTestdata(1).getPattern());
+		System.out.println(inputHandler.getTestdata(1).containsExptectedResults());
+		System.out.println(inputHandler.getTestdata(1).getExpectedString());
 	}
 	
 }

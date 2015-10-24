@@ -2,6 +2,8 @@ package sandbox.info.pkern.experiments;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 
@@ -45,6 +47,27 @@ public class StringMatchingAndPositioning {
 		for (Integer colInt : testList) {
 			System.out.println(colInt);
 		}
+	}
+	
+	
+	@Test
+	public void testScannerMatchPattern() {
+		//Not Working!
+//		Pattern pattern = Pattern.compile("#expected \\d+$");
+//		Pattern pattern = Pattern.compile("#expected \\d+");
+//		Pattern pattern = Pattern.compile("^#expected#\\d+$");
+		Pattern pattern = Pattern.compile("_expected#\\d+");
+		String content = "erste zeile\n_expected#2\nerste resultat zeile\nzweite resultat zeile";
+		Scanner scanner = new Scanner(content);
+
+		System.out.println(scanner.delimiter());
+		System.out.println(pattern.pattern());
+		System.out.println(scanner.nextLine());
+		System.out.println(scanner.hasNext(pattern));
+		System.out.println(scanner.findInLine(pattern));
+		System.out.println(scanner.nextLine());
+		System.out.println(scanner.nextLine());
+		System.out.println(scanner.nextLine());
 	}
 	
 	
