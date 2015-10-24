@@ -58,6 +58,10 @@ public class TestdataHandler<T extends AbstractTestdata> {
 		return numberOfTests;
 	}
 	
+	public boolean testsMayContainExptectedResult() {
+		return mayContainExpectedResults;
+	}
+	
 	private int readNumberOfTests(Scanner scanner) {
 		try {
 			return Integer.parseInt(scanner.nextLine());

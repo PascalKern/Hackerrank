@@ -1,6 +1,7 @@
 package info.pkern.algorithms.impl.gridSearch.localClasses;
 
 import static org.junit.Assert.*;
+import info.pkern.LoggerConfiguration;
 import info.pkern.TestdataHandler;
 
 import java.io.ByteArrayInputStream;
@@ -10,7 +11,16 @@ import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Formatter;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DataGridTest {
@@ -70,6 +80,8 @@ public class DataGridTest {
 	}
 	
 
+	/*
+	 * Not nice because all tests after one failing will not be run!
 	@Test
 	public void testGridContainsWithDataFromFile() throws IOException {
 		Path file = Paths.get("test", getClass().getPackage().getName().replace(".", "/"), TestdataHandler.TESTDATA_FILE_NAME);
@@ -85,6 +97,53 @@ public class DataGridTest {
 			exptected = testdata.getExpectedString();
 			actual = (testdata.getGrid().contains(testdata.getPattern()))?"YES":"NO";
 			assertEquals("Test #" + testdata.getTestNr(), actual, exptected);
+		}
+	}
+	*/
+	
+	private static TestdataHandler<Testdata> inputHandler;
+	private Testdata testdata;
+	
+	@BeforeClass
+	public static void init() throws IOException {
+		LoggerConfiguration.enableSingleLineFineConsoleLogging();
+		
+		Path file = Paths.get("test", DataGridTest.class.getPackage().getName().replace(".", "/"), TestdataHandler.TESTDATA_FILE_NAME);
+		
+		assertTrue("The file with the testdata does not exist! [file: " + file.normalize().toAbsolutePath() +"]",
+				Files.exists(file, LinkOption.NOFOLLOW_LINKS));
+		
+		inputHandler = new TestdataHandler<>(Testdata.class, file);
+	}
+	
+	@Test
+	public void testOne() {
+		testdata = inputHandler.getAllTestdata().get(0);
+		String exptected  = testdata.getExpectedString();
+		String actual = evaluateResultString(testdata.getGrid().contains(testdata.getPattern()));
+		assertEquals("Test #" + testdata.getTestNr(), actual, exptected);
+	}
+	@Test
+	public void testTwo() {
+		testdata = inputHandler.getAllTestdata().get(1);
+		String exptected  = testdata.getExpectedString();
+		String actual = evaluateResultString(testdata.getGrid().contains(testdata.getPattern()));
+		assertEquals("Test #" + testdata.getTestNr(), actual, exptected);
+	}
+	@Test
+	public void testThree() {
+		testdata = inputHandler.getAllTestdata().get(2);
+		String exptected  = testdata.getExpectedString();
+		String actual = evaluateResultString(testdata.getGrid().contains(testdata.getPattern()));
+		assertNotEquals("Test #" + testdata.getTestNr(), actual, exptected);
+	}
+	
+	
+	private String evaluateResultString(boolean result) {
+		if (result) {
+			return "YES";
+		} else {
+			return "NO";
 		}
 	}
 }

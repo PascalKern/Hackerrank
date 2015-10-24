@@ -2,15 +2,19 @@ package info.pkern.algorithms.impl.gridSearch.localClasses;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class DataGrid {
 
+	private static Logger logger = Logger.getLogger(DataGrid.class.getName());
+	
 	private final int numberOfRows;
 	private final int numberOfColumns;
 	private final List<String> grid;
-	
-	private int matchedRow;
-	private int matchedColumn;
+
+	private Integer firstMatchedRow;
+	private Integer firstMatchedColumn;
 	
 	public DataGrid(int numberOfRows, int numberOfColumns, List<String> grid) {
 		this.numberOfRows = numberOfRows;
@@ -22,17 +26,23 @@ public class DataGrid {
 	
 	public boolean contains(DataGrid pattern) {
 		
-		List<Integer> matchOfIndices;
+		List<Integer> matchOfColumneIndices;
 		boolean contained = false;
-		int currentGridRow = 0;	//matchedRow
+		int currentGridRow = 0;
 		
 		while (!contained && currentGridRow < numberOfRows && pattern.numberOfRows <= numberOfRows - currentGridRow) {
-			matchOfIndices = getMatches(grid.get(currentGridRow), pattern.grid.get(0));
-			for (Integer matchOf : matchOfIndices) {	//matchedColumn
-				contained = checkSubrowMatches(matchOf, pattern, currentGridRow);
+			matchOfColumneIndices = getMatches(grid.get(currentGridRow), pattern.grid.get(0));
+			for (Integer matchOfColumneIndex : matchOfColumneIndices) {
+				firstMatchedColumn = matchOfColumneIndex;
+				contained = checkSubrowMatches(matchOfColumneIndex, pattern, currentGridRow);
+				if (contained) {
+					break;
+				}
 			}
 			currentGridRow++;
 		}
+		
+		firstMatchedRow = currentGridRow - 1;
 		
 		return contained;
 	}
@@ -46,10 +56,10 @@ public class DataGrid {
 			String gridRow = grid.get(startRowInGrid);
 			contained = matches(gridRow, pattern.grid.get(startRowInGrid - startRow), matchOfColumnIndex);
 			if (contained) {
-				System.out.println(String.format("String: '%s' %-26s %-10s in column: %05d, row: %05d.", 
+				logger.fine(String.format("String: '%s' %-26s %-10s in column: %05d, row: %05d.", 
 						gridRow , "contains pattern:", pattern.grid.get(startRowInGrid - startRow), matchOfColumnIndex, startRowInGrid));
 			} else {
-				System.out.println(String.format("String: '%s' %-26s %-10s in column: %05d, row: %05d.", 
+				logger.fine(String.format("String: '%s' %-26s %-10s in column: %05d, row: %05d.", 
 						gridRow , "does NOT contain pattern:", pattern.grid.get(startRowInGrid - startRow), matchOfColumnIndex, startRowInGrid));
 			}
 			startRowInGrid++;
@@ -70,10 +80,10 @@ public class DataGrid {
 			while (0 <= (matchPos = content.indexOf(pattern, matchPos + 1))) {
 				matchPositions.add(matchPos);
 			}
-			System.out.println(String.format("String: '%s' %-25s  %-10s at position(s): %s.", content, 
+			logger.fine(String.format("String: '%s' %-25s  %-10s at position(s): %s.", content, 
 					"contains pattern:", pattern, matchPositions));			
 		} else {
-			System.out.println(String.format("String: '%s' %-25s  %-10s [%s].", content, "does NOT contain pattern:", 
+			logger.fine(String.format("String: '%s' %-25s  %-10s [%s].", content, "does NOT contain pattern:", 
 					pattern, matchPositions));
 		}
 		return matchPositions;
