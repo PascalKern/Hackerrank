@@ -24,7 +24,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-public class DocClassificationSolutionExp {
+public class SimulateSolutionDocClassificationExp {
 
 	private final String TRAININGS_DATA_FILE = "orig_trainingdata.txt";
 	private final Integer TESTS_COUNT = 10;
