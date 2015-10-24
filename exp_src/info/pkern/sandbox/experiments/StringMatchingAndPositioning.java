@@ -1,4 +1,4 @@
-package sandbox.info.pkern.experiments;
+package info.pkern.sandbox.experiments;
 
 import java.util.ArrayList;
 import java.util.List;

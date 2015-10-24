@@ -27,15 +27,20 @@ public class Solution {
     	
     	TestdataHandler<Testdata> inputProcessor = new TestdataHandler<>(Testdata.class, System.in);
     	
+    	boolean testResult;
     	for (Testdata testdata : inputProcessor.getAllTestdata()) {
-    		if (testdata.getGrid().contains(testdata.getPattern())) {
-    			System.out.println("YES");
-    		} else {
-    			System.out.println("NO");
-    		}
+    		testResult = testdata.getGrid().contains(testdata.getPattern());
+    		System.out.println(evaluateHackerrankResultString(testResult));
     	}
     	
     }
     
+	public static String evaluateHackerrankResultString(boolean result) {
+		if (result) {
+			return "YES";
+		} else {
+			return "NO";
+		}
+	}
     
 }

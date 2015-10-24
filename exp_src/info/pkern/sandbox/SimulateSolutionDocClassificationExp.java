@@ -1,4 +1,4 @@
-package sandbox.info.pkern;
+package info.pkern.sandbox;
 
 import info.pkern.ai.statistic_ml.documentClassification.Solution;
 
