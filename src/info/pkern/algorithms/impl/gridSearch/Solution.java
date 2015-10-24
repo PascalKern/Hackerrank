@@ -6,8 +6,8 @@ package info.pkern.algorithms.impl.gridSearch;
  * ============================================================================
  */
 
-import info.pkern.TestdataInputProcessor;
-import info.pkern.algorithms.impl.gridSearch.localClasses.GridSearchTestData;
+import info.pkern.TestdataHandler;
+import info.pkern.algorithms.impl.gridSearch.localClasses.Testdata;
 
 import java.io.*;
 import java.util.*;
@@ -25,9 +25,9 @@ public class Solution {
 	
     public static void main(String[] args) {
     	
-    	TestdataInputProcessor<GridSearchTestData> inputProcessor = new TestdataInputProcessor<>(GridSearchTestData.class, System.in);
+    	TestdataHandler<Testdata> inputProcessor = new TestdataHandler<>(Testdata.class, System.in);
     	
-    	for (GridSearchTestData testdata : inputProcessor.getTestDatas()) {
+    	for (Testdata testdata : inputProcessor.getAllTestdata()) {
     		if (testdata.getGrid().contains(testdata.getPattern())) {
     			System.out.println("YES");
     		} else {

@@ -12,14 +12,14 @@ import java.util.Scanner;
 
 import info.pkern.AbstractTestdata;
 
-public class GridSearchTestData extends AbstractTestdata {
+public class Testdata extends AbstractTestdata {
 
 	private DataGrid grid;
 	private DataGrid pattern;
 
 	@Override
-	public GridSearchTestData newInstance(Scanner scanner) {
-		GridSearchTestData testdata = new GridSearchTestData();
+	public Testdata newInstance(Scanner scanner) {
+		Testdata testdata = new Testdata();
 		testdata.grid = createGrid(scanner);
 		testdata.pattern = createGrid(scanner);
 		return testdata;

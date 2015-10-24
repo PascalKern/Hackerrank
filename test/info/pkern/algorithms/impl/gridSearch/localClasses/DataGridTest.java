@@ -1,7 +1,7 @@
 package info.pkern.algorithms.impl.gridSearch.localClasses;
 
 import static org.junit.Assert.*;
-import info.pkern.TestdataInputProcessor;
+import info.pkern.TestdataHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -56,11 +56,11 @@ public class DataGridTest {
 	@Test
 	public void testGridContains() {
 		InputStream in = new ByteArrayInputStream(("2\n" + gridData10x10 + patternData3x4 + "\n" + gridData15x15 + patternData2x2).getBytes());
-		TestdataInputProcessor<GridSearchTestData> inputProcessor = new TestdataInputProcessor<GridSearchTestData>(GridSearchTestData.class, in);
+		TestdataHandler<Testdata> inputProcessor = new TestdataHandler<Testdata>(Testdata.class, in);
 		System.out.println("Test data grid 1:");
-		System.out.println("Contained: " + inputProcessor.getTestData(0).getGrid().contains(inputProcessor.getTestData(0).getPattern()));
+		System.out.println("Contained: " + inputProcessor.getTestdata(0).getGrid().contains(inputProcessor.getTestdata(0).getPattern()));
 		System.out.println("Test data grid 2:");
-		System.out.println("Contained: " + inputProcessor.getTestData(1).getGrid().contains(inputProcessor.getTestData(1).getPattern()));
+		System.out.println("Contained: " + inputProcessor.getTestdata(1).getGrid().contains(inputProcessor.getTestdata(1).getPattern()));
 		
 		
 		

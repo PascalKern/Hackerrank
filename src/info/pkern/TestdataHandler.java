@@ -1,6 +1,6 @@
 package info.pkern;
 
-import info.pkern.algorithms.impl.gridSearch.localClasses.GridSearchTestData;
+import info.pkern.algorithms.impl.gridSearch.localClasses.Testdata;
 
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -12,24 +12,24 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class TestdataInputProcessor<T extends AbstractTestdata> {
+public class TestdataHandler<T extends AbstractTestdata> {
 
 	private final int numberOfTests;
-	private List<T> testData;
+	private List<T> testdata;
 	
 	
-	public TestdataInputProcessor(Class<T> clazz, InputStream in) {
+	public TestdataHandler(Class<T> clazz, InputStream in) {
 		Scanner scanner = new Scanner(in);
 		numberOfTests = readNumberOfTests(scanner);
-		testData = createTestData(clazz, scanner);
+		testdata = createTestData(clazz, scanner);
 	}
 
-	public List<T> getTestDatas() {
-		return new ArrayList<>(testData);
+	public List<T> getAllTestdata() {
+		return new ArrayList<>(testdata);
 	}
 	
-	public T getTestData(int index) {
-		return testData.get(index);
+	public T getTestdata(int index) {
+		return testdata.get(index);
 	}
 	
 	public int getNumberOfTests() {

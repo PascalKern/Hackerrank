@@ -10,8 +10,8 @@ import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.Scanner;
 
-import info.pkern.TestdataInputProcessor;
-import info.pkern.algorithms.impl.gridSearch.localClasses.GridSearchTestData;
+import info.pkern.TestdataHandler;
+import info.pkern.algorithms.impl.gridSearch.localClasses.Testdata;
 
 import org.junit.Test;
 
@@ -65,10 +65,10 @@ public class TestGridSearchDatainputProcessor {
 //			System.out.println(charr);
 //		}
 		
-		TestdataInputProcessor<GridSearchTestData> inputProcessor = new TestdataInputProcessor<GridSearchTestData>(GridSearchTestData.class, in);
+		TestdataHandler<Testdata> inputProcessor = new TestdataHandler<Testdata>(Testdata.class, in);
 		
-		System.out.println(inputProcessor.getTestData(0).getGrid());
-		System.out.println(inputProcessor.getTestData(0).getPattern());
+		System.out.println(inputProcessor.getTestdata(0).getGrid());
+		System.out.println(inputProcessor.getTestdata(0).getPattern());
 		
 	}
 	
