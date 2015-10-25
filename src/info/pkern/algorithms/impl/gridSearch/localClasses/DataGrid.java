@@ -7,7 +7,8 @@ import java.util.logging.Logger;
 
 public class DataGrid {
 
-	private static Logger logger = Logger.getLogger(DataGrid.class.getName());
+//	private static Logger logger = Logger.getLogger(DataGrid.class.getName());
+	private static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DataGrid.class.getName());
 	
 	private final int numberOfRows;
 	private final int numberOfColumns;
@@ -15,14 +16,13 @@ public class DataGrid {
 
 	private Integer firstMatchedRow;
 	private Integer firstMatchedColumn;
-	
+
 	public DataGrid(int numberOfRows, int numberOfColumns, List<String> grid) {
 		this.numberOfRows = numberOfRows;
 		this.numberOfColumns = numberOfColumns;
 		this.grid = grid;
 		validateGridShape();
 	}
-	
 	
 	public boolean contains(DataGrid pattern) {
 		
@@ -68,14 +68,9 @@ public class DataGrid {
 	}
 
 
-	/*
-	 * Better return a empty List instead of null?!
-	 */
 	private List<Integer> getMatches(String content, String pattern) {
 		List<Integer> matchPositions = new ArrayList<>();
-//		List<Integer> matchPositions = null;
 		if (content.contains(pattern)) {
-//			matchPositions = new ArrayList<>();
 			Integer matchPos = -1;
 			while (0 <= (matchPos = content.indexOf(pattern, matchPos + 1))) {
 				matchPositions.add(matchPos);
@@ -92,23 +87,42 @@ public class DataGrid {
 	private boolean matches(String content, String pattern, int ofColumnIndex) {
 		int matchedIndex = -1;
 		if (content.contains(pattern)) {
-//			matchedIndex = content.indexOf(pattern, ofIndex);
 			matchedIndex = content.indexOf(pattern, ofColumnIndex);
-//			System.out.println(String.format("String: '%s' %-26s %-10s in column: %05d.",content , "contains pattern:", pattern, ofColumnIndex));
-//			matchedIndex -= ofIndex;
+			logger.finer(String.format("String: '%s' %-26s %-10s in column: %05d.",content , "contains pattern:", pattern, ofColumnIndex));
 		} else {
-//			System.out.println(String.format("String: '%s' %-26s %-10s in column: %05d.",content , "does NOT contain pattern:", pattern, ofColumnIndex));
+			logger.finer(String.format("String: '%s' %-26s %-10s in column: %05d.",content , "does NOT contain pattern:", pattern, ofColumnIndex));
 		}
 		return ofColumnIndex == matchedIndex; 
 	}
 
-	/*
-	 * TODO Check every row for the correct amount of columns!
-	 */
 	private void validateGridShape() {
 		if (numberOfColumns != grid.get(0).length()) {
 			throw new IllegalStateException("Validation of testdata failed due of wrong number of "
-					+ "columns in 'grid'! [exptected:"+numberOfColumns+", effective:"+grid.get(0).length()+"]");
+					+ "columns in 'grid'! [exptected: "+numberOfColumns+", effective: "+grid.get(0).length()+"]");
 		}
+		for (int i = 0; i < grid.size(); i++) {
+			if (grid.get(i).length() != numberOfColumns) {
+				throw new IllegalStateException("Not not all rows of the grid have the same column counts!"
+						+ "[row: "+i+", columns actual: "+grid.get(i).length()+", exptectd: "+numberOfColumns+"]");
+			}
+		}
+	}
+	
+	public String gridToSimulationString(GridType type) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(numberOfRows).append(type.getShapeSizeSeparator()).append(numberOfColumns).append(System.lineSeparator());
+		for (int i = 0, j = 1; i < grid.size(); i++, j++) {
+			if (j < grid.size()) {
+				sb.append(grid.get(i)).append(System.lineSeparator());
+			} else {
+				sb.append(grid.get(i));
+			}
+		}
+		return sb.toString();
+	}
+	
+	@Override
+	public String toString() {
+		return gridToSimulationString(GridType.GRID);
 	}
 }

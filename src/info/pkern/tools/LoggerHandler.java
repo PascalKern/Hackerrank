@@ -1,4 +1,4 @@
-package info.pkern;
+package info.pkern.tools;
 
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;

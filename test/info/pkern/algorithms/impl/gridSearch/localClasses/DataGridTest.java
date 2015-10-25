@@ -1,9 +1,9 @@
 package info.pkern.algorithms.impl.gridSearch.localClasses;
 
 import static org.junit.Assert.*;
-import info.pkern.LoggerHandler;
 import info.pkern.TestdataHandler;
 import info.pkern.algorithms.impl.gridSearch.Solution;
+import info.pkern.tools.LoggerHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -37,7 +37,7 @@ public class DataGridTest {
 				TestdataHandler.TESTDATA_FILE_NAME);
 		assertTrue("The file with the testdata does not exist! [file: " + file.normalize().toAbsolutePath() +"]",
 				Files.exists(file, LinkOption.NOFOLLOW_LINKS));
-		testdataHandler = new TestdataHandler<>(Testdata.class, file);
+		testdataHandler = new TestdataHandler<>(Testdata.class, file.toFile());
 	}
 	
 	@Test

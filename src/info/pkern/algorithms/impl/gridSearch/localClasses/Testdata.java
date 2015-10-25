@@ -46,6 +46,13 @@ public class Testdata extends AbstractTestdata {
 		return pattern;
 	}
 	
+	@Override
+	public String getGridForSimulation() {
+		return grid.gridToSimulationString(GridType.GRID)
+				+System.lineSeparator()
+				+pattern.gridToSimulationString(GridType.PATTERN);
+	}
+	
 	private DataGrid createGrid(Scanner scanner) {
 		int rows;
 		int columns;
@@ -86,5 +93,4 @@ public class Testdata extends AbstractTestdata {
 			return scanner.next();
 		}
 	}
-
 }

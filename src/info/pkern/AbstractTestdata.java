@@ -18,6 +18,7 @@ public abstract class AbstractTestdata {
 	public abstract <T extends AbstractTestdata> T newInstance(Scanner scanner);
 	public abstract Object getExpected();
 	public abstract String getExpectedString();
+	public abstract String getGridForSimulation();
 	
 	public boolean containsExptectedResults() {
 		return containsExptectedResults;
