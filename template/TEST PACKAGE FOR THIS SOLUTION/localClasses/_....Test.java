@@ -1,4 +1,11 @@
 package info.pkern;
+/* ============================================================================
+ * Copyright (c) 2015 Pascal Kern
+ * 
+ * http://github.com/PascalKern/Hackerrank_java7
+ * http://www.pkern.info/
+ * ============================================================================
+ */
 
 import static org.junit.Assert.*;
 import info.pkern......Solution;
@@ -24,6 +31,10 @@ import java.util.logging.SimpleFormatter;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+/**
+ * @version 0.1 - (Hackerrank Solution-Environment)
+ * @author Pascal Kern
+ */
 public class ....Test {
 	
 	private static TestdataHandler<Testdata> testdataHandler;
