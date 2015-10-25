@@ -1,4 +1,11 @@
-package info.pkern.tools;
+package info.pkern.hackerrank.tools;
+/* ============================================================================
+ * Copyright (c) 2015 Pascal Kern
+ * 
+ * http://github.com/PascalKern/Hackerrank_java7
+ * http://www.pkern.info/
+ * ============================================================================
+ */
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -7,6 +14,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+/**
+ * @version 0.1 - (Hackerrank Solution-Tools)
+ * @author Pascal Kern
+ */
 public class MapUtil {
 
 	public static enum SORT_ORDER{ASC, DESC};

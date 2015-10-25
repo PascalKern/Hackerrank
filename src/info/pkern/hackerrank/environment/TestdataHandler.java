@@ -1,4 +1,11 @@
-package info.pkern;
+package info.pkern.hackerrank.environment;
+/* ============================================================================
+ * Copyright (c) 2015 Pascal Kern
+ * 
+ * http://github.com/PascalKern/Hackerrank_java7
+ * http://www.pkern.info/
+ * ============================================================================
+ */
 
 import info.pkern.algorithms.impl.gridSearch.localClasses.Testdata;
 
@@ -17,6 +24,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+/**
+ * @version 0.1 - (Hackerrank Solution-Environment)
+ * @author Pascal Kern
+ */
 public class TestdataHandler<T extends AbstractTestdata> {
 
 	public static final String TESTDATA_FILE_NAME = "test_input.txt";
@@ -39,18 +50,10 @@ public class TestdataHandler<T extends AbstractTestdata> {
 		this(clazz, in, false);
 	}
 
-//	public TestdataHandler(Class<T> clazz, Path testInput, boolean containsExptectedResults) throws IOException {
-//		this(clazz, Files.newInputStream(testInput, StandardOpenOption.READ), containsExptectedResults);
-//	}
-
 	public TestdataHandler(Class<T> clazz, File testInput, boolean containsExptectedResults) throws IOException {
 		this(clazz, new FileInputStream(testInput), containsExptectedResults);
 	}
 	
-//	public TestdataHandler(Class<T> clazz, Path testInput) throws IOException {
-//		this(clazz, testInput, false);
-//	}
-
 	public TestdataHandler(Class<T> clazz, File testInput) throws IOException {
 		this(clazz, testInput, false);
 	}

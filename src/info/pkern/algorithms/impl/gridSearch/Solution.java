@@ -14,7 +14,7 @@ import java.math.*;
 import java.util.regex.*;
 
 /**
- * @version 0.0.1
+ * @version 0.1 - (Hackerrank Solution-Environment)
  * @author Pascal Kern
  * @category Algorithms - Implementation
  * @see https://www.hackerrank.com/challenges/the-grid-search
@@ -314,18 +314,10 @@ public class Solution {
 			this(clazz, in, false);
 		}
 
-//		public TestdataHandler(Class<T> clazz, Path testInput, boolean containsExptectedResults) throws IOException {
-//			this(clazz, Files.newInputStream(testInput, StandardOpenOption.READ), containsExptectedResults);
-//		}
-
 		public TestdataHandler(Class<T> clazz, File testInput, boolean containsExptectedResults) throws IOException {
 			this(clazz, new FileInputStream(testInput), containsExptectedResults);
 		}
 		
-//		public TestdataHandler(Class<T> clazz, Path testInput) throws IOException {
-//			this(clazz, testInput, false);
-//		}
-
 		public TestdataHandler(Class<T> clazz, File testInput) throws IOException {
 			this(clazz, testInput, false);
 		}

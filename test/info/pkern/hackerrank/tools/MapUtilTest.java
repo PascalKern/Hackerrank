@@ -1,8 +1,8 @@
-package info.pkern.tools;
+package info.pkern.hackerrank.tools;
 
 import static org.junit.Assert.*;
-import info.pkern.tools.MapUtil;
-import info.pkern.tools.MapUtil.SORT_ORDER;
+import info.pkern.hackerrank.tools.MapUtil;
+import info.pkern.hackerrank.tools.MapUtil.SORT_ORDER;
 
 import java.util.HashMap;
 import java.util.List;

@@ -1,8 +1,19 @@
-package info.pkern.tools;
+package info.pkern.hackerrank.tools;
+/* ============================================================================
+ * Copyright (c) 2015 Pascal Kern
+ * 
+ * http://github.com/PascalKern/Hackerrank_java7
+ * http://www.pkern.info/
+ * ============================================================================
+ */
 
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
+/**
+ * @version 0.1 - (Hackerrank Solution-Tools)
+ * @author Pascal Kern
+ */
 public class SolutionSimulator implements Runnable {
 
 	private InputStream oldSystemIn = System.in;

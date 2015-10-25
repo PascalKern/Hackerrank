@@ -1,9 +1,9 @@
 package info.pkern.algorithms.impl.gridSearch.localClasses;
 
 import static org.junit.Assert.*;
-import info.pkern.TestdataHandler;
 import info.pkern.algorithms.impl.gridSearch.Solution;
-import info.pkern.tools.LoggerHandler;
+import info.pkern.hackerrank.environment.TestdataHandler;
+import info.pkern.hackerrank.tools.LoggerHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
