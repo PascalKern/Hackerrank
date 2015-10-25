@@ -9,7 +9,7 @@
 /**
  * @version 0.1 - (Hackerrank Solution-Environment)
  * @author Pascal Kern
- * @category Template classes for Hackerrank chalngnges
+ * @category Template classes for Hackerrank challenges
  * @see https://www.hackerrank.com/challenges/
  */
 
