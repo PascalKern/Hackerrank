@@ -41,6 +41,18 @@ public class DataGridTest {
 	}
 	
 	@Test
+	public void testAllInTestdata() {
+		LoggerHandler.disableLogging();
+		for (Testdata testdata : testdataHandler.getAllTestdata()) {
+			String exptected  = testdata.getExpectedString();
+			String actual = Solution.evaluateHackerrankResultString(testdata.getGrid().contains(testdata.getPattern()));
+			String position = testdata.getGrid().positionWhereGridContainsPattern(testdata.getPattern());
+			System.out.println(String.format("Test # %02d: Expected: %6s, Actual: %6s. Matched at: %s", testdata.getTestNr(), exptected, actual, position));
+			assertEquals("Test #" + testdata.getTestNr(), exptected, actual);
+		}
+	}
+	
+	@Test
 	public void testPatternContained() {
 		testdata = testdataHandler.getAllTestdata().get(0);
 		String exptected  = testdata.getExpectedString();
@@ -57,10 +69,10 @@ public class DataGridTest {
 	}
 	
 	@Test
-	public void testWrongTestResultInTestdataFile() {
-		testdata = testdataHandler.getAllTestdata().get(2);
+	public void testPatternEqualsGrid() {
+		testdata = testdataHandler.getAllTestdata().get(8);
 		String exptected  = testdata.getExpectedString();
 		String actual = Solution.evaluateHackerrankResultString(testdata.getGrid().contains(testdata.getPattern()));
-		assertNotEquals("Test #" + testdata.getTestNr(), actual, exptected);
+		assertEquals("Test #" + testdata.getTestNr(), actual, exptected);
 	}
 }

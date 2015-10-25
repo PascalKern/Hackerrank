@@ -6,8 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class DataGrid {
-
-//	private static Logger logger = Logger.getLogger(DataGrid.class.getName());
+	//Must be full qualified to not an additional import java.util.logging.*; to the Solution class! 
 	private static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DataGrid.class.getName());
 	
 	private final int numberOfRows;
@@ -47,6 +46,14 @@ public class DataGrid {
 		return contained;
 	}
 
+	public String positionWhereGridContainsPattern(DataGrid pattern) {
+		if (contains(pattern)) {
+			return String.format("row: %-3s, column: %-3s", firstMatchedRow, firstMatchedColumn);
+		} else {
+			return "Grid does NOT contain the pattern!";
+		}
+	}
+	
 	private boolean checkSubrowMatches(Integer matchOfColumnIndex, DataGrid pattern, int startRow) {
 		
 		boolean contained = true;
@@ -98,7 +105,8 @@ public class DataGrid {
 	private void validateGridShape() {
 		if (numberOfColumns != grid.get(0).length()) {
 			throw new IllegalStateException("Validation of testdata failed due of wrong number of "
-					+ "columns in 'grid'! [exptected: "+numberOfColumns+", effective: "+grid.get(0).length()+"]");
+					+ "columns in 'grid'! [exptected: "+numberOfColumns+", effective: "+grid.get(0).length()
+					+ "grid: "+grid.toString()+"]");
 		}
 		for (int i = 0; i < grid.size(); i++) {
 			if (grid.get(i).length() != numberOfColumns) {

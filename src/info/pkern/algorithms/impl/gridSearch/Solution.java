@@ -2,15 +2,14 @@ package info.pkern.algorithms.impl.gridSearch;
 /* ============================================================================
  * Copyright (c) 2015 Pascal Kern
  * 
+ * http://github.com/PascalKern/Hackerrank_java7
  * http://www.pkern.info/
  * ============================================================================
  */
 
-
 import java.io.*;
 import java.util.*;
 import java.text.*;
-import java.lang.reflect.InvocationTargetException;
 import java.math.*;
 import java.util.regex.*;
 
@@ -20,6 +19,7 @@ import java.util.regex.*;
  * @category Algorithms - Implementation
  * @see https://www.hackerrank.com/challenges/the-grid-search
  */
+@SuppressWarnings("unused")
 public class Solution {
 	
     public static void main(String[] args) {
@@ -52,8 +52,7 @@ public class Solution {
 	 **************************************************************************************************************/
 //	public class DataGrid {
 	private static class DataGrid {
-
-//		private static Logger logger = Logger.getLogger(DataGrid.class.getName());
+		//Must be full qualified to not an additional import java.util.logging.*; to the Solution class! 
 		private static java.util.logging.Logger logger = java.util.logging.Logger.getLogger(DataGrid.class.getName());
 		
 		private final int numberOfRows;
@@ -93,6 +92,14 @@ public class Solution {
 			return contained;
 		}
 
+		public String positionWhereGridContainsPattern(DataGrid pattern) {
+			if (contains(pattern)) {
+				return String.format("row: %-3s, column: %-3s", firstMatchedRow, firstMatchedColumn);
+			} else {
+				return "Grid does NOT contain the pattern!";
+			}
+		}
+		
 		private boolean checkSubrowMatches(Integer matchOfColumnIndex, DataGrid pattern, int startRow) {
 			
 			boolean contained = true;
@@ -144,7 +151,8 @@ public class Solution {
 		private void validateGridShape() {
 			if (numberOfColumns != grid.get(0).length()) {
 				throw new IllegalStateException("Validation of testdata failed due of wrong number of "
-						+ "columns in 'grid'! [exptected: "+numberOfColumns+", effective: "+grid.get(0).length()+"]");
+						+ "columns in 'grid'! [exptected: "+numberOfColumns+", effective: "+grid.get(0).length()
+						+ "grid: "+grid.toString()+"]");
 			}
 			for (int i = 0; i < grid.size(); i++) {
 				if (grid.get(i).length() != numberOfColumns) {
@@ -172,9 +180,12 @@ public class Solution {
 			return gridToSimulationString(GridType.GRID);
 		}
 	}
-	
-	public enum GridType {
-		GRID(" "), PATTERN("\t");
+
+//	public enum GridType {	
+	private enum GridType {
+		
+		GRID(" "), 
+		PATTERN("\t");
 
 		private String shapeSizeSeparator;
 
@@ -373,14 +384,15 @@ public class Solution {
 					testData.add(test);
 				}
 			} catch (InstantiationException | IllegalAccessException
-					| InvocationTargetException | NoSuchMethodException
+					| java.lang.reflect.InvocationTargetException | NoSuchMethodException
 					| IllegalArgumentException | SecurityException ex) {
 				throw new RuntimeException("Could not create test datas!", ex);
 			}
 			return testData;
 		}
 	}
-	
+
+//	public abstract class AbstractTestdata {
 	private abstract class AbstractTestdata {
 		
 		private final Pattern numberOfExptectedResultLines = Pattern.compile("_expected#\\d+");

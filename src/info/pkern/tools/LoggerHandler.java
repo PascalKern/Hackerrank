@@ -17,11 +17,19 @@ public class LoggerHandler {
 
 		LogManager.getLoggingMXBean().setLoggerLevel("", Level.FINE.toString());
 		
+		setAllLogHanderLevels(Level.FINE);
+	}
+
+	private static void setAllLogHanderLevels(Level level) {
 		for (Handler handler : Logger.getLogger("").getHandlers()) {
 			if (handler instanceof ConsoleHandler) {
-				handler.setLevel(Level.FINE);
+				handler.setLevel(level);
 			}
 		}
+	}
+
+	public static void disableLogging() {
+		setAllLogHanderLevels(Level.OFF);
 	}
 	
 }
