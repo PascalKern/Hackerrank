@@ -16,7 +16,7 @@ import java.util.regex.*;
 /**
  * @version 0.1 - (Hackerrank Solution-Environment)
  * @author Pascal Kern
- * @category Algorithms - Implementation
+ * @category Algorithms - Implementation: The Grid Search
  * @see https://www.hackerrank.com/challenges/the-grid-search
  */
 @SuppressWarnings("unused")
