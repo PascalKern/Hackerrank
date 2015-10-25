@@ -109,6 +109,7 @@ public class TestdataHandler<T extends AbstractTestdata> {
 				testData.add(test);
 			}
 		} catch (InstantiationException | IllegalAccessException
+//				| InvocationTargetException | NoSuchMethodException
 				| IllegalArgumentException | SecurityException ex) {
 			throw new RuntimeException("Could not create test datas!", ex);
 		}

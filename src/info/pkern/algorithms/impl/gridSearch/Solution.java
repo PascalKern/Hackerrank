@@ -10,6 +10,7 @@ package info.pkern.algorithms.impl.gridSearch;
 import java.io.*;
 import java.util.*;
 import java.text.*;
+import java.lang.reflect.InvocationTargetException;
 import java.math.*;
 import java.util.regex.*;
 
@@ -363,15 +364,16 @@ public class Solution {
 				while (testCounter > 0) {
 					testCounter--;
 					//Works only when Testdata implementation is not a inner class!
-					test = clazz.newInstance();
+//					test = clazz.newInstance();
 					//Solution to be used when Testdata implementation is an inner class of Solution!
-//					test = clazz.getConstructor(Solution.class).newInstance(new Solution());
+					test = clazz.getConstructor(Solution.class).newInstance(new Solution());
 					test = test.newInstance(scanner);
 					mayContainExpectedResults = test.containsExptectedResults();
 					test.setTestNr(numberOfTests - testCounter);
 					testData.add(test);
 				}
 			} catch (InstantiationException | IllegalAccessException
+					| InvocationTargetException | NoSuchMethodException
 					| IllegalArgumentException | SecurityException ex) {
 				throw new RuntimeException("Could not create test datas!", ex);
 			}
