@@ -1,9 +1,10 @@
 package info.pkern.algorithms.impl.gridSearch;
 
-import info.pkern.TestdataHandler;
+import info.pkern.algorithms.impl.gridSearch.Solution;
 import info.pkern.algorithms.impl.gridSearch.localClasses.DataGridTest;
 import info.pkern.algorithms.impl.gridSearch.localClasses.Testdata;
-import info.pkern.tools.SolutionSimulator;
+import info.pkern.hackerrank.environment.TestdataHandler;
+import info.pkern.hackerrank.tools.SolutionSimulator;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class Simulation {
+public class SimulationApp {
 
 	public static void main(String[] args) throws IOException {
 		Path file = Paths.get("test", DataGridTest.class.getPackage().getName().replace(".", "/"), 

@@ -1,30 +1,17 @@
-package info.pkern.ai.statistic_ml.documentClassification.localClasses;
+package info.pkern.sandbox.ai.statistic_ml.documentClassification.localClasses;
 
-import static org.junit.Assert.*;
-import info.pkern.tools.MapUtil;
-import info.pkern.tools.RecursiveSimpleFileVisitor;
-import info.pkern.tools.MapUtil.SORT_ORDER;
+import static org.junit.Assert.assertFalse;
+import info.pkern.ai.statistic_ml.documentClassification.localClasses.BagOfWords;
+import info.pkern.ai.statistic_ml.documentClassification.localClasses.Pool;
+import info.pkern.hackerrank.tools.MapUtil;
+import info.pkern.hackerrank.tools.RecursiveSimpleFileVisitor;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.StringTokenizer;
 
 import org.junit.Test;
 

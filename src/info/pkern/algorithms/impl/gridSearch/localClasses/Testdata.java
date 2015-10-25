@@ -1,5 +1,7 @@
 package info.pkern.algorithms.impl.gridSearch.localClasses;
 
+import info.pkern.hackerrank.environment.AbstractTestdata;
+
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.IOException;
@@ -9,8 +11,6 @@ import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-
-import info.pkern.AbstractTestdata;
 
 public class Testdata extends AbstractTestdata {
 
@@ -47,7 +47,7 @@ public class Testdata extends AbstractTestdata {
 	}
 	
 	@Override
-	public String getGridForSimulation() {
+	public String getStringForSimulation() {
 		return grid.gridToSimulationString(GridType.GRID)
 				+System.lineSeparator()
 				+pattern.gridToSimulationString(GridType.PATTERN);
