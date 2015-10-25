@@ -42,7 +42,7 @@ public class Testdata extends AbstractTestdata {
 	}
 	
 	@Override
-	public String getGridForSimulation() {
+	public String getStringForSimulation() {
 		throw new RuntimeException("Not yet implemented!");
 	}
 }
