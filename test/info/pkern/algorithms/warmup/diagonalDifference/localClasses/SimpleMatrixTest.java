@@ -23,6 +23,13 @@ public class SimpleMatrixTest {
 		
 		SimpleMatrix sm = new SimpleMatrix(matrixData);
 		System.out.println(sm);
+		
+		assertEquals(Arrays.asList(new Integer[]{1,5,8}), sm.getMainDiagonal());
+		assertEquals(Arrays.asList(new Integer[]{3,5,6}), sm.getAntiDiagonal());
+		Integer expected = new Integer(14);
+		assertEquals(expected, sm.getMainDiagonalSum());
+		assertEquals(expected, sm.getAntidiagonalSum());
+		
 	}
 
 	@Test
@@ -40,6 +47,12 @@ public class SimpleMatrixTest {
 		
 		SimpleMatrix sm = new SimpleMatrix(matrixData);
 		System.out.println(sm);
+		
+		assertEquals(Arrays.asList(new Integer[]{1,6,2,7}), sm.getMainDiagonal());
+		assertEquals(Arrays.asList(new Integer[]{4,7,1,4}), sm.getAntiDiagonal());
+		Integer expected = new Integer(16);
+		assertEquals(expected, sm.getMainDiagonalSum());
+		assertEquals(expected, sm.getAntidiagonalSum());
 	}
 
 	@Test
@@ -55,6 +68,12 @@ public class SimpleMatrixTest {
 		
 		SimpleMatrix sm = new SimpleMatrix(matrixData);
 		System.out.println(sm);
+		
+		assertEquals(Arrays.asList(new Integer[]{1,5,8}), sm.getMainDiagonal());
+		assertEquals(Arrays.asList(new Integer[]{3,5,6}), sm.getAntiDiagonal());
+		Integer expected = new Integer(14);
+		assertEquals(expected, sm.getMainDiagonalSum());
+		assertEquals(expected, sm.getAntidiagonalSum());
 	}
 
 	@Test
@@ -72,5 +91,11 @@ public class SimpleMatrixTest {
 		
 		SimpleMatrix sm = new SimpleMatrix(matrixData);
 		System.out.println(sm);
+		
+		assertEquals(Arrays.asList(new Integer[]{1,5,8}), sm.getMainDiagonal());
+		assertEquals(Arrays.asList(new Integer[]{3,5,6}), sm.getAntiDiagonal());
+		Integer expected = new Integer(14);
+		assertEquals(expected, sm.getMainDiagonalSum());
+		assertEquals(expected, sm.getAntidiagonalSum());
 	}
 }
