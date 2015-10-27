@@ -40,7 +40,7 @@ public class Solution {
 		private final List<Integer> numbers;
 		
 		public ArrayTotalizer(String testdata) {
-			numbers = convertStringToIntArray(testdata.split(" "));
+			numbers = ListTypeConverter.toInteger(testdata.split(" "));
 		}
 
 		public Integer sumListIterative() {
@@ -73,13 +73,22 @@ public class Solution {
 				return sum + sumListRecursive(numbers.subList(1, numbers.size()));
 			}
 		}
+	}
+	
+	
+	/* ************************************************************************************************************
+	 * General helper classes for the submission of a hackerrank solution. When working on the solution locally
+	 * those classes are available within the project. 
+	 **************************************************************************************************************/
+	private static class ListTypeConverter {
 
-		private List<Integer> convertStringToIntArray(String[] strings) {
-			List<Integer> intList = new ArrayList<>(strings.length);
-			for (int i = 0; i < strings.length; i++) {
-				intList.add(Integer.parseInt(strings[i]));
+		public static List<Integer> toInteger(String[] stringArray) {
+			List<Integer> integerList = new ArrayList<>(stringArray.length);
+			for (int i = 0; i < stringArray.length; i++) {
+				integerList.add(Integer.parseInt(stringArray[i]));
 			}
-			return intList;
+			return integerList;
 		}
 	}
+
 }
