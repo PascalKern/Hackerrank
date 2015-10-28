@@ -29,7 +29,10 @@ public class Solution {
     		values = Arrays.asList(scanner.nextLine().split(" "));
     	}
     	Collections.reverse(values);
-    	System.out.println(values);
+    	String result = values.toString().replace(" ", "").replace(",", " ");
+    	result = result.replace("[", "").replace("]", "");
+    	System.out.println(result);
+    	
     }
     
     
