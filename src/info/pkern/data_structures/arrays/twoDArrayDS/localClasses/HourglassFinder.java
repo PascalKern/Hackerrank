@@ -2,9 +2,11 @@ package info.pkern.data_structures.arrays.twoDArrayDS.localClasses;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class HourglassFinder {
@@ -27,7 +29,7 @@ public class HourglassFinder {
 		if (hourglassSums.keySet().contains(topLeftHourglassIndex)) {
 			return hourglassSums.get(topLeftHourglassIndex);
 		} else { 
-			return null;
+			throw new NoSuchElementException("No hourglass found for index: " + topLeftHourglassIndex);
 		}
 	}
 	
@@ -37,7 +39,12 @@ public class HourglassFinder {
 
 	public Integer getMaxHourglasSum() {
 		List<Integer> values = new ArrayList<>(hourglassSums.values()); 
-		Collections.sort(values);
+		Collections.sort(values, new Comparator<Integer>() {
+			@Override
+			public int compare(Integer o1, Integer o2) {
+				return o2.intValue() - o1.intValue();
+			}
+		});
 		return values.get(0);
 	}
 
@@ -45,14 +52,10 @@ public class HourglassFinder {
 		boolean isHourglass = false;
 		int bottomLeftHourglasIndex = 2 * gridSize + topLeftHourglassIndex;
 		
-		isHourglass = grid.get(topLeftHourglassIndex) > 0;
-		isHourglass = grid.size() >= bottomLeftHourglasIndex;
-		
+		isHourglass = grid.get(topLeftHourglassIndex) > 0
+				&& grid.size() > bottomLeftHourglasIndex + 2;
 		if (isHourglass) {
-			isHourglass = grid.get(gridSize + topLeftHourglassIndex) > 0;
-//					&& grid.get(gridSize + topLeftHourglassIndex + 2) == 0; and, or
-//					&& grid.get(gridSize + topLeftHourglassIndex + 1) > 0 
-//					&& grid.get(bottomLeftHourglasIndex) > 0;
+			isHourglass = grid.get(bottomLeftHourglasIndex) > 0;
 		}
 		return isHourglass;
 	}
@@ -60,7 +63,6 @@ public class HourglassFinder {
 	private Map<Integer, Integer> findHourglassesAndSum() {
 		Map<Integer, Integer> hourglassSums = new HashMap<>();
 		for (int i = 0; i < grid.size(); i++) {
-//			int currentHourglassIndex = grid.get(i);
 			if (isHourglassAt(i)) {
 				hourglassSums.put(i, calculateHourglassSum(i));
 			}
