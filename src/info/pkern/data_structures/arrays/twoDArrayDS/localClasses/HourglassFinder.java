@@ -39,23 +39,40 @@ public class HourglassFinder {
 
 	public Integer getMaxHourglasSum() {
 		List<Integer> values = new ArrayList<>(hourglassSums.values()); 
-		Collections.sort(values, new Comparator<Integer>() {
-			@Override
-			public int compare(Integer o1, Integer o2) {
-				return o2.intValue() - o1.intValue();
-			}
-		});
-		return values.get(0);
+		if(values.isEmpty()) {
+			return 0;
+		} else {
+			Collections.sort(values, new Comparator<Integer>() {
+				@Override
+				public int compare(Integer o1, Integer o2) {
+					return o2.intValue() - o1.intValue();
+				}
+			});
+			return values.get(0);
+		}
 	}
 
+	private boolean isHourglassPossibleAt(int topLeftHourglassIndex) {
+		boolean isHourglass = false;
+		int bottomLeftHourglasIndex = 2 * gridSize + topLeftHourglassIndex;
+		int maxColumnIndexOnThisRow = ((int)(topLeftHourglassIndex / gridSize) * gridSize) + (gridSize - 3);
+
+		isHourglass = grid.size() > bottomLeftHourglasIndex + 2;
+		if (isHourglass) {
+			isHourglass = topLeftHourglassIndex <= maxColumnIndexOnThisRow;
+		}
+		return isHourglass;
+	}
+	
 	private boolean isHourglassAt(int topLeftHourglassIndex) {
 		boolean isHourglass = false;
 		int bottomLeftHourglasIndex = 2 * gridSize + topLeftHourglassIndex;
 		
-		isHourglass = grid.get(topLeftHourglassIndex) > 0
-				&& grid.size() > bottomLeftHourglasIndex + 2;
+		isHourglass = grid.get(topLeftHourglassIndex) != 0
+				&& isHourglassPossibleAt(topLeftHourglassIndex);
+//				&& grid.size() > bottomLeftHourglasIndex + 2;
 		if (isHourglass) {
-			isHourglass = grid.get(bottomLeftHourglasIndex) > 0;
+			isHourglass = grid.get(bottomLeftHourglasIndex) != 0;
 		}
 		return isHourglass;
 	}
@@ -63,7 +80,8 @@ public class HourglassFinder {
 	private Map<Integer, Integer> findHourglassesAndSum() {
 		Map<Integer, Integer> hourglassSums = new HashMap<>();
 		for (int i = 0; i < grid.size(); i++) {
-			if (isHourglassAt(i)) {
+//			if (isHourglassAt(i)) {
+			if (isHourglassPossibleAt(i)) {
 				hourglassSums.put(i, calculateHourglassSum(i));
 			}
 		}
