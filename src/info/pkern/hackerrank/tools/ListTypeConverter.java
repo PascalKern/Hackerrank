@@ -12,5 +12,12 @@ public class ListTypeConverter {
 		}
 		return integerList;
 	}
-	
+
+	public static List<Integer> toInteger(List<String> stringList) {
+		List<Integer> integerList = new ArrayList<>(stringList.size());
+		for (String string : stringList) {
+			integerList.add(Integer.parseInt(string));
+		}
+		return integerList;
+	}
 }
