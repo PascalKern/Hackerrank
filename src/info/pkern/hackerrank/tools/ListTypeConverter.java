@@ -20,4 +20,15 @@ public class ListTypeConverter {
 		}
 		return integerList;
 	}
+	
+	public static <E> String toSpaceSeparatedString(List<E> list) {
+		StringBuilder sb = new StringBuilder();
+		for (E entry : list) {
+			sb.append(entry);
+			if (list.indexOf(entry) < list.size()) {
+				sb.append(" ");
+			}
+		}
+		return sb.toString();
+	}
 }
