@@ -15,6 +15,11 @@ public class DocumentTokanizerTest {
 			+ "of record as of april the company also said its board voted to recommend to shareholders at the "
 			+ "annual meeting april an increase in the authorized capital stock from five mln to mln shares reuter";
 
+	private final String TEST_STRING2 = "1 champion products ch approves stock split champion products inc said "
+			+ "its board of directors - approved a two, for one stock split of its common shares for shareholders "
+			+ "of record as of april \"the company\" also said: its board   voted to, recommend to shareholders at the "
+			+ "annual meeting april an increase in the authorized capital-stock from five mln to mln blub shares reuter";
+
 	private final DocumentTokanizer tokanizer = new DocumentTokanizer(TEST_STRING);
 	
 	
@@ -89,6 +94,14 @@ public class DocumentTokanizerTest {
 
 	@Test
 	public void testGetNumberOfTokens() throws Exception {
+		assertEquals("Tokenscount after opening the tokanizer is not correct!", new Integer(63), tokanizer.getNumberOfTokens());
+		tokanizer.addFilter(new MinLengthFilter(3));
+		assertEquals("Tokenscount after opening the tokanizer is not correct!", new Integer(49), tokanizer.getNumberOfTokens());
+	}
+
+	@Test
+	public void testGetNumberOfTokens2() throws Exception {
+		DocumentTokanizer tokanizer = new DocumentTokanizer(TEST_STRING2);
 		assertEquals("Tokenscount after opening the tokanizer is not correct!", new Integer(63), tokanizer.getNumberOfTokens());
 		tokanizer.addFilter(new MinLengthFilter(3));
 		assertEquals("Tokenscount after opening the tokanizer is not correct!", new Integer(49), tokanizer.getNumberOfTokens());

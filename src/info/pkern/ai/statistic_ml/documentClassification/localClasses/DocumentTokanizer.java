@@ -18,6 +18,7 @@ public class DocumentTokanizer {
 		this.text = text;
 	}
 	
+	@Deprecated
 	public DocumentTokanizer() {
 		this("");
 	}
@@ -60,9 +61,30 @@ public class DocumentTokanizer {
 		return tokens.size();
 	}
 	
+	//TODO Could also use some command classes (Analyzer) like with the filters to tokanize the string with different analyzers.
 	private List<String> tokanizeText(String text) {
 		
-		List<String> tokens = Arrays.asList(text.split("[\\s,\\.;:]"));
+		/* Could also replace ALL non character chars with a space and remove double spaces afterwards?! */
+		//Simplify the text
+		text = text.toLowerCase();
+		text = text.replaceAll("\\t", " ");
+		text = text.replaceAll("\\r\\n", " ");
+		
+		//Treat punctuation
+		text = text.replaceAll("\\b[,\\.:;!?] ", " ");
+		
+		//Treat text specific constructs - Experimental
+		text = text.replaceAll("\\b-\\b", "");
+		text = text.replaceAll("-", " ");
+		text = text.replaceAll("[\"]", "");
+		
+		//Normalize spacings
+		text = text.replaceAll(" {1,}", " ");
+		
+		
+		
+//		List<String> tokens = Arrays.asList(text.split("[\\s,\\.;:]"));
+		List<String> tokens = Arrays.asList(text.split("[\\s]"));
 		return filterWords(tokens);
 		
 		/*
