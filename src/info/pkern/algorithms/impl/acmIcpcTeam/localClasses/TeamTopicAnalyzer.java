@@ -15,6 +15,7 @@ public class TeamTopicAnalyzer {
 	
 	public void addPersonTopics(String personTopicsData) {
 		BitSet personTopics = new BitSet(personTopicsData.length());
+		//Better use personTopicsData.toCharArray() and iterate over it 
 		for (int i = 0, j = personTopicsData.length() - 1; j >= 0; i++, j--) {
 			personTopics.set(i, personTopicsData.charAt(j) == '1');
 		}
