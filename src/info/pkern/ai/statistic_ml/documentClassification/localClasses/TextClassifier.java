@@ -42,7 +42,10 @@ public class TextClassifier {
 	private int lastClassifiedBag;
 	
 	private boolean useNormalizedFrequences = false;
-	
+
+	public TextClassifier() {
+		this(null);
+	}
 	public TextClassifier(Integer maxNumberOfTerms) {
 		if (null == maxNumberOfTerms) {
 			this.maxNumberOfTerms = Integer.MAX_VALUE;
@@ -225,7 +228,7 @@ public class TextClassifier {
 		if (! maxNumberOfTerms.equals(Integer.MAX_VALUE)) {
 			List<Entry<String, Double>> sortedList = MapUtil.sortByValuesDescending(inverseDocumentFrequency);
 			Map<String, Double> reducedMap = new HashMap<>(maxNumberOfTerms);
-			for (int i = 0; i < maxNumberOfTerms; i++) {
+			for (int i = 0; i < maxNumberOfTerms && i < sortedList.size(); i++) {
 				Entry<String, Double> entry = sortedList.get(i);
 				reducedMap.put(entry.getKey(), entry.getValue());
 			}
