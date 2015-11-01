@@ -4,12 +4,44 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Test;
 
 public class Variouse {
 
+	
+	@Test
+	public void sortList() {
+		List<Double> classification = Arrays.asList(new Double[]{1d,2d,3d});
+		Collections.sort(classification, new Comparator<Double>() {
+			@Override
+			public int compare(Double o1, Double o2) {
+//				return o1.compareTo(o2);
+				System.out.println("Compare o1 to o2: " + o1 + " to " + o2 + " = " + o1.compareTo(o2));
+				System.out.println("Compare o2 to o1: " + o2 + " to " + o1 + " = " + o2.compareTo(o1));
+				return o2.compareTo(o1);
+			}
+		});
+		System.out.println(classification);
+	}
+	
+	@Test
+	public void setRemoveAllTest() {
+		Set<String> firstSet = new HashSet<>(Arrays.asList(new String[]{"eins","zwei","fünf"}));
+		Set<String> secondSet = new HashSet<>(Arrays.asList(new String[]{"eins","zwei","drei","vier"}));
+		System.out.println(secondSet);
+		System.out.println(secondSet.removeAll(firstSet));
+		System.out.println(secondSet);
+		secondSet = new HashSet<>(Arrays.asList(new String[]{"eins","zwei","fünf"}));
+		System.out.println(secondSet);
+		System.out.println(secondSet.removeAll(firstSet));
+		System.out.println(secondSet);
+	}
+	
 	@Test
 	public void listTest() {
 		List<Integer> ints = Arrays.asList(new Integer[]{1,2,3});
