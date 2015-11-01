@@ -2,153 +2,136 @@ package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
-/**
- * Implementing a bag of words, words corresponding with their frequency of usages in 
- * a "document" for usage by the Document class, DocumentClass class and the Pool class.
- * @author pkern
- *
- */
 public class BagOfWords {
 
-	private Integer numberOfWords = 0;
-	private Integer sumOfWordFrequencies = 0;
-	private Map<String, Integer> bagVocabulary = new HashMap<>();
-	
-//	/**
-//	 * Constructs a BagOfWords with the given words as initial content.
-//	 * 
-//	 * @param words to add to this bag.
-//	 */
-//	public BagOfWords(List<String> words) {
-//		addWords(words);
-//	}
+	private Integer maxTermFrequency = 0;
+	private Map<String, Integer> terms = new HashMap<>();
 
-	public static BagOfWords mergeBags(BagOfWords bagA, BagOfWords bagB) {
-		BagOfWords mergedBag = new BagOfWords();
-		mergedBag.numberOfWords = bagA.numberOfWords;
-		mergedBag.bagVocabulary = bagA.bagVocabulary;
-		mergedBag.add(bagB);
-		return mergedBag;
-	}
-	
-	/**
-	 * Method to join two BagOfWords. Adds the content of another bag
-	 * to this bag.
-	 * 
-	 * @param anotherBag to join with this bag.
-	 */
-	public void add(BagOfWords anotherBag) {
-		for (Entry<String, Integer> entry : anotherBag.bagVocabulary.entrySet()) {
-			addWord(entry.getKey(), entry.getValue());
-		}
-//		numberOfWords += anotherBag.numberOfWords;
-	}
-
-	/**
-	 * Adds a word to this BagOfWords.
-	 * 
-	 * @param word to add to this bag.
-	 */
-	public void addWord(String word) {
-		addWord(word, 1);
-	}
-
-	public void addWord(String word, Integer frequency) {
-		if (bagVocabulary.containsKey(word)) {
-			bagVocabulary.put(word, bagVocabulary.get(word) + frequency);
+	public void addTerm(String term, Integer frequency) {
+		int newFrequency = frequency;
+		if (terms.keySet().contains(term)) {
+			newFrequency += terms.get(term);
+			terms.put(term, newFrequency);
 		} else {
-			bagVocabulary.put(word, frequency);
-			numberOfWords++;
+			terms.put(term, newFrequency);
 		}
-		sumOfWordFrequencies += frequency;
+		maxTermFrequency = Math.max(newFrequency, maxTermFrequency);
+	}
+	
+	public void addTerm(String term) {
+		addTerm(term, 1);
+	}
+	
+	public void addTerms(Collection<String> terms) {
+		for (String term : terms) {
+			addTerm(term, 1);
+		}
+	}
+	
+	public void add(BagOfWords bagOfWords) {
+		for (Entry<String, Integer> entry : bagOfWords.terms.entrySet()) {
+			addTerm(entry.getKey(), entry.getValue());
+		}
 	}
 
-	/**
-	 * Adds a list of words to this BagOfWords.
-	 * 
-	 * @param words to add to this bag.
-	 */
-	public void addWords(List<String> words) {
-		for (String word : words) {
-			addWord(word);
-		}
-	}
-
-	public void addWordWithoutFrequency(String word) {
-		addWord(word, 0);
-	}
-	
-	/**
-	 * Get the number of different words in this bag.
-	 * 
-	 * @return number of different words.
-	 */
-	public Integer getNumberOfWords() {
-		return bagVocabulary.size();
-	}
-	
-	/**
-	 * Returning a list of the words contained in the object
-	 * 
-	 * @return a list of words in this bag. 
-	 */
-	public List<String> getWords() {
-		List<String> words = new ArrayList<>(bagVocabulary.size());
-		words.addAll(bagVocabulary.keySet());
-		return words;
-	}
-	
-	public List<Integer> getFrequences() {
-		List<Integer> frequences = new ArrayList<>(bagVocabulary.size());
-		frequences.addAll(bagVocabulary.values());
-		return frequences;
-	}
-	
-	public Integer getSumOfFrequencies() {
-		return sumOfWordFrequencies;
-	}
-	
-	/**
-	 * Normalizes this bag to a given set of words. After the normalization
-	 * every word within the list will be in this bag.<br/>
-	 * Any word from the list which was not part of the bag before will be
-	 * added with a frequency of 0!
-	 * 
-	 * @param words list of words to normalize with.
-	 */
-	public void normalizeBag(List<String> words) {
-		for (String word : words) {
-			addWordWithoutFrequency(word);
-		}
-	}
-	
-	/**
-	 * Returning the frequency of a word
-	 * 
-	 * @param word to get it's frequency in this bag.
-	 * @return the frequency of the given word.
-	 */
-	public Integer getFrequenceOf(String word) {
-		if (bagVocabulary.containsKey(word)) {
-			return bagVocabulary.get(word);
+	public Integer removeTerm(String term) {
+		Integer frequency = terms.remove(term);
+		if (null == frequency) {
+			return 0;
 		} else {
+			return frequency;
+		}
+	}
+	
+	public List<Entry<String, Integer>> removeTerms(List<String> terms) {
+		List<Entry<String, Integer>> removed = new ArrayList<>(terms.size());
+		for (String term : terms) {
+			Entry<String, Integer> entry = new SimpleEntry<>(term, removeTerm(term));
+			removed.add(entry);
+		}
+		return removed;
+	}
+	
+	public Map<String, Integer> clear() {
+		Map<String, Integer> terms = new HashMap<>();
+		terms.putAll(this.terms);
+		this.terms.clear();
+		maxTermFrequency = 0;
+		return terms;
+	}
+	
+	public Integer getFrequency(String term) {
+		if (terms.containsKey(term)) {
+			return terms.get(term);
+		} else { 
 			return 0;
 		}
 	}
-
-	/**
-	 * Returning the dictionary, containing the words (keys) with their frequency (values)
-	 * 
-	 * @return map as the dictionary
-	 */
-	@Deprecated
-	public Map<String, Integer> getVocabulary() {
-		return new HashMap<String, Integer>(bagVocabulary);
+	
+	public Double getNormalizedFrequency(String term) {
+		Integer frequency = terms.get(term);
+		if (null == frequency) {
+			return 0d;
+		} else {
+			return new Double((double)frequency/maxTermFrequency);
+		}
 	}
 	
+	/**
+	 * Gets a copy of the terms in this bag. Changes to this set are <strong>not</strong> be reflected to this bag!
+	 *
+	 * @return the terms in this bag.
+	 */
+	public Set<String> getTerms() {
+		return new HashSet<>(this.terms.keySet());
+	}
+	
+	public Integer getNumberOfTerms() {
+		return terms.size();
+	}
+	
+	public boolean contains(String term) {
+		return terms.containsKey(term);
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime
+				* result
+				+ ((maxTermFrequency == null) ? 0 : maxTermFrequency.hashCode());
+		result = prime * result + ((terms == null) ? 0 : terms.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BagOfWords other = (BagOfWords) obj;
+		if (maxTermFrequency == null) {
+			if (other.maxTermFrequency != null)
+				return false;
+		} else if (!maxTermFrequency.equals(other.maxTermFrequency))
+			return false;
+		if (terms == null) {
+			if (other.terms != null)
+				return false;
+		} else if (!terms.equals(other.terms))
+			return false;
+		return true;
+	}
 }

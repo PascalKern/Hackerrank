@@ -1,118 +1,64 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
-import java.util.List;
+import java.util.Set;
 
-/*
- * TODO Remove extending. Replace Document with this class!
- */
+import javax.print.attribute.standard.MediaSize.Other;
+
 public class DocumentClass {
 
-	private BagOfWords classVocabulary = new BagOfWords();
-	private Integer numberOfDocuments = 0;
 	private final String name;
+	private Integer totalNumberOfBags = 0;
+	private BagOfWords terms = new BagOfWords();
 	
+	//TODO Not nice to keep the terms twice! Once in each bag.
+	//Not the proper OOP way! This violates the SRP of the BagOfWords. Here not words/terms where counted instead bags!
+	private BagOfWords bagFrequencies = new BagOfWords();
 	
 	public DocumentClass(String name) {
 		this.name = name;
 	}
 	
-	/**
-	 * Returns the probability for a given word in this document class.
-	 * 
-	 * @param word to check it's probability.
-	 * @return value of probability.
-	 */
-	public Float probability(String word) {
-		Integer vocabularySize = classVocabulary.getNumberOfWords();
-		Integer sumN = 0;
-		for (Integer frequency : classVocabulary.getFrequences()) {
-			sumN += frequency;
-		}
-		Integer N = classVocabulary.getFrequenceOf(word);
-		Float result = new Float(1 + N);
-		result /= vocabularySize + sumN;
-		return result;
+	public void add(BagOfWords bagOfWords) {
+		terms.add(bagOfWords);
+		totalNumberOfBags++;
+		bagFrequencies.addTerms(bagOfWords.getTerms());
 	}
 	
-	public void addWordsToDocumentClass(BagOfWords bagOfWords) {
-		classVocabulary.add(bagOfWords);
-		numberOfDocuments++;
-	}
-
-	public void addWordWithoutFrequency(String word) {
-		classVocabulary.addWordWithoutFrequency(word);
-	}
-
-	public Integer numberOfWords() {
-		return classVocabulary.getNumberOfWords();
-	}
-
-	public List<String> getWords() {
-		return classVocabulary.getWords();
-	}
-
-	public Integer getFrequenceOf(String word) {
-		return classVocabulary.getFrequenceOf(word);
-	}
-
-	//	/**
-	//	 * Sets the number of documents in this document class.
-	//	 * 
-	//	 * @param numberOfDocuments the number of documents.
-	//	 */
-	//	public void setNumberOfDocuments(Integer numberOfDocuments) {
-	//		this.numberOfDocuments = numberOfDocuments;
-	//	}
-		
-		
-		/**
-		 * Get the number of documents in this document class.
-		 * 
-		 * @return documents count.
-		 */
-		public Integer getNumberOfDocuments() {
-			return numberOfDocuments;
+	public void add(DocumentClass anotherClass) {
+		if (! name.equals(anotherClass.getName())) {
+			throw new UnsupportedOperationException("Can only add (merge) classes with the same name! [names: this="
+					+ name + ", other=" + anotherClass.getName() + "]");
 		}
+		totalNumberOfBags += anotherClass.totalNumberOfBags;
+		terms.add(anotherClass.terms);
+		bagFrequencies.add(anotherClass.bagFrequencies);
+	}
+	
+	public Double getFrequency(String term) {
+		Double bagFraction = bagFrequencies.getFrequency(term) / totalNumberOfBags.doubleValue();
+		return bagFraction * terms.getFrequency(term);
+	}
+
+	public Double getNormalizedFrequency(String term) {
+		Double bagFraction = bagFrequencies.getFrequency(term) / totalNumberOfBags.doubleValue();
+		return bagFraction * terms.getNormalizedFrequency(term);
+	}
 
 	/**
- 	 * Method to join two DocumentClasses.
-	 * 
-	 * @param DocumentClass to join with this document class.
-	 * @return new DocumentClass instance with the words of both document classes.
+	 * Gets a copy of the terms in this document class. Changes to this set are <strong>not</strong> reflected</br>
+	 * to this document class!
+	 *
+	 * @return the terms in this document class.
 	 */
-	@Deprecated
-	public DocumentClass add(DocumentClass otherDocumentClass) {
-		DocumentClass newDocumentClass = new DocumentClass(otherDocumentClass.name);
-		newDocumentClass.classVocabulary = classVocabulary;
-		newDocumentClass.classVocabulary.add(otherDocumentClass.classVocabulary);
-		newDocumentClass.numberOfDocuments = numberOfDocuments;
-		newDocumentClass.numberOfDocuments += otherDocumentClass.numberOfDocuments;
-		return newDocumentClass;
+	public Set<String> getTerms() {
+		return terms.getTerms();
 	}
 
-	public boolean contains(String word) {
-		return classVocabulary.getWords().contains(word);
+	public boolean contains(String term) {
+		return terms.contains(term);
 	}
 
 	public String getName() {
 		return name;
 	}
-
-	public Integer getSumOfFrequencies() {
-		return classVocabulary.getSumOfFrequencies();
-	}
-
-	public void normalizeBag(List<String> words) {
-		classVocabulary.normalizeBag(words);
-	}
-	
-//	/**
-//	 * Sets the number of documents in this document class.
-//	 * 
-//	 * @param numberOfDocuments the number of documents.
-//	 */
-//	public void setNumberOfDocuments(Integer numberOfDocuments) {
-//		this.numberOfDocuments = numberOfDocuments;
-//	}
-
 }
