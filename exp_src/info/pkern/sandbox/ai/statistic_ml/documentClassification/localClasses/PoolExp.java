@@ -36,7 +36,7 @@ public class PoolExp {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			BagOfWords trainBag = new BagOfWords();
 			fileContent = fileContent.replaceAll("[\"]", "");
-			trainBag.addWords(Arrays.asList(fileContent.split("[^\\wäöüÄÖÜß]*")));
+			trainBag.addTerms(Arrays.asList(fileContent.split("[^\\wäöüÄÖÜß]*")));
 //			trainBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':!?]")));
 			pool.learn(trainBag, file.getParent().getFileName().toString());
 		}
@@ -57,7 +57,7 @@ public class PoolExp {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			BagOfWords testBag = new BagOfWords();
 			fileContent = fileContent.replaceAll("[\"]", "");
-			testBag.addWords(Arrays.asList(fileContent.split("[^\\wäöüÄÖÜß]*")));
+			testBag.addTerms(Arrays.asList(fileContent.split("[^\\wäöüÄÖÜß]*")));
 //			testBag.addWords(Arrays.asList(fileContent.split("[\\s,\\.;':]")));
 //				probability = pool.probability(testBag, dclass);
 			Map<String, Float> probAllClasses = pool.probability(file.getFileName().toString(), testBag);

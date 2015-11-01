@@ -11,6 +11,24 @@ import org.junit.Test;
 public class Variouse {
 
 	@Test
+	public void listTest() {
+		List<Integer> ints = Arrays.asList(new Integer[]{1,2,3});
+		System.out.println(ints.indexOf(2));
+		ints.set(1, null);
+		System.out.println(ints.indexOf(2));
+		System.out.println(ints.indexOf(null));
+	}
+	
+	
+	@Test
+	public void intAsFloat() {
+		float floatNumber = 1.00000000000f;
+		System.out.println(floatNumber);
+		floatNumber = 123432f;
+		System.out.println(floatNumber);
+	}
+	
+	@Test
 	public void listAddAtIndex() {
 //		List<Integer> theList = new ArrayList<>(3);
 		List<Integer> theList = Arrays.asList(new Integer[3]);

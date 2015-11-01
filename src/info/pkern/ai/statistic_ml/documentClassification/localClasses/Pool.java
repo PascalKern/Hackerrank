@@ -32,9 +32,9 @@ public class Pool {
 		Integer sum = 0;
 		
 		DocumentClass docClass = documentClasses.get(docClassName);
-		for (String word : poolVocabulary.getWords()) {
+		for (String word : poolVocabulary.getTerms()) {
 			if (docClass.contains(word)) {
-				sum += docClass.getFrequenceOf(word); 
+				sum += docClass.getWeightOf(word); 
 			}
 		}
 		return sum;
@@ -42,15 +42,15 @@ public class Pool {
 
 	public void normalizePool() {
 		for (DocumentClass documentClass : documentClasses.values()) {
-			documentClass.normalizeBag(poolVocabulary.getWords());
+			documentClass.normalizeBag(poolVocabulary.getTerms());
 		}
 	}
 	
 	public Integer countOfWordsInClassOld(String docClassName) {
 		checkDocumentClassExists(docClassName);
 		Integer sum = 0;
-		for (String word : documentClasses.get(docClassName).getWords()) {
-			sum += poolVocabulary.getFrequenceOf(word);
+		for (String word : documentClasses.get(docClassName).getTerms()) {
+			sum += poolVocabulary.getTermFrequence(word);
 		}
 		return sum;
 	}
@@ -65,8 +65,8 @@ public class Pool {
 			documentClasses.put(docClassName, docClass);
 		}
 		int oldSizeClass = docClass.numberOfWords();
-		docClass.addWordsToDocumentClass(bag);
-		int oldSize = poolVocabulary.getNumberOfWords();
+		docClass.addDocumentToDocumentClass(bag);
+		int oldSize = poolVocabulary.getTermsCount();
 		poolVocabulary.add(bag);
 //		System.out.println("Learned bag! Class: " + docClassName + " Bag size: " + bag.numberOfWords() 
 //				+ ", class vocabulary old: " + oldSizeClass + ", new: " + docClass.numberOfWords()
@@ -97,7 +97,7 @@ public class Pool {
 	}
 	
 	public Integer getNumberOfWords() {
-		return poolVocabulary.getNumberOfWords();
+		return poolVocabulary.getTermsCount();
 	}
 
 	/**
@@ -120,9 +120,9 @@ public class Pool {
 		for (DocumentClass current_dClass : documentClasses.values()) {
 			Integer sum_current_dClass = current_dClass.getSumOfFrequencies();						//sum_j
 			Float prod = new Float(1);																//prod
-			for (String word : bag.getWords()) {
-				Integer wordFrequence_dClass = 1 + dClass.getFrequenceOf(word);						//wf_dclass
-				Integer wordFrequence_current_dClass = 1 + current_dClass.getFrequenceOf(word);		//wf
+			for (String word : bag.getTerms()) {
+				Integer wordFrequence_dClass = 1 + dClass.getWeightOf(word);						//wf_dclass
+				Integer wordFrequence_current_dClass = 1 + current_dClass.getWeightOf(word);		//wf
 				Float r = new Float((wordFrequence_current_dClass * sum_current_dClass) / (wordFrequence_dClass * sum_dClass));	//R
 				prod = prod * r;
 				
@@ -148,7 +148,7 @@ public class Pool {
 		}
 		
 		if (debug) {
-			System.out.println((System.nanoTime() - startTime) / Math.pow(10, 6) + "ms Duration for probability calculation for dClass: " + docClassName + ", with bag of " + bag.getNumberOfWords() + " words!");
+			System.out.println((System.nanoTime() - startTime) / Math.pow(10, 6) + "ms Duration for probability calculation for dClass: " + docClassName + ", with bag of " + bag.getTermsCount() + " words!");
 		}
 		
 		
@@ -192,7 +192,7 @@ public class Pool {
 		}
 		
 		if (debug) {
-			System.out.println((System.nanoTime() - startTime) / Math.pow(10, 6) + "ms Duration for probability map calculation with bag of " + bag.getNumberOfWords() + " words!");
+			System.out.println((System.nanoTime() - startTime) / Math.pow(10, 6) + "ms Duration for probability map calculation with bag of " + bag.getTermsCount() + " words!");
 		}
 		
 		return probabilityMap;
