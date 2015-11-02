@@ -30,6 +30,7 @@ public class TextClassifier {
 	 * BUT! This implements a state for this classifier which is not preferred. Especially not
 	 * for to use this classifier in a multithreading environment!
 	 */
+	//NOTE: This is some kind of "cached"! 
 	private Map<String, Double> inverseDocumentFrequency;
 	//Could maybe added to the document class itself! Or better calculate it inside the document class with a 
 	//given IDF Map. Also the vector length!
