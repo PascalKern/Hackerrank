@@ -181,9 +181,11 @@ public class TextClassifier {
 			Double idf = inverseDocumentFrequency.get(term);
 			Double tf;
 			if (useNormalizedFrequences) {
-				tf = terms.getNormalizedFrequency(term);
+//				tf = terms.getNormalizedFrequency(term);
+				tf = terms.getL2NormFromNormalizedFrequency(term);
 			} else {
-				tf = terms.getFrequency(term);
+//				tf = terms.getFrequency(term);
+				tf = terms.getL2NormFromFrequency(term);
 			}
 			if (tf > 0f && idf != null && idf > 0d) {
 				tfIdfs.put(term, tf * idf);
