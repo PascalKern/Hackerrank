@@ -273,7 +273,7 @@ public class TextClassifier {
 				for (int i = 0, j = 1; i < terms.size(); i++, j++) {
 					currentValue = currentClass.getValue().get(terms.get(i));
 					if (null == currentValue) {
-						fwVertices.append(String.format("%.8g", new Double(0)));
+						fwVertices.append(String.format("%.8g", new Double(0))); 
 					} else {
 						fwVertices.append(String.format("%.8g", currentValue));
 					}

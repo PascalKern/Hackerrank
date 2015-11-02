@@ -14,6 +14,7 @@ import java.nio.file.Paths;
 import java.nio.file.attribute.FileAttribute;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -38,10 +39,11 @@ public class TextClassifierTestBigerExample {
 		String fileContent;
 		for (Path file : ((RecursiveSimpleFileVisitor) fileProcessor).getFiles()) {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
-			fileContent.toLowerCase();
-			fileContent = fileContent.replaceAll("[\\r\\n\",;:.]", "");
+			fileContent.toLowerCase(Locale.ENGLISH);
+			fileContent = fileContent.replaceAll("[\\r\\n\\t\",;:?!.\\(\\)]", " ");
 			fileContent = fileContent.replaceAll("'s", "");
 			fileContent = fileContent.replaceAll("\\b-\\b", "");
+			fileContent = fileContent.replaceAll("[0-9]", "");
 			fileContent = fileContent.replaceAll("[_-]", " ");
 			fileContent = fileContent.replaceAll(" {2,}", " ");
 			BagOfWords trainBag = new BagOfWords();
@@ -61,10 +63,11 @@ public class TextClassifierTestBigerExample {
 		int countRights = 0;
 		for (Path file : ((RecursiveSimpleFileVisitor) fileProcessor).getFiles()) {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
-			fileContent.toLowerCase();
-			fileContent = fileContent.replaceAll("[\\r\\n\",;:.]", "");
+			fileContent.toLowerCase(Locale.ENGLISH);
+			fileContent = fileContent.replaceAll("[\\r\\n\\t\",;:?!.\\(\\)]", " ");
 			fileContent = fileContent.replaceAll("'s", "");
 			fileContent = fileContent.replaceAll("\\b-\\b", "");
+			fileContent = fileContent.replaceAll("[0-9]", "");
 			fileContent = fileContent.replaceAll("[_-]", " ");
 			fileContent = fileContent.replaceAll(" {2,}", " ");
 			BagOfWords testBag = new BagOfWords();
