@@ -239,6 +239,7 @@ public class TextClassifier {
 				Entry<String, Double> entry = sortedList.get(i);
 				reducedMap.put(entry.getKey(), entry.getValue());
 			}
+			inverseDocumentFrequency = reducedMap;
 		}
 	}
 	

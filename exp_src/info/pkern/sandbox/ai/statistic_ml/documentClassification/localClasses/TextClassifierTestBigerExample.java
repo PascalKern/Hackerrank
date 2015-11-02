@@ -32,6 +32,7 @@ public class TextClassifierTestBigerExample {
 		Path testBase = Paths.get(basePath + "/learn_and_test/test");
 		
 		TextClassifier textClassifier = new TextClassifier();
+//		TextClassifier textClassifier = new TextClassifier(500);
 		
 		FileVisitor<Path> fileProcessor = new RecursiveSimpleFileVisitor("txt");
 		Files.walkFileTree(learnBase, fileProcessor);
