@@ -177,7 +177,15 @@ public class TextClassifier {
 
 	//Should return absolute already here? So no Math.abs needed in classification calculation.
 	private Map<String, Double> calculateTfIdf(DocumentClass terms) {
-		Map<String, Double> tfIdfs = new HashMap<>(); 
+		Map<String, Double> tfIdfs = new HashMap<>();
+		
+		//TODO: Must also use the L2-Normed frequency from the document class?!
+		Double denominatorL2Norm = 0d;
+		for (String term : terms.getTerms()) {
+			denominatorL2Norm += Math.pow(termFrequencies.getFrequency(term), 2);
+		}
+		denominatorL2Norm = Math.sqrt(denominatorL2Norm);
+		
 		for (String term : terms.getTerms()) {
 			Double idf = inverseDocumentFrequency.get(term);
 			Double tf;
@@ -188,7 +196,10 @@ public class TextClassifier {
 //				tf = terms.getFrequency(term);
 				tf = terms.getL2NormFromFrequency(term);
 			}
+			//TODO Better only:
+//			if (idf != null) { //OR much better above always set it to 0d when map returns null!
 			if (tf > 0f && idf != null && idf > 0d) {
+				idf = idf / denominatorL2Norm;
 				tfIdfs.put(term, tf * idf);
 			}
 		}
