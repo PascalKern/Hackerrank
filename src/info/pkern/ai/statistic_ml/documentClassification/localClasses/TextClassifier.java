@@ -120,7 +120,8 @@ public class TextClassifier {
 				Double dotProduct = calculateDotProduct(queryWeights, classWeights.getValue());
 				
 				Double classificationProbability = dotProduct / 
-						(Math.abs(vectorLength) * Math.abs(termWeightVectorLengthPerClass.get(classWeights.getKey())));
+//						(Math.abs(vectorLength) * Math.abs(termWeightVectorLengthPerClass.get(classWeights.getKey())));
+						vectorLength * termWeightVectorLengthPerClass.get(classWeights.getKey());
 				
 				classifications.add(new SimpleEntry<>(classWeights.getKey(), classificationProbability));
 			}
@@ -180,6 +181,7 @@ public class TextClassifier {
 		Map<String, Double> tfIdfs = new HashMap<>();
 		
 		//TODO: Must also use the L2-Normed frequency from the document class?!
+		//Ignore zeros because 0^2 still is 0. Also 0/x is still 0 so there is no need to include them!
 		Double denominatorL2Norm = 0d;
 		for (String term : terms.getTerms()) {
 			denominatorL2Norm += Math.pow(termFrequencies.getFrequency(term), 2);
@@ -199,6 +201,7 @@ public class TextClassifier {
 			//TODO Better only:
 //			if (idf != null) { //OR much better above always set it to 0d when map returns null!
 			if (tf > 0f && idf != null && idf > 0d) {
+				//Calculate L2-Norm
 				idf = idf / denominatorL2Norm;
 				tfIdfs.put(term, tf * idf);
 			}
