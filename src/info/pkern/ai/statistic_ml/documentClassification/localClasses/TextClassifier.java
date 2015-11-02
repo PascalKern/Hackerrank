@@ -2,6 +2,8 @@ package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
 import info.pkern.hackerrank.tools.MapUtil;
 
+import java.io.FileWriter;
+import java.nio.file.Path;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -252,6 +254,41 @@ public class TextClassifier {
 	private void checkReadyForClassification() {
 		if (! trainingFinished) {
 			throw new IllegalStateException("The training of this classifier was not yet finished! Use finishTrainig() first.");
+		}
+	}
+	
+	public void writeOutVectorsForVisualisation(Path location, String filename) {
+		Path vertices = location.resolve(filename);
+		Path lables = location.resolve("labels_" + filename);
+		try (FileWriter fwLables = new FileWriter(lables.toFile()); FileWriter fwVertices = new FileWriter(vertices.toFile())) {
+			List<String> terms = new ArrayList<>(termFrequencies.getTerms());
+			for (String term : terms) {
+				fwVertices.append(term).append(", ");
+			}
+			fwVertices.append(System.lineSeparator());
+			int classCounter = 1;
+			for (Entry<String, Map<String, Double>> currentClass : termWeightVectorsPerClass.entrySet()) {
+				fwLables.append(currentClass.getKey());
+				Double currentValue;
+				for (int i = 0, j = 1; i < terms.size(); i++, j++) {
+					currentValue = currentClass.getValue().get(terms.get(i));
+					if (null == currentValue) {
+						fwVertices.append(String.format("%.8g", new Double(0)));
+					} else {
+						fwVertices.append(String.format("%.8g", currentValue));
+					}
+					if (j < terms.size()) {
+						fwVertices.append(", ");
+					}
+				}
+				if (classCounter < termWeightVectorsPerClass.size()) {
+					fwLables.append(System.lineSeparator());
+					fwVertices.append(System.lineSeparator());
+				}
+				classCounter++;
+			}
+		} catch (Exception ex) {
+			throw new RuntimeException("Could not write lables or vertices file!", ex);
 		}
 	}
 }

@@ -8,8 +8,10 @@ import info.pkern.hackerrank.tools.RecursiveSimpleFileVisitor;
 
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.FileAttribute;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -37,7 +39,7 @@ public class TextClassifierTestBigerExample {
 		for (Path file : ((RecursiveSimpleFileVisitor) fileProcessor).getFiles()) {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			fileContent.toLowerCase();
-			fileContent = fileContent.replaceAll("[\",;:.]", "");
+			fileContent = fileContent.replaceAll("[\\r\\n\",;:.]", "");
 			fileContent = fileContent.replaceAll("'s", "");
 			fileContent = fileContent.replaceAll("\\b-\\b", "");
 			fileContent = fileContent.replaceAll("[_-]", " ");
@@ -60,7 +62,7 @@ public class TextClassifierTestBigerExample {
 		for (Path file : ((RecursiveSimpleFileVisitor) fileProcessor).getFiles()) {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			fileContent.toLowerCase();
-			fileContent = fileContent.replaceAll("[\",;:.]", "");
+			fileContent = fileContent.replaceAll("[\\r\\n\",;:.]", "");
 			fileContent = fileContent.replaceAll("'s", "");
 			fileContent = fileContent.replaceAll("\\b-\\b", "");
 			fileContent = fileContent.replaceAll("[_-]", " ");
@@ -80,6 +82,12 @@ public class TextClassifierTestBigerExample {
 		}
 		System.out.println("Total right: " + countRights);
 		System.out.println("Total failures: " + countFailures);
+		
+		Path location = Paths.get("noGit");
+		if (! Files.exists(location, LinkOption.NOFOLLOW_LINKS)) {
+			Files.createDirectory(location, new FileAttribute[]{});
+		}
+		textClassifier.writeOutVectorsForVisualisation(location, "example.txt");
 		
 	}
 }
