@@ -18,8 +18,8 @@ import java.util.Set;
 public class TextClassifier {
 
 	//Maybe make changeable?
-	private final Integer maxNumberOfTerms;
-	private Map<String, DocumentClass> classes = new HashMap<>();
+	private final Integer maxNumberAllowedTerms;
+	private Map<String, DocumentClass> docClasses = new HashMap<>();
 
 	//TODO Not nice to keep the terms multiple times! Once in each bag and Map.
 	/*
@@ -33,40 +33,45 @@ public class TextClassifier {
 	//given IDF Map. Also the vector length!
 	private Map<String, Map<String, Double>> termWeightVectorsPerClass;
 	private Map<String, Double> termWeightVectorLengthPerClass;
+	
 	private boolean trainingFinished = false;
 
 	//Not the proper OOP way! This violates the SRP of the BagOfWords. Here not words/terms where counted instead doc classes!
-	private  BagOfWords docClassFrequencies = new BagOfWords();
+	private  BagOfWords termFrequencies = new BagOfWords();
 	
+	//For littlest caching
 	private List<Entry<String, Double>> lastClassificationResult;
 	private int lastClassifiedBag;
 	
+	//Just experimental
 	private boolean useNormalizedFrequences = false;
 
+	
 	public TextClassifier() {
 		this(null);
 	}
+	
 	public TextClassifier(Integer maxNumberOfTerms) {
 		if (null == maxNumberOfTerms) {
-			this.maxNumberOfTerms = Integer.MAX_VALUE;
+			this.maxNumberAllowedTerms = Integer.MAX_VALUE;
 		} else {
-			this.maxNumberOfTerms = maxNumberOfTerms;
+			this.maxNumberAllowedTerms = maxNumberOfTerms;
 		}
 	}
 	
 	public void train(DocumentClass docClass) {
 		String className = docClass.getName();
-		DocumentClass existing = classes.get(className);
+		DocumentClass existing = docClasses.get(className);
 		if (null == existing) {
-			 classes.put(className, docClass);
-			 docClassFrequencies.addTerms(docClass.getTerms());
+			 docClasses.put(className, docClass);
+			 termFrequencies.addTerms(docClass.getTerms());
 		} else {
 			existing.add(docClass);
-			classes.put(className, existing);
+			docClasses.put(className, existing);
 			Set<String> newTerms = docClass.getTerms();
 			newTerms.removeAll(existing.getTerms());
 			if (! newTerms.isEmpty()) {
-				docClassFrequencies.addTerms(newTerms);
+				termFrequencies.addTerms(newTerms);
 			}
 		}
 		trainingFinished = false;
@@ -107,7 +112,7 @@ public class TextClassifier {
 			Map<String, Double> queryWeights = calculateTfIdf(query);
 			Double vectorLength = calculateTermWeightVectorLength(queryWeights.values());
 			
-			classifications = new ArrayList<>(classes.size());
+			classifications = new ArrayList<>(docClasses.size());
 			for (Entry<String, Map<String, Double>> classWeights : termWeightVectorsPerClass.entrySet()) {
 				Double dotProduct = calculateDotProduct(queryWeights, classWeights.getValue());
 				
@@ -153,19 +158,19 @@ public class TextClassifier {
 	 */
 	@Deprecated
 	public Double calculateIDF(String term) {
-		Integer docFrequency = docClassFrequencies.getFrequency(term);
+		Integer docFrequency = termFrequencies.getFrequency(term);
 		if (0 == docFrequency) {
 			return docFrequency.doubleValue();
 		} else {
-			Double docFraction = classes.size() / docFrequency.doubleValue();
+			Double docFraction = docClasses.size() / docFrequency.doubleValue();
 			return Math.log10(docFraction);
 		}
 	}
 	
 	//Do not add zero calculated IDFs!? Then remove "&& idf > 0d" within calculateTfIdf(DocClass terms) bellow.
 	private Map<String, Double> calculateIDF() {
-		Map<String, Double> inverseDocumentFrequency = new HashMap<>(docClassFrequencies.getNumberOfTerms());
-		for (String term : docClassFrequencies.getTerms()) {
+		Map<String, Double> inverseDocumentFrequency = new HashMap<>(termFrequencies.getNumberOfTerms());
+		for (String term : termFrequencies.getTerms()) {
 			inverseDocumentFrequency.put(term, calculateIDF(term));
 		}
 		return inverseDocumentFrequency;
@@ -191,7 +196,7 @@ public class TextClassifier {
 
 	private Map<String, Map<String, Double>> calculateTermWeigthVectorPerClass() {
 		Map<String, Map<String, Double>> weightedTermsPerClass = new HashMap<>();
-		for (Entry<String, DocumentClass> currentClass : classes.entrySet()) {
+		for (Entry<String, DocumentClass> currentClass : docClasses.entrySet()) {
 			weightedTermsPerClass.put(currentClass.getKey(), calculateTfIdf(currentClass.getValue()));
 		}
 		return weightedTermsPerClass;
@@ -225,10 +230,10 @@ public class TextClassifier {
 	
 	//Could also remove 0 values here!?
 	private void reduceIdfToMaxNumberOfTerms() {
-		if (! maxNumberOfTerms.equals(Integer.MAX_VALUE)) {
+		if (! maxNumberAllowedTerms.equals(Integer.MAX_VALUE)) {
 			List<Entry<String, Double>> sortedList = MapUtil.sortByValuesDescending(inverseDocumentFrequency);
-			Map<String, Double> reducedMap = new HashMap<>(maxNumberOfTerms);
-			for (int i = 0; i < maxNumberOfTerms && i < sortedList.size(); i++) {
+			Map<String, Double> reducedMap = new HashMap<>(maxNumberAllowedTerms);
+			for (int i = 0; i < maxNumberAllowedTerms && i < sortedList.size(); i++) {
 				Entry<String, Double> entry = sortedList.get(i);
 				reducedMap.put(entry.getKey(), entry.getValue());
 			}

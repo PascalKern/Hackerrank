@@ -13,15 +13,15 @@ import java.util.Set;
 public class BagOfWords {
 
 	private Integer maxTermFrequency = 0;
-	private Map<String, Integer> terms = new HashMap<>();
+	private Map<String, Integer> termFrequencies = new HashMap<>();
 
 	public void addTerm(String term, Integer frequency) {
 		int newFrequency = frequency;
-		if (terms.keySet().contains(term)) {
-			newFrequency += terms.get(term);
-			terms.put(term, newFrequency);
+		if (termFrequencies.keySet().contains(term)) {
+			newFrequency += termFrequencies.get(term);
+			termFrequencies.put(term, newFrequency);
 		} else {
-			terms.put(term, newFrequency);
+			termFrequencies.put(term, newFrequency);
 		}
 		maxTermFrequency = Math.max(newFrequency, maxTermFrequency);
 	}
@@ -37,13 +37,13 @@ public class BagOfWords {
 	}
 	
 	public void add(BagOfWords bagOfWords) {
-		for (Entry<String, Integer> entry : bagOfWords.terms.entrySet()) {
+		for (Entry<String, Integer> entry : bagOfWords.termFrequencies.entrySet()) {
 			addTerm(entry.getKey(), entry.getValue());
 		}
 	}
 
 	public Integer removeTerm(String term) {
-		Integer frequency = terms.remove(term);
+		Integer frequency = termFrequencies.remove(term);
 		if (null == frequency) {
 			return 0;
 		} else {
@@ -62,22 +62,22 @@ public class BagOfWords {
 	
 	public Map<String, Integer> clear() {
 		Map<String, Integer> terms = new HashMap<>();
-		terms.putAll(this.terms);
-		this.terms.clear();
+		terms.putAll(this.termFrequencies);
+		this.termFrequencies.clear();
 		maxTermFrequency = 0;
 		return terms;
 	}
 	
 	public Integer getFrequency(String term) {
-		if (terms.containsKey(term)) {
-			return terms.get(term);
+		if (termFrequencies.containsKey(term)) {
+			return termFrequencies.get(term);
 		} else { 
 			return 0;
 		}
 	}
 	
 	public Double getNormalizedFrequency(String term) {
-		Integer frequency = terms.get(term);
+		Integer frequency = termFrequencies.get(term);
 		if (null == frequency) {
 			return 0d;
 		} else {
@@ -91,15 +91,15 @@ public class BagOfWords {
 	 * @return the terms in this bag.
 	 */
 	public Set<String> getTerms() {
-		return new HashSet<>(this.terms.keySet());
+		return new HashSet<>(this.termFrequencies.keySet());
 	}
 	
 	public Integer getNumberOfTerms() {
-		return terms.size();
+		return termFrequencies.size();
 	}
 	
 	public boolean contains(String term) {
-		return terms.containsKey(term);
+		return termFrequencies.containsKey(term);
 	}
 
 	@Override
@@ -109,7 +109,7 @@ public class BagOfWords {
 		result = prime
 				* result
 				+ ((maxTermFrequency == null) ? 0 : maxTermFrequency.hashCode());
-		result = prime * result + ((terms == null) ? 0 : terms.hashCode());
+		result = prime * result + ((termFrequencies == null) ? 0 : termFrequencies.hashCode());
 		return result;
 	}
 
@@ -127,10 +127,10 @@ public class BagOfWords {
 				return false;
 		} else if (!maxTermFrequency.equals(other.maxTermFrequency))
 			return false;
-		if (terms == null) {
-			if (other.terms != null)
+		if (termFrequencies == null) {
+			if (other.termFrequencies != null)
 				return false;
-		} else if (!terms.equals(other.terms))
+		} else if (!termFrequencies.equals(other.termFrequencies))
 			return false;
 		return true;
 	}

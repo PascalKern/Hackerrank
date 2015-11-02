@@ -38,6 +38,7 @@ public class TextClassifierTestBigerExample {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			fileContent.toLowerCase();
 			fileContent = fileContent.replaceAll("[\",;:.]", "");
+			fileContent = fileContent.replaceAll("'s", "");
 			fileContent = fileContent.replaceAll("\\b-\\b", "");
 			fileContent = fileContent.replaceAll("[_-]", " ");
 			fileContent = fileContent.replaceAll(" {2,}", " ");
@@ -60,6 +61,7 @@ public class TextClassifierTestBigerExample {
 			fileContent = new String(Files.readAllBytes(file)); // readAllLines(file, Charset.defaultCharset());
 			fileContent.toLowerCase();
 			fileContent = fileContent.replaceAll("[\",;:.]", "");
+			fileContent = fileContent.replaceAll("'s", "");
 			fileContent = fileContent.replaceAll("\\b-\\b", "");
 			fileContent = fileContent.replaceAll("[_-]", " ");
 			fileContent = fileContent.replaceAll(" {2,}", " ");
