@@ -161,12 +161,8 @@ public class TextClassifier {
 	@Deprecated
 	public Double calculateIDF(String term) {
 		Integer docFrequency = termFrequencies.getFrequency(term);
-		if (0 == docFrequency) {
-			return docFrequency.doubleValue();
-		} else {
-			Double docFraction = docClasses.size() / docFrequency.doubleValue();
-			return Math.log10(docFraction);
-		}
+		Double docFraction = docClasses.size() / (1 + docFrequency.doubleValue());
+		return Math.log10(docFraction);
 	}
 	
 	//Do not add zero calculated IDFs!? Then remove "&& idf > 0d" within calculateTfIdf(DocClass terms) bellow.
