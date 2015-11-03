@@ -276,9 +276,12 @@ public class TextClassifier {
 		Path lables = location.resolve("labels_" + filename);
 		try (FileWriter fwLables = new FileWriter(lables.toFile()); FileWriter fwVertices = new FileWriter(vertices.toFile())) {
 			List<String> terms = new ArrayList<>(termFrequencies.getTerms());
+			StringBuilder header = new StringBuilder();
 			for (String term : terms) {
-				fwVertices.append(term).append(", ");
+				header.append(String.format("%-16s", term + ",")).append("  ");
 			}
+			header.delete(header.lastIndexOf(","),header.length());
+			fwVertices.append(header);
 			fwVertices.append(System.lineSeparator());
 			int classCounter = 1;
 			for (Entry<String, Map<String, Double>> currentClass : termWeightVectorsPerClass.entrySet()) {
@@ -287,9 +290,9 @@ public class TextClassifier {
 				for (int i = 0, j = 1; i < terms.size(); i++, j++) {
 					currentValue = currentClass.getValue().get(terms.get(i));
 					if (null == currentValue) {
-						fwVertices.append(String.format("%.8g", new Double(0))); 
+						fwVertices.append(String.format("%.10E", 0d)); 
 					} else {
-						fwVertices.append(String.format("%.8g", currentValue));
+						fwVertices.append(String.format("%.10E", currentValue));
 					}
 					if (j < terms.size()) {
 						fwVertices.append(", ");

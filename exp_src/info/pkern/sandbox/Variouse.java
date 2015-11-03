@@ -15,6 +15,21 @@ public class Variouse {
 
 	
 	@Test
+	public void formatDoubleAsScientificString() {
+		Double d = 0.0000012354252342346231463452134d;
+		System.out.println(String.format("%g",d));
+		System.out.println(String.format("%4g",d));
+		System.out.println(String.format("%.6g",d));
+		System.out.println(String.format("%4.6g",d));
+		System.out.println(String.format("%E",d));
+		System.out.println(String.format("%4E",d));
+		System.out.println(String.format("%.6e",d));
+		System.out.println(String.format("%4.6e",d));
+		System.out.println(String.format("%.10e",d));
+		System.out.println(String.format("%4.10e",d));
+	}
+	
+	@Test
 	public void sortList() {
 		List<Double> classification = Arrays.asList(new Double[]{1d,2d,3d});
 		Collections.sort(classification, new Comparator<Double>() {
