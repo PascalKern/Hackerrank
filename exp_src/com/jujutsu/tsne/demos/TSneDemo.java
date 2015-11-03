@@ -162,7 +162,7 @@ public class TSneDemo {
         System.out.println("Finished TSNE: " + new Date());
         //System.out.println("Result is = " + Y.length + " x " + Y[0].length + " => \n" + MatrixOps.doubleArrayToString(Y));
         System.out.println("Result is = " + Y.length + " x " + Y[0].length);
-        saveFile(new File("Java-tsne-result.txt"), MatrixOps.doubleArrayToString(Y));
+        saveFile(new File("./noGit/Java-tsne-result.txt"), MatrixOps.doubleArrayToString(Y));
         Plot2DPanel plot = new Plot2DPanel();
         
         ColoredScatterPlot setosaPlot = new ColoredScatterPlot("setosa", Y, labels);
@@ -190,7 +190,7 @@ public class TSneDemo {
         System.out.println("Finished TSNE: " + new Date());
         //System.out.println("Result is = " + Y.length + " x " + Y[0].length + " => \n" + MatrixOps.doubleArrayToString(Y));
         System.out.println("Result is = " + Y.length + " x " + Y[0].length);
-        saveFile(new File("Java-tsne-result.txt"), MatrixOps.doubleArrayToString(Y));
+        saveFile(new File("./noGit/Java-tsne-result.txt"), MatrixOps.doubleArrayToString(Y));
         Plot2DPanel plot = new Plot2DPanel();
         
         ScatterPlot setosaPlot = new ScatterPlot("setosa", Color.BLACK, Y);
