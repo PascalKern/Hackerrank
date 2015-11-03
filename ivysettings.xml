@@ -1,29 +1,14 @@
 <ivysettings>
-    <!--
-    <settings defaultResolver="central"/>
     <settings defaultResolver="internal"/>
-    -->
     <resolvers>
-        <!--
-		<filesystem name="local_libs" checkmodified="true">
-			<ivy pattern="${ivy.settings.dir}/libs/[artifact]-[revision].[ext]" />
-			<artifact pattern="${ivy.settings.dir}/libs/[artifact]-[revision].[ext]" />
-		</filesystem>
-        -->
-        <filesystem name="local-maven-2" m2compatible="true" force="false" local="true">
-           <artifact pattern="${user.home}/.m2/repository/[organisation]/[module]/[revision]/[module]-[revision].[ext]"/>
-           <ivy pattern="${user.home}/.m2/repository/[organisation]/[module]/[revision]/[module]-[revision].pom"/>
-        </filesystem>
-        <!--
-        <ibiblio name="central" m2compatible="true"/>
-        -->
+	    <chain name="internal" dual="true">
+	        <filesystem name="local-maven-2" m2compatible="true" force="false" local="true">
+	           <artifact pattern="${user.home}/.m2/repository/[organisation]/[module]/[revision]/[module]-[revision].[ext]"/>
+	           <ivy pattern="${user.home}/.m2/repository/[organisation]/[module]/[revision]/[module]-[revision].pom"/>
+	        </filesystem>
+	        <ibiblio name="central" m2compatible="true"/>
+	    </chain>    
     </resolvers>
-    <!-- <chain name="internal" dual="true" checkmodified="true" changingPattern=".*SNAPSHOT"> -->
-    <chain name="internal" dual="true" >
-        <resolver ref="local-maven-2"/>
-        <resolver ref="apache-snapshot"/> 
-        <resolver ref="maven2"/>
-    </chain>    
     <!--
     <modules>
         <module organisation="oracle.jdbc" name="ojdbc" resolver="local_libs"/>
