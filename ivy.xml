@@ -1,0 +1,36 @@
+<ivy-module version="2.0" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:noNamespaceSchemaLocation="http://ant.apache.org/ivy/schemas/ivy.xsd"> 
+    
+    <info organisation="info.pkern" module="hackerrank"/>
+    
+    <configurations defaultconfmapping="compile->default">
+        <conf name="compile" description="Required to compile application"/>
+        <conf name="runtime" description="Additional run-time dependencies" extends="compile"/>
+        <conf name="test"    description="Required for test only" extends="runtime"/>
+    </configurations>
+    
+    <dependencies>
+        <!-- compile dependencies -->
+        <dependency org="com.github.yannrichet" name="JMathPlot" rev="1.0"/>
+
+        <dependency org="gov.nist.math" name="jama" rev="1.0.2"/>
+        <dependency org="org.ejml" name="equation" rev="0.27"/>
+        <dependency org="org.ejml" name="core" rev="0.27"/>
+
+        
+        
+        <!--
+        Local jars in ivy!
+        http://stackoverflow.com/a/10180491/5230043
+        http://stackoverflow.com/questions/8895227/how-to-use-ivy-to-resolve-locally
+        <dependency org="oracle.jdbc" name="ojdbc" rev="6"/>
+        -->
+
+        <!-- runtime dependencies -->
+        <!-- ...conf="runtime->default"/> -->
+        
+        <!-- test dependencies -->
+        <!-- ...conf="test->default"/> -->
+ 	</dependencies>	
+</ivy-module>	   

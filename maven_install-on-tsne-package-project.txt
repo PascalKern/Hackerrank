@@ -1,0 +1,157 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.jujutsu.tsne:tsne-demos:jar:0.1
+[WARNING] 'dependencies.dependency.systemPath' for de.berlios.jmathtools:jmathplot:jar should not point at files within the project directory, ${basedir}/extralibs/jmathplot-1.0.0.jar will be unresolvable by dependent projects @ line 41, column 16
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] Java T-SNE
+[INFO] Java T-SNE Demos
+[INFO] Java T-SNE Package
+[INFO] 
+[INFO] Using the builder org.apache.maven.lifecycle.internal.builder.singlethreaded.SingleThreadedBuilder with a thread count of 1
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java T-SNE 0.0.2
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- buildnumber-maven-plugin:1.2:create (default) @ tsne ---
+[INFO] Checking for local modifications: skipped.
+[INFO] Updating project files from SCM: skipped.
+[INFO] Executing: cmd.exe /X /C "git rev-parse --verify HEAD"
+[INFO] Working directory: C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-core
+[INFO] Storing buildNumber: bb8de24937d0913a20650b2a17fe0acceaac94bb at timestamp: 1446539139319
+[INFO] Executing: cmd.exe /X /C "git rev-parse --verify HEAD"
+[INFO] Working directory: C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-core
+[INFO] Storing buildScmBranch: UNKNOWN
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ tsne ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-core\src\main\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ tsne ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ tsne ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 2 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ tsne ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ tsne ---
+[INFO] Surefire report directory: C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-core\target\surefire-reports
+
+-------------------------------------------------------
+ T E S T S
+-------------------------------------------------------
+Running com.jujutsu.tsne.MatrixOpTest
+Size is 2500 x 2350...
+Iter 0...
+Iter 100...
+Iter 200...
+Iter 300...
+Iter 400...
+Iter 500...
+Iter 600...
+Iter 700...
+Iter 800...
+Iter 900...
+    Tr time: 14522
+Par Tr time: 14827
+Size is: 2500 x2350...
+Iter 0...
+Iter 100...
+Iter 200...
+Iter 300...
+Iter 400...
+    Tr time: 58491
+Par Tr time: 7353
+    Tr time: 2463
+Par Tr time: 463
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 369.063 sec
+
+Results :
+
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0
+
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.2:jar (default-jar) @ tsne ---
+[INFO] Building jar: C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-core\target\tsne-0.0.2.jar
+[INFO] 
+[INFO] --- maven-shade-plugin:1.6:shade (default) @ tsne ---
+[INFO] Including gov.nist.math:jama:jar:1.0.2 in the shaded jar.
+[INFO] Including com.googlecode.efficient-java-matrix-library:core:jar:0.26 in the shaded jar.
+[INFO] Including com.googlecode.efficient-java-matrix-library:equation:jar:0.26 in the shaded jar.
+[INFO] Including junit:junit:jar:4.12 in the shaded jar.
+[INFO] Including org.hamcrest:hamcrest-core:jar:1.3 in the shaded jar.
+[INFO] Replacing original artifact with shaded artifact.
+[INFO] Replacing C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-core\target\tsne-0.0.2.jar with C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-core\target\tsne-0.0.2-shaded.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ tsne ---
+[INFO] Installing C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-core\target\tsne-0.0.2.jar to C:\Users\pascal\.m2\repository\com\jujutsu\tsne\tsne\0.0.2\tsne-0.0.2.jar
+[INFO] Installing C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-core\dependency-reduced-pom.xml to C:\Users\pascal\.m2\repository\com\jujutsu\tsne\tsne\0.0.2\tsne-0.0.2.pom
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java T-SNE Demos 0.1
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:resources (default-resources) @ tsne-demos ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] Copying 9 resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:compile (default-compile) @ tsne-demos ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- maven-resources-plugin:2.6:testResources (default-testResources) @ tsne-demos ---
+[INFO] Using 'UTF-8' encoding to copy filtered resources.
+[INFO] skip non existing resourceDirectory C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-demos\src\test\resources
+[INFO] 
+[INFO] --- maven-compiler-plugin:3.1:testCompile (default-testCompile) @ tsne-demos ---
+[INFO] No sources to compile
+[INFO] 
+[INFO] --- maven-surefire-plugin:2.12.4:test (default-test) @ tsne-demos ---
+[INFO] 
+[INFO] --- maven-jar-plugin:2.3.2:jar (default-jar) @ tsne-demos ---
+[INFO] Building jar: C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-demos\target\tsne-demos-0.1.jar
+[INFO] 
+[INFO] --- maven-shade-plugin:1.6:shade (default) @ tsne-demos ---
+[INFO] Including com.jujutsu.tsne:tsne:jar:0.0.2 in the shaded jar.
+[INFO] Including joinery:joinery-dataframe:jar:1.6 in the shaded jar.
+[INFO] Including io.dropwizard.metrics:metrics-annotation:jar:3.1.1 in the shaded jar.
+[INFO] Including net.sf.supercsv:super-csv:jar:2.3.1 in the shaded jar.
+[INFO] Including org.apache.commons:commons-math3:jar:3.4.1 in the shaded jar.
+[INFO] Including commons-cli:commons-cli:jar:1.2 in the shaded jar.
+[INFO] Including org.apache.poi:poi:jar:3.11 in the shaded jar.
+[INFO] Including commons-codec:commons-codec:jar:1.9 in the shaded jar.
+[INFO] Replacing original artifact with shaded artifact.
+[INFO] Replacing C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-demos\target\tsne-demos-0.1.jar with C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-demos\target\tsne-demos-0.1-shaded.jar
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ tsne-demos ---
+[INFO] Installing C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-demos\target\tsne-demos-0.1.jar to C:\Users\pascal\.m2\repository\com\jujutsu\tsne\tsne-demos\0.1\tsne-demos-0.1.jar
+[INFO] Installing C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\tsne-demos\dependency-reduced-pom.xml to C:\Users\pascal\.m2\repository\com\jujutsu\tsne\tsne-demos\0.1\tsne-demos-0.1.pom
+[INFO]                                                                         
+[INFO] ------------------------------------------------------------------------
+[INFO] Building Java T-SNE Package 0.0.1-SNAPSHOT
+[INFO] ------------------------------------------------------------------------
+[INFO] 
+[INFO] --- maven-install-plugin:2.4:install (default-install) @ tsne-package ---
+[INFO] Installing C:\Users\pascal\Documents\projekte_ec\Java\work_tests\T-SNE-Java\pom.xml to C:\Users\pascal\.m2\repository\com\jujutsu\tsne\tsne-package\0.0.1-SNAPSHOT\tsne-package-0.0.1-SNAPSHOT.pom
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary:
+[INFO] 
+[INFO] Java T-SNE ........................................ SUCCESS [06:11 min]
+[INFO] Java T-SNE Demos .................................. SUCCESS [  2.716 s]
+[INFO] Java T-SNE Package ................................ SUCCESS [  0.044 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 06:14 min
+[INFO] Finished at: 2015-11-03T09:31:53+01:00
+[INFO] Final Memory: 10M/235M
+[INFO] ------------------------------------------------------------------------
