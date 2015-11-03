@@ -10,23 +10,23 @@
         <conf name="test"    description="Required for test only" extends="runtime"/>
     </configurations>
     
+    <!-- <dependencies defaultconfmapping="*->default,sources,javadoc">  -->
     <dependencies>
         <!-- compile dependencies -->
-        <dependency org="com.github.yannrichet" name="JMathPlot" rev="1.0"/>
+        <dependency org="com.github.yannrichet" name="JMathPlot" rev="1.0.1" conf="compile->default,sources,javadoc"/> <!-- 1.0 can't resolve dependencies! -->
 
-        <dependency org="gov.nist.math" name="jama" rev="1.0.2"/>
-        <dependency org="org.ejml" name="equation" rev="0.27"/>
-        <dependency org="org.ejml" name="core" rev="0.27"/>
-
-        
-        
-        <!--
-        Local jars in ivy!
-        http://stackoverflow.com/a/10180491/5230043
-        http://stackoverflow.com/questions/8895227/how-to-use-ivy-to-resolve-locally
-        <dependency org="oracle.jdbc" name="ojdbc" rev="6"/>
+        <dependency org="com.jujutsu.tsne" name="tsne" rev="0.0.2" conf="compile->default,sources,javadoc"/>
+        <!-- OR - includes all dependencies? 
+        <dependency org="com.jujutsu.tsne" name="tsne" rev="0.0.2" />
+        <dependency org="com.jujutsu.tsne" name="tsne-package" rev="0.0.1-SNAPSHOT"/>
         -->
-
+        
+        <!-- This dependencies should already be included within the tsne.jar!? 
+             But the source or javadoc will not be included there!-->
+        <dependency org="gov.nist.math" name="jama" rev="1.0.2" conf="compile->default,sources,javadoc"/>
+        <dependency org="org.ejml" name="equation" rev="0.27" conf="compile->default,sources,javadoc"/>
+        <dependency org="org.ejml" name="core" rev="0.27" conf="compile->default,sources,javadoc"/>
+        
         <!-- runtime dependencies -->
         <!-- ...conf="runtime->default"/> -->
         
