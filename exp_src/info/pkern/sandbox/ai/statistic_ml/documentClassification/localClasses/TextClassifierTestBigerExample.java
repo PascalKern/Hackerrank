@@ -25,8 +25,8 @@ public class TextClassifierTestBigerExample {
 	@Test
 	public void testLearn() throws Exception {
 
-		String basePath = "/Users/pkern/Google Drive/BOW";
-//		String basePath = "C:/Users/pascal/Google Drive/BOW";
+//		String basePath = "/Users/pkern/Google Drive/BOW";
+		String basePath = "C:/Users/pascal/Google Drive/BOW";
 		
 		Path learnBase = Paths.get(basePath + "/learn_and_test/learn");
 		Path testBase = Paths.get(basePath + "/learn_and_test/test");
@@ -48,7 +48,7 @@ public class TextClassifierTestBigerExample {
 			fileContent = fileContent.replaceAll("[_-]", " ");
 			fileContent = fileContent.replaceAll(" {2,}", " ");
 			BagOfWords trainBag = new BagOfWords();
-			trainBag.addTerms(Arrays.asList(fileContent.split(" ")));
+			trainBag.addTerms(Arrays.asList(fileContent.trim().split("[\\s]")));
 			textClassifier.train(trainBag, file.getParent().getFileName().toString());
 		}
 		
@@ -72,7 +72,7 @@ public class TextClassifierTestBigerExample {
 			fileContent = fileContent.replaceAll("[_-]", " ");
 			fileContent = fileContent.replaceAll(" {2,}", " ");
 			BagOfWords testBag = new BagOfWords();
-			testBag.addTerms(Arrays.asList(fileContent.split(" ")));
+			testBag.addTerms(Arrays.asList(fileContent.trim().split("[\\s]")));
 			
 			List<Entry<String, Double>> probabilities = textClassifier.getClassificationProbabilities(testBag);
 			MapUtil.sortEntryListByValueDescending(probabilities);

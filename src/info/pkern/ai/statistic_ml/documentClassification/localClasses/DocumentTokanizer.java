@@ -64,6 +64,7 @@ public class DocumentTokanizer {
 	//TODO Could also use some command classes (Analyzer) like with the filters to tokanize the string with different analyzers.
 	private List<String> tokanizeText(String text) {
 		
+		//TODO Move to filter/analyzer class(es)
 		/* Could also replace ALL non character chars with a space and remove double spaces afterwards?! */
 		//Simplify the text
 		text = text.toLowerCase();
@@ -84,7 +85,7 @@ public class DocumentTokanizer {
 		
 		
 //		List<String> tokens = Arrays.asList(text.split("[\\s,\\.;:]"));
-		List<String> tokens = Arrays.asList(text.split("[\\s]"));
+		List<String> tokens = Arrays.asList(text.trim().split("[\\s]"));
 		return filterWords(tokens);
 		
 		/*
