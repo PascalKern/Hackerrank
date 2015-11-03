@@ -10,6 +10,7 @@
         <conf name="test"    description="Required for test only" extends="runtime"/>
     </configurations>
     
+    <!-- <dependencies defaultconfmapping="*->default,sources,javadoc">  -->
     <dependencies>
         <!-- compile dependencies -->
         <dependency org="com.github.yannrichet" name="JMathPlot" rev="1.0.1" conf="compile->default,sources,javadoc"/> <!-- 1.0 can't resolve dependencies! -->

@@ -1,18 +1,22 @@
 <ivysettings>
-    <settings defaultResolver="internal"/>
+    <settings defaultResolver="chain_1"/>
     <resolvers>
-	    <chain name="internal" dual="true">
-	        <filesystem name="local-maven-2" m2compatible="true" force="false" local="true">
-	           <artifact pattern="${user.home}/.m2/repository/[organisation]/[module]/[revision]/[module]-[revision].[ext]"/>
-	           <ivy pattern="${user.home}/.m2/repository/[organisation]/[module]/[revision]/[module]-[revision].pom"/>
+        <chain name="chain_1" returnFirst="true">
+			<!-- Works when the T-SNE Maven project was build with: package install with the maven-attache-source and
+			javadoc plugin configured on tsne-core and tsne-demo. Eventuelly existing tsne jars cached by ivy must be
+			delete to get the sources loaded! 
+			-->
+	        <filesystem name="local-maven-2" m2compatible="true" force="false" local="true" checkmodified="true">
+	           <artifact pattern="${user.home}/.m2/repository/[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]"/>
+	           <ivy pattern="${user.home}/.m2/repository/[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).pom"/>
 	        </filesystem>
+	        <!-- 
+			<filesystem name="local_libs" checkmodified="true" >
+				<ivy pattern="${ivy.settings.dir}/libs/[module]-[revision]/[module]-[revision].[ext]" />
+				<artifact pattern="${ivy.settings.dir}/libs/[module]-[revision]/[module]-[revision].[ext]" />
+			</filesystem>
+			-->
 	        <ibiblio name="central" m2compatible="true"/>
-	        <ibiblio name="local-m2" m2compatible="true" root="${user.home}/.m2/repository/" />
-	    </chain>    
+		</chain>
     </resolvers>
-    <!--
-    <modules>
-        <module organisation="oracle.jdbc" name="ojdbc" resolver="local_libs"/>
-    </modules>
-    -->
 </ivysettings>
