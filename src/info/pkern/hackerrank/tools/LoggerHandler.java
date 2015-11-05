@@ -1,3 +1,5 @@
+package info.pkern.hackerrank.tools;
+
 import java.util.logging.ConsoleHandler;
 import java.util.logging.Handler;
 import java.util.logging.Level;
