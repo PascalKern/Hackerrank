@@ -102,6 +102,12 @@ public class BagOfWords {
 		return termFrequencies.containsKey(term);
 	}
 
+	public Set<String> termsOnlyInOtherBag(BagOfWords otherBag) {
+		Set<String> bagTerms = new HashSet<>(otherBag.termFrequencies.keySet());
+		bagTerms.removeAll(termFrequencies.keySet());
+		return bagTerms;
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

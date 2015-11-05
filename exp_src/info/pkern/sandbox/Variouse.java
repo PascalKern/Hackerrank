@@ -15,6 +15,16 @@ public class Variouse {
 
 	
 	@Test
+	public void setRetainAll() {
+		Set<String> setA = new HashSet<>(Arrays.asList(new String[]{"eins","zwei","drei"}));
+		Set<String> setB = new HashSet<>(Arrays.asList(new String[]{"zwei","drei","vier"}));
+		System.out.println(setA);
+		System.out.println(setA.retainAll(setB));
+		System.out.println(setA);
+		System.out.println(setB);
+	}
+	
+	@Test
 	public void formatDoubleAsScientificString() {
 		Double d = 0.0000012354252342346231463452134d;
 		System.out.println(String.format("%g",d));

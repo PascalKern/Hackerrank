@@ -3,7 +3,10 @@ package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 import static org.junit.Assert.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -123,5 +126,21 @@ public class BagOfWordsTest {
 		System.out.println(testBag.getNormalizedFrequency("he"));
 		System.out.println(testBag.getNormalizedFrequency("blubber"));
 	}
+
+	@Test
+			public void testTermsOnlyInOtherBag() throws Exception {
+				BagOfWords bagA = new BagOfWords();
+				BagOfWords bagB = new BagOfWords();
+				bagA.addTerm("one");
+				bagA.addTerm("two");
+				bagA.addTerm("three");
+				bagB.addTerm("two");
+				bagB.addTerm("three");
+				bagB.addTerm("four");
+				bagB.addTerm("five");
+				Set<String> expected = new HashSet<>(Arrays.asList(new String[]{"four","five"}));
+				assertEquals(expected, bagA.termsOnlyInOtherBag(bagB));
+				
+			}
 	
 }
