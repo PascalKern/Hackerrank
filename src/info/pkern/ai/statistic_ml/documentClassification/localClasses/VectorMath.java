@@ -1,6 +1,8 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
+import java.io.InvalidObjectException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 public class VectorMath {
@@ -13,10 +15,23 @@ public class VectorMath {
 	 * @param vector to calculate the norm.
 	 * @return the L2-Norm value.
 	 */
-	public static Double euclidianNorm(List<Double> vector) {
+	public static Double euclidianNorm(Collection<Double> vector) {
 		Double length= 0d;
 		for (Double element : vector) {
-			length += Math.pow(element, 2d);
+			if (null != element) {
+				length += Math.pow(element, 2d);
+			}
+		}
+		return Math.sqrt(length);
+	}
+
+	//TODO To nasty this code duplication!
+	public static Double euclidianNormInt(Collection<Integer> vector) {
+		Double length= 0d;
+		for (Integer element : vector) {
+			if (null != element) {
+				length += Math.pow(element, 2d);
+			}
 		}
 		return Math.sqrt(length);
 	}
@@ -38,7 +53,11 @@ public class VectorMath {
 		}
 		Double dotProd = 0d;
 		for (int i = 0; i < vectorA.size(); i++) {
-			dotProd += vectorA.get(i) * vectorB.get(i);
+			Double elementA = vectorA.get(i);
+			Double elementB = vectorB.get(i);
+			if (null != elementA && null != elementB) {
+				dotProd += vectorA.get(i) * vectorB.get(i);
+			}
 		}
 		return dotProd;
 	}
@@ -68,14 +87,20 @@ public class VectorMath {
 	public static List<Double> normlizeVectorWithEuclidianNorm(List<Double> vector, Double euclidianNorm) {
 		List<Double> normalized = new ArrayList<>(vector.size());
 		for (Double element : vector) {
-			normalized.add(element / euclidianNorm);
+			if (null != element) {
+				normalized.add(element / euclidianNorm);
+			}
 		}
 		return normalized;
 	}
 	
-	public static Double cosineSimilarity(List<Double> vectorA, List<Double> vectorB) {
+	public static Double cosineSimilarity(List<Double> vectorA, List<Double> vectorB) throws InvalidObjectException {
 		Double dotProd = dotProduct(vectorA, vectorB);
 		Double euclidianNormProduct = euclidianNorm(vectorA) * euclidianNorm(vectorB);
-		return dotProd / euclidianNormProduct;
+		if (null != euclidianNormProduct && 0 != euclidianNormProduct) {
+			return dotProd / euclidianNormProduct;
+		} else {
+			throw new InvalidObjectException("Division by zero not allowed! [deonomiator euclidianNormProduct="+euclidianNormProduct+"]");
+		}
 	}
 }
