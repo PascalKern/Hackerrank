@@ -3,6 +3,8 @@ package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 import info.pkern.hackerrank.tools.MapUtil;
 
 import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.nio.file.Path;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
@@ -17,6 +19,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+//TODO Use the VectorMath where possible!
 public class TextClassifier {
 
 	//Maybe make changeable?
@@ -40,7 +43,7 @@ public class TextClassifier {
 	private boolean trainingFinished = false;
 
 	//Not the proper OOP way! This violates the SRP of the BagOfWords. Here not words/terms where counted instead doc classes!
-	private  BagOfWords termFrequencies = new BagOfWords();
+	private  BagOfWords docClassFrequencies = new BagOfWords();
 	
 	//For littlest caching
 	private List<Entry<String, Double>> lastClassificationResult;
@@ -62,30 +65,50 @@ public class TextClassifier {
 		}
 	}
 	
+	//Deprecated due the not yet MultiDimBag implementation of add() within the DocumentClass! 
+	@Deprecated
 	public void train(DocumentClass docClass) {
 		String className = docClass.getName();
-		DocumentClass existing = docClasses.get(className);
-		if (null == existing) {
+		DocumentClass docClassEdit = docClasses.get(className);
+		if (null == docClassEdit) {
 			 docClasses.put(className, docClass);
-			 termFrequencies.addTerms(docClass.getTerms());
+			 docClassFrequencies.addTerms(docClass.getTerms());
 		} else {
-			existing.add(docClass);
-			docClasses.put(className, existing);
+			docClassEdit.add(docClass);
+			docClasses.put(className, docClassEdit);
 			Set<String> newTerms = docClass.getTerms();
-			newTerms.removeAll(existing.getTerms());
+			newTerms.removeAll(docClassEdit.getTerms());
 			if (! newTerms.isEmpty()) {
-				termFrequencies.addTerms(newTerms);
+				docClassFrequencies.addTerms(newTerms);
 			}
 		}
+		docClassEdit.setTrained(false);
 		trainingFinished = false;
 	}
 	
-	public void train(BagOfWords bag, String docClassName) {
-		DocumentClass docClass = new DocumentClass(docClassName);
-		docClass.add(bag);
-		train(docClass);
-	}
+	//Old when used with the newly deprecated train(DocumentClass) method!
+//	public void train(BagOfWords bag, String docClassName) {
+//		DocumentClass docClass = new DocumentClass(docClassName);
+//		docClass.add(bag);
+//		train(docClass);
+//	}
 
+	public void train(BagOfWords bag, String docClassName) {
+		DocumentClass docClass = docClasses.get(docClassName);
+		if (null == docClass) {
+			docClass = new DocumentClass(docClassName);
+			docClass.add(bag);
+			docClasses.put(docClassName, docClass);
+			docClassFrequencies.addTerms(docClass.getTerms());
+		} else {
+			docClassFrequencies.addTerms(bag.termsNotIn(docClass.getTerms()));
+			docClass.add(bag);
+			docClasses.put(docClassName, docClass);
+		}
+		docClass.setTrained(false);
+		trainingFinished = false;
+	}
+	
 	public Entry<String, Double> classify(BagOfWords queryBag) {
 		checkReadyForClassification();
 		List<Entry<String, Double>> classifications;
@@ -162,15 +185,15 @@ public class TextClassifier {
 	 */
 	@Deprecated
 	public Double calculateIDF(String term) {
-		Integer docFrequency = termFrequencies.getFrequency(term);
+		Integer docFrequency = docClassFrequencies.getFrequency(term);
 		Double docFraction = docClasses.size() / (1 + docFrequency.doubleValue());
 		return Math.log10(docFraction);
 	}
 	
 	//Do not add zero calculated IDFs!? Then remove "&& idf > 0d" within calculateTfIdf(DocClass terms) bellow.
 	private Map<String, Double> calculateIDF() {
-		Map<String, Double> inverseDocumentFrequency = new HashMap<>(termFrequencies.getNumberOfTerms());
-		for (String term : termFrequencies.getTerms()) {
+		Map<String, Double> inverseDocumentFrequency = new HashMap<>(docClassFrequencies.getNumberOfTerms());
+		for (String term : docClassFrequencies.getTerms()) {
 			inverseDocumentFrequency.put(term, calculateIDF(term));
 		}
 		return inverseDocumentFrequency;
@@ -184,7 +207,7 @@ public class TextClassifier {
 		//Ignore zeros because 0^2 still is 0. Also 0/x is still 0 so there is no need to include them!
 		Double denominatorL2Norm = 0d;
 		for (String term : terms.getTerms()) {
-			denominatorL2Norm += Math.pow(termFrequencies.getFrequency(term), 2);
+			denominatorL2Norm += Math.pow(docClassFrequencies.getFrequency(term), 2);
 		}
 		denominatorL2Norm = Math.sqrt(denominatorL2Norm);
 		
@@ -275,7 +298,9 @@ public class TextClassifier {
 		Path vertices = location.resolve(filename);
 		Path lables = location.resolve("labels_" + filename);
 		try (FileWriter fwLables = new FileWriter(lables.toFile()); FileWriter fwVertices = new FileWriter(vertices.toFile())) {
-			List<String> terms = new ArrayList<>(termFrequencies.getTerms());
+			List<String> terms = new ArrayList<>(docClassFrequencies.getTerms());
+			//Header. Only right for doc class term weights!
+			/*
 			StringBuilder header = new StringBuilder();
 			for (String term : terms) {
 				header.append(String.format("%-16s", term + ",")).append("  ");
@@ -283,9 +308,12 @@ public class TextClassifier {
 			header.delete(header.lastIndexOf(","),header.length());
 			fwVertices.append(header);
 			fwVertices.append(System.lineSeparator());
-			int classCounter = 1;
+			*/
+			
+//			int classCounter = 1;
 			for (Entry<String, Map<String, Double>> currentClass : termWeightVectorsPerClass.entrySet()) {
-				fwLables.append(currentClass.getKey());
+				String className = currentClass.getKey();
+				fwLables.append(className);
 				Double currentValue;
 				for (int i = 0, j = 1; i < terms.size(); i++, j++) {
 					currentValue = currentClass.getValue().get(terms.get(i));
@@ -298,14 +326,57 @@ public class TextClassifier {
 						fwVertices.append(", ");
 					}
 				}
-				if (classCounter < termWeightVectorsPerClass.size()) {
-					fwLables.append(System.lineSeparator());
+				fwLables.append(System.lineSeparator());
+				fwVertices.append(System.lineSeparator());
+				docClasses.get(className).cleanUpTfPerBag(termWeightVectorsPerClass.get(className).keySet());
+				for (List<Double> currentValues : docClasses.get(className).getAllTermFrequencyBags()) {
+					fwLables.append(className).append(System.lineSeparator());
+					writeClassOfTfAsRow(fwVertices, currentValues);
 					fwVertices.append(System.lineSeparator());
+//					completeMissingTermsAndNullValues(currentValues);
+//					for (int i = 0; i < currentValues.size(); i++) {
+//						fwVertices.append(String.format("%.10E", currentValues.get(i))); 
+//						if (i < currentValues.size()) {
+//							fwVertices.append(", ");
+//						}
+//					}
 				}
-				classCounter++;
+//				if (classCounter < termWeightVectorsPerClass.size()) {
+//					fwLables.append(System.lineSeparator());
+//					fwVertices.append(System.lineSeparator());
+//				}
+//				classCounter++;
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException("Could not write lables or vertices file!", ex);
 		}
+	}
+	
+	private void writeClassOfTfAsRow(Writer writer, List<Double> values) {
+		completeMissingTermsAndNullValues(values);
+		for (int i = 0; i < values.size(); i++) {
+			try {
+				writer.append(String.format("%.10E", values.get(i)));
+				if (i < values.size()) {
+					writer.append(", ");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			} 
+		}
+	}
+
+	//TODO Does the order matter!?
+	public void completeMissingTermsAndNullValues(List<Double> termFrequencyVector) {
+		int nullIndex = -1;
+		while (-1 != (nullIndex = termFrequencyVector.indexOf(null))) {
+			termFrequencyVector.set(nullIndex, 0d);
+		}
+		int missingTermsCount = docClassFrequencies.getTerms().size() - termFrequencyVector.size();
+		while (missingTermsCount > 0) {
+			termFrequencyVector.add(0d);
+			missingTermsCount--;
+		}
+		System.out.println(termFrequencyVector.size() + " -> " + docClassFrequencies.getTerms().size());
 	}
 }

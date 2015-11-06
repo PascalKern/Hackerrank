@@ -76,6 +76,8 @@ public class BagOfWords {
 		}
 	}
 	
+	//Not to useful!
+	@Deprecated
 	public Double getNormalizedFrequency(String term) {
 		Integer frequency = termFrequencies.get(term);
 		if (null == frequency) {
@@ -102,10 +104,14 @@ public class BagOfWords {
 		return termFrequencies.containsKey(term);
 	}
 
-	public Set<String> termsOnlyInOtherBag(BagOfWords otherBag) {
-		Set<String> bagTerms = new HashSet<>(otherBag.termFrequencies.keySet());
-		bagTerms.removeAll(termFrequencies.keySet());
-		return bagTerms;
+	public Set<String> termsNotIn(BagOfWords otherBag) {
+		return termsNotIn(getTerms());
+	}
+	
+	public Set<String> termsNotIn(Collection<String> terms) {
+		Set<String> notYetInThisBag = new HashSet<>(getTerms());
+		notYetInThisBag.removeAll(terms);
+		return notYetInThisBag;
 	}
 	
 	@Override
@@ -139,5 +145,22 @@ public class BagOfWords {
 		} else if (!termFrequencies.equals(other.termFrequencies))
 			return false;
 		return true;
+	}
+
+	public Set<Integer> getFrequencies() {
+		return new HashSet<Integer>(termFrequencies.values());
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("BagOfWords [maxTermFrequency=");
+		builder.append(maxTermFrequency);
+		builder.append(", termCount=");
+		builder.append(getNumberOfTerms());
+		builder.append(", termFrequencies=");
+		builder.append(termFrequencies);
+		builder.append("]");
+		return builder.toString();
 	}
 }

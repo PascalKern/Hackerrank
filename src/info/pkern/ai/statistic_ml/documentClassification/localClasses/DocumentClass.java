@@ -1,7 +1,10 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,6 +24,8 @@ public class DocumentClass {
 	//Not the proper OOP way! This violates the SRP of the BagOfWords. Here not words/terms where counted instead bags!
 	private BagOfWords bagFrequencies = new BagOfWords();
 	
+	private boolean trained = false;
+	
 	/*
 	 * Preparation to keep / calculate a idf vector for each added document (BOW). Mostly needed to visualize later.
 	 * Almost a Matrix where each row is a document and each column the frequency of the term at this index. The longer
@@ -30,22 +35,101 @@ public class DocumentClass {
 	 *  
 	 * Could also use a MashMap for each row with the index as key.
 	 */
-	private Map<String, Integer> termIndices = new HashMap<>();
-	private List<List<Double>> idfPerDocument = new ArrayList<>();
+//	private Map<String,Integer> indices = new HashMap<>();
+	private List<String> indices = new ArrayList<>();
+	private List<List<Double>> tfPerBag = new ArrayList<>();
 	
 	private Double denominatorL2Norm;
+	private Double denominatorL2NormNormalized;
 	
 	public DocumentClass(String name) {
 		this.name = name;
 	}
 	
+	public boolean isTrained() {
+		return trained;
+	}
+
+	public void setTrained(boolean trained) {
+		this.trained = trained;
+	}
+
 	public void add(BagOfWords bagOfWords) {
 		termFrequencies.add(bagOfWords);
 		totalNumberOfBags++;
 		bagFrequencies.addTerms(bagOfWords.getTerms());
 		denominatorL2Norm = null;
+		denominatorL2NormNormalized = null;
+		
+		//MultiDimBag
+		if (indices.isEmpty()) {
+			addNewTerms(bagOfWords.getTerms());
+		} else {
+			Set<String> newTermsFromBag = bagOfWords.termsNotIn(indices);
+			addNewTerms(newTermsFromBag);
+		}
+		List<Double> newBagFrequencies = populateZeroedList(indices.size());
+		for (String term : bagOfWords.getTerms()) {
+			int index = indices.indexOf(term);
+			newBagFrequencies.set(index, bagOfWords.getNormalizedFrequency(term));
+		}
+		tfPerBag.add(newBagFrequencies);
 	}
 	
+	//MultiDimBag
+	private List<Double> populateZeroedList(int elementsCount) {
+		//Does not work! Will throw a UnsuportedOperationException due the list is write through to the backed up array!!!
+//		List<Double> newBagFrequencies = Arrays.asList(new Double[indices.size()]);
+		List<Double> list = new ArrayList<>(elementsCount);
+		while (0 < elementsCount) {
+			list.add(0d);
+			elementsCount--;
+		}
+		return list;
+	}
+	
+	//MultiDimBag
+	private void addNewTerms(Set<String> newTerms) {
+		for (String term : newTerms) {
+			int index;
+			if (-1 != (index = indices.indexOf(null))) {
+				indices.set(index, term);
+			} else {
+				indices.add(term);
+			}
+		}
+	}
+
+	//MultiDimBag
+	public List<List<Double>> getAllTermFrequencyBags() {
+		List<List<Double>> listCopy = new ArrayList<List<Double>>();
+		listCopy.addAll(tfPerBag);
+		return listCopy;
+	}
+
+	//MultiDimBag
+	public void cleanUpTfPerBag(Collection<String> termsToKeep) {
+		Set<String> termsToRemove = new HashSet<>(indices);
+		termsToRemove.removeAll(termsToKeep);
+		for (String term : termsToRemove) {
+			int index = indices.indexOf(term);
+			for (List<Double> bagTerms : tfPerBag) {
+				bagTerms.set(index, null);
+			}
+		}
+		for (List<Double> bagTerms : tfPerBag) {
+			for (int i = bagTerms.size(); i > 0; i--) {
+				bagTerms.remove(i);
+			}
+		}
+	}
+	
+	
+	/**
+	 * Not (yet) implemented for the MultiDimBag functionality!
+	 * @param anotherClass
+	 */
+	@Deprecated
 	public void add(DocumentClass anotherClass) {
 		if (! name.equals(anotherClass.getName())) {
 			throw new UnsupportedOperationException("Can only add (merge) classes with the same name! [names: this="
@@ -69,24 +153,24 @@ public class DocumentClass {
 	}
 	
 	public Double getL2NormFromFrequency(String term) {
-		reCalculateDenominatorL2Norm();
+		reCalculateDenominators();
 		return termFrequencies.getFrequency(term) / denominatorL2Norm;
 	}
 
 	@Deprecated
 	public Double getL2NormFromNormalizedFrequency(String term) {
-		reCalculateDenominatorL2Norm();
-		return termFrequencies.getNormalizedFrequency(term) / denominatorL2Norm;
+		reCalculateDenominators();
+		return termFrequencies.getNormalizedFrequency(term) / denominatorL2NormNormalized;
 	}
 	
-	//Ignore zeros because 0^2 still is 0. Also 0/x is still 0 so there is no need to include them!
-	private void reCalculateDenominatorL2Norm() {
+	private void reCalculateDenominators() {
 		if (null == denominatorL2Norm) {
-			Double pow2Sum = 0d;
-			for (String term : termFrequencies.getTerms()) {
-				pow2Sum += Math.pow(termFrequencies.getFrequency(term), 2);
+			denominatorL2Norm = VectorMath.euclidianNormInt(termFrequencies.getFrequencies());
+			List<Double> normlizedFrequencies = new ArrayList<>();
+			for (String currentTerm : termFrequencies.getTerms()) {
+				normlizedFrequencies.add(termFrequencies.getNormalizedFrequency(currentTerm));
 			}
-			denominatorL2Norm = Math.sqrt(pow2Sum);
+			denominatorL2NormNormalized = VectorMath.euclidianNorm(normlizedFrequencies);
 		}
 	}
 	
