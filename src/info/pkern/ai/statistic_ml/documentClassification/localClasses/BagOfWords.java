@@ -14,7 +14,9 @@ public class BagOfWords {
 
 	private Integer maxTermFrequency = 0;
 	private Map<String, Integer> termFrequencies = new HashMap<>();
-
+	private List<Double> normalizedFrequenciesL2Norm;
+	private Double denominatorL2Norm;
+	
 	public void addTerm(String term, Integer frequency) {
 		int newFrequency = frequency;
 		if (termFrequencies.keySet().contains(term)) {
@@ -24,6 +26,7 @@ public class BagOfWords {
 			termFrequencies.put(term, newFrequency);
 		}
 		maxTermFrequency = Math.max(newFrequency, maxTermFrequency);
+		normalizedFrequenciesL2Norm = null;
 	}
 	
 	public void addTerm(String term) {
@@ -76,6 +79,10 @@ public class BagOfWords {
 		}
 	}
 	
+	public Set<Integer> getFrequencies() {
+		return new HashSet<Integer>(termFrequencies.values());
+	}
+
 	//Not to useful!
 	@Deprecated
 	public Double getNormalizedFrequency(String term) {
@@ -87,6 +94,27 @@ public class BagOfWords {
 		}
 	}
 	
+	public Double getNormalizedFrequencyL2Norm(String term) {
+		if (null == denominatorL2Norm) {
+			//euclidNorm^2 is inverse of sqrt() used to calculate the vector length!
+			denominatorL2Norm = Math.pow(VectorMath.euclidianNorm(termFrequencies.values()), 2d);
+		}
+		//TODO CHECK ok?
+		Integer tf;
+		if (null == (tf = termFrequencies.get(term))) {
+			return 0d;
+		} else {
+			return tf / denominatorL2Norm;
+		}
+	}
+	
+	public List<Double> getNormalizedFrequenciesL2Norm() {
+		if (null == normalizedFrequenciesL2Norm) {
+			normalizedFrequenciesL2Norm = VectorMath.normlizeVectorWithEuclidianNorm(termFrequencies.values());
+		}
+		return normalizedFrequenciesL2Norm;
+	}
+
 	/**
 	 * Gets a copy of the terms in this bag. Changes to this set are <strong>not</strong> be reflected to this bag!
 	 *
@@ -145,10 +173,6 @@ public class BagOfWords {
 		} else if (!termFrequencies.equals(other.termFrequencies))
 			return false;
 		return true;
-	}
-
-	public Set<Integer> getFrequencies() {
-		return new HashSet<Integer>(termFrequencies.values());
 	}
 
 	@Override

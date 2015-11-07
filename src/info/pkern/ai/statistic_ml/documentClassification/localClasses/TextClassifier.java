@@ -37,8 +37,6 @@ public class TextClassifier {
 	private Map<String, Double> inverseDocumentFrequency;
 	//Could maybe added to the document class itself! Or better calculate it inside the document class with a 
 	//given IDF Map. Also the vector length!
-	private Map<String, Map<String, Double>> termWeightVectorsPerClass;
-	private Map<String, Double> termWeightVectorLengthPerClass;
 	
 	private boolean trainingFinished = false;
 
@@ -49,7 +47,8 @@ public class TextClassifier {
 	private List<Entry<String, Double>> lastClassificationResult;
 	private int lastClassifiedBag;
 	
-	//Just experimental
+	//TODO Remove all not normalized Methods! Use only L2-Norm over all classes!!!
+	@Deprecated
 	private boolean useNormalizedFrequences = false;
 
 	
@@ -135,18 +134,16 @@ public class TextClassifier {
 		} else {
 			DocumentClass query = new DocumentClass("Query");
 			query.add(queryBag);
-			Map<String, Double> queryWeights = calculateTfIdf(query);
-			Double vectorLength = calculateTermWeightVectorLength(queryWeights.values());
+			
+			query.weightFrequenciesWithIDF(inverseDocumentFrequency);
 			
 			classifications = new ArrayList<>(docClasses.size());
-			for (Entry<String, Map<String, Double>> classWeights : termWeightVectorsPerClass.entrySet()) {
-				Double dotProduct = calculateDotProduct(queryWeights, classWeights.getValue());
-				
-				Double classificationProbability = dotProduct / 
-//						(Math.abs(vectorLength) * Math.abs(termWeightVectorLengthPerClass.get(classWeights.getKey())));
-						vectorLength * termWeightVectorLengthPerClass.get(classWeights.getKey());
-				
-				classifications.add(new SimpleEntry<>(classWeights.getKey(), classificationProbability));
+			
+			for (DocumentClass docClass : docClasses.values()) {
+				Double dotProduct = VectorMath.dotProduct(query.getTfIdfWeightedFrequencies(), docClass.getTfIdfWeightedFrequencies());
+				Double classificationProbability = dotProduct /
+						query.getWeightedEuclidianNorm() * docClass.getWeightedEuclidianNorm();
+				classifications.add(new SimpleEntry<>(docClass.getName(), classificationProbability));
 			}
 			lastClassificationResult = new ArrayList<>(classifications);
 			lastClassifiedBag = queryBag.hashCode();
@@ -154,14 +151,17 @@ public class TextClassifier {
 		return classifications;
 	}
 	
+	@Deprecated
 	public boolean isUseNormalizedFrequences() {
 		return useNormalizedFrequences;
 	}
 
+	@Deprecated
 	public void setUseNormalizedFrequences(boolean useNormalizedFrequences) {
 		this.useNormalizedFrequences = useNormalizedFrequences;
 	}
 
+	@Deprecated
 	public Double getIDF(String term) {
 		checkReadyForClassification();
 		return getIDFOrZero(term);
@@ -171,9 +171,14 @@ public class TextClassifier {
 	public void finishTraining() {
 		inverseDocumentFrequency = calculateIDF();
 		reduceIdfToMaxNumberOfTerms();
-		termWeightVectorsPerClass = calculateTermWeigthVectorPerClass();
-		termWeightVectorLengthPerClass = calculateTermWeightVectorLengthPerClass();
+		processDocumentClasses();
 		trainingFinished = true;
+	}
+
+	private void processDocumentClasses() {
+		for (DocumentClass docClass : docClasses.values()) {
+			docClass.weightFrequenciesWithIDF(inverseDocumentFrequency);
+		}
 	}
 
 	/**
@@ -199,74 +204,6 @@ public class TextClassifier {
 		return inverseDocumentFrequency;
 	}
 
-	//Should return absolute already here? So no Math.abs needed in classification calculation.
-	private Map<String, Double> calculateTfIdf(DocumentClass terms) {
-		Map<String, Double> tfIdfs = new HashMap<>();
-		
-		//TODO: Must also use the L2-Normed frequency from the document class?!
-		//Ignore zeros because 0^2 still is 0. Also 0/x is still 0 so there is no need to include them!
-		Double denominatorL2Norm = 0d;
-		for (String term : terms.getTerms()) {
-			denominatorL2Norm += Math.pow(docClassFrequencies.getFrequency(term), 2);
-		}
-		denominatorL2Norm = Math.sqrt(denominatorL2Norm);
-		
-		for (String term : terms.getTerms()) {
-			Double idf = inverseDocumentFrequency.get(term);
-			Double tf;
-			if (useNormalizedFrequences) {
-//				tf = terms.getNormalizedFrequency(term);
-				tf = terms.getL2NormFromNormalizedFrequency(term);
-			} else {
-//				tf = terms.getFrequency(term);
-				tf = terms.getL2NormFromFrequency(term);
-			}
-			//TODO Better only:
-//			if (idf != null) { //OR much better above always set it to 0d when map returns null!
-			if (tf > 0f && idf != null && idf > 0d) {
-				//Calculate L2-Norm
-				idf = idf / denominatorL2Norm;
-				tfIdfs.put(term, tf * idf);
-			}
-		}
-		return tfIdfs;
-	}
-
-	private Map<String, Map<String, Double>> calculateTermWeigthVectorPerClass() {
-		Map<String, Map<String, Double>> weightedTermsPerClass = new HashMap<>();
-		for (Entry<String, DocumentClass> currentClass : docClasses.entrySet()) {
-			weightedTermsPerClass.put(currentClass.getKey(), calculateTfIdf(currentClass.getValue()));
-		}
-		return weightedTermsPerClass;
-	}
-	
-	private Double calculateTermWeightVectorLength(Collection<Double> weightVector) {
-		Double vectorLength = 0d;
-		for (Double weight : weightVector) {
-			vectorLength += Math.pow(weight, 2);
-		}
-		return Math.sqrt(vectorLength);
-	}
-
-	private Map<String, Double> calculateTermWeightVectorLengthPerClass() {
-		Map<String, Double> weightVectorLenghtsPerClass = new HashMap<>();
-		for (Entry<String, Map<String, Double>> classVector : termWeightVectorsPerClass.entrySet()) {
-			weightVectorLenghtsPerClass.put(classVector.getKey(), calculateTermWeightVectorLength(classVector.getValue().values()));
-		}
-		return weightVectorLenghtsPerClass;
-	}
-
-	private Double calculateDotProduct(Map<String, Double> queryWeights, Map<String, Double> weightsOfClass) {
-		Double dotProduct = 0d;
-		for (String term : queryWeights.keySet()) {
-			if (weightsOfClass.containsKey(term)) {
-				dotProduct += queryWeights.get(term) * weightsOfClass.get(term);
-			}
-		}
-		return dotProduct;
-	}
-	
-	//Could also remove 0 values here!?
 	private void reduceIdfToMaxNumberOfTerms() {
 		if (! maxNumberAllowedTerms.equals(Integer.MAX_VALUE)) {
 			List<Entry<String, Double>> sortedList = MapUtil.sortByValuesDescending(inverseDocumentFrequency);
@@ -294,6 +231,15 @@ public class TextClassifier {
 		}
 	}
 	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	public void writeOutVectorsForVisualisation(Path location, String filename) {
 		Path vertices = location.resolve(filename);
 		Path lables = location.resolve("labels_" + filename);
@@ -311,12 +257,12 @@ public class TextClassifier {
 			*/
 			
 //			int classCounter = 1;
-			for (Entry<String, Map<String, Double>> currentClass : termWeightVectorsPerClass.entrySet()) {
-				String className = currentClass.getKey();
-				fwLables.append(className);
+			for (DocumentClass docClass : docClasses.values()) {
+				String className = docClass.getName();
+				fwLables.append(className.toUpperCase());
 				Double currentValue;
 				for (int i = 0, j = 1; i < terms.size(); i++, j++) {
-					currentValue = currentClass.getValue().get(terms.get(i));
+					currentValue = docClass.getTfIdfWeightedFrequency(terms.get(i));
 					if (null == currentValue) {
 						fwVertices.append(String.format("%.10E", 0d)); 
 					} else {
@@ -328,30 +274,20 @@ public class TextClassifier {
 				}
 				fwLables.append(System.lineSeparator());
 				fwVertices.append(System.lineSeparator());
-				docClasses.get(className).cleanUpTfPerBag(termWeightVectorsPerClass.get(className).keySet());
-				for (List<Double> currentValues : docClasses.get(className).getAllTermFrequencyBags()) {
-					fwLables.append(className).append(System.lineSeparator());
+//				docClasses.get(className).cleanUpTfPerBag(termWeightVectorsPerClass.get(className).keySet());
+				for (List<Double> currentValues : docClass.getAllTermFrequencyBags()) {
+					fwLables.append(className.substring(0, 2)).append(System.lineSeparator());
 					writeClassOfTfAsRow(fwVertices, currentValues);
 					fwVertices.append(System.lineSeparator());
-//					completeMissingTermsAndNullValues(currentValues);
-//					for (int i = 0; i < currentValues.size(); i++) {
-//						fwVertices.append(String.format("%.10E", currentValues.get(i))); 
-//						if (i < currentValues.size()) {
-//							fwVertices.append(", ");
-//						}
-//					}
 				}
-//				if (classCounter < termWeightVectorsPerClass.size()) {
-//					fwLables.append(System.lineSeparator());
-//					fwVertices.append(System.lineSeparator());
-//				}
-//				classCounter++;
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException("Could not write lables or vertices file!", ex);
 		}
 	}
 	
+	//TODO Use only terms from the idf vector and only the weighted vectors in the classes.
+	//As noted in the doc class clean the bags in the classes.
 	private void writeClassOfTfAsRow(Writer writer, List<Double> values) {
 		completeMissingTermsAndNullValues(values);
 		for (int i = 0; i < values.size(); i++) {
@@ -377,6 +313,5 @@ public class TextClassifier {
 			termFrequencyVector.add(0d);
 			missingTermsCount--;
 		}
-		System.out.println(termFrequencyVector.size() + " -> " + docClassFrequencies.getTerms().size());
 	}
 }

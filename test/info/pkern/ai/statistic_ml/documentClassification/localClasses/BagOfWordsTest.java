@@ -128,19 +128,19 @@ public class BagOfWordsTest {
 	}
 
 	@Test
-			public void testTermsOnlyInOtherBag() throws Exception {
-				BagOfWords bagA = new BagOfWords();
-				BagOfWords bagB = new BagOfWords();
-				bagA.addTerm("one");
-				bagA.addTerm("two");
-				bagA.addTerm("three");
-				bagB.addTerm("two");
-				bagB.addTerm("three");
-				bagB.addTerm("four");
-				bagB.addTerm("five");
-				Set<String> expected = new HashSet<>(Arrays.asList(new String[]{"four","five"}));
-				assertEquals(expected, bagA.termsOnlyInOtherBag(bagB));
-				
-			}
+					public void testTermsNotIn() throws Exception {
+						BagOfWords bagA = new BagOfWords();
+						BagOfWords bagB = new BagOfWords();
+						bagA.addTerm("one");
+						bagA.addTerm("two");
+						bagA.addTerm("three");
+						bagB.addTerm("two");
+						bagB.addTerm("three");
+						bagB.addTerm("four");
+						bagB.addTerm("five");
+						Set<String> expected = new HashSet<>(Arrays.asList(new String[]{"four","five"}));
+						assertEquals(expected, bagA.termsNotIn(bagB));
+						
+					}
 	
 }

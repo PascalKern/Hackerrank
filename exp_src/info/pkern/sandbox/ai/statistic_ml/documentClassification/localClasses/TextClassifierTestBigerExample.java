@@ -26,18 +26,20 @@ public class TextClassifierTestBigerExample {
 	@Test
 	public void testLearn() throws Exception {
 
-		String basePath = "/Users/pkern/Google Drive/BOW/smallset";
-//		String basePath = "/Users/pkern/Google Drive/BOW";
+//		String basePath = "/Users/pkern/Google Drive/BOW/smallset";
+		String basePath = "/Users/pkern/Google Drive/BOW";
 //		String basePath = "C:/Users/pascal/Google Drive/BOW";
 		
 		Path learnBase = Paths.get(basePath + "/learn_and_test/learn");
 		Path testBase = Paths.get(basePath + "/learn_and_test/test");
 		
 //		TextClassifier textClassifier = new TextClassifier();
-		TextClassifier textClassifier = new TextClassifier(500);
+		TextClassifier textClassifier = new TextClassifier(5000);
 		
 		FileVisitor<Path> fileProcessor = new RecursiveSimpleFileVisitor("txt");
 		Files.walkFileTree(learnBase, fileProcessor);
+		
+		Long start = System.nanoTime();
 		
 		String fileContent;
 		for (Path file : ((RecursiveSimpleFileVisitor) fileProcessor).getFiles()) {
@@ -55,14 +57,20 @@ public class TextClassifierTestBigerExample {
 			textClassifier.train(trainBag, file.getParent().getFileName().toString());
 		}
 		
-//		textClassifier.setUseNormalizedFrequences(true);
+		Long loadTrainData = System.nanoTime() - start;
+		start = System.nanoTime();
+		
 		textClassifier.finishTraining();
+		
+		Long trained = System.nanoTime() - start; 
 		
 		System.out.println("Trained finished!");
 		
 		fileProcessor = new RecursiveSimpleFileVisitor("txt");
 		Files.walkFileTree(testBase, fileProcessor);
 		
+		start = System.nanoTime();
+
 		int countFailures = 0;
 		int countRights = 0;
 		for (Path file : ((RecursiveSimpleFileVisitor) fileProcessor).getFiles()) {
@@ -88,15 +96,30 @@ public class TextClassifierTestBigerExample {
 			countFailures += (isRight)?0:1;
 			countRights += (isRight)?1:0;
 		}
+		
+		Long probCalc = System.nanoTime() - start;
+		
 		System.out.println("Total right: " + countRights);
 		System.out.println("Total failures: " + countFailures);
+
 		
 		Path location = Paths.get("noGit");
 		if (! Files.exists(location, LinkOption.NOFOLLOW_LINKS)) {
 			Files.createDirectory(location, new FileAttribute[]{});
 		}
+
+		start = System.nanoTime();
 		
 		textClassifier.writeOutVectorsForVisualisation(location, "example.txt");
 		
+		Long writeData = System.nanoTime() - start;
+
+		StringBuilder sb = new StringBuilder();
+		sb.append("Load data:  ").append(loadTrainData/10E6).append(System.lineSeparator());
+		sb.append("Trained:    ").append(trained/10E6).append(System.lineSeparator());
+		sb.append("Prob calc:  ").append(probCalc/10E6).append(System.lineSeparator());
+		sb.append("Write data: ").append(writeData/10E6).append(System.lineSeparator());
+		sb.append("TOTAL:      ").append((loadTrainData + trained + probCalc + writeData)/10E6);
+		System.out.println(sb.toString());
 	}
 }

@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.print.attribute.standard.MediaSize.Other;
@@ -20,11 +21,12 @@ public class DocumentClass {
 	private Integer totalNumberOfBags = 0;
 	private BagOfWords termFrequencies = new BagOfWords();
 	
+	private boolean trained = false;
+	private Map<String, Double> weightedFrequencies = new HashMap<>();
+	
 	//TODO Not nice to keep the terms twice! Once in each bag.
 	//Not the proper OOP way! This violates the SRP of the BagOfWords. Here not words/terms where counted instead bags!
 	private BagOfWords bagFrequencies = new BagOfWords();
-	
-	private boolean trained = false;
 	
 	/*
 	 * Preparation to keep / calculate a idf vector for each added document (BOW). Mostly needed to visualize later.
@@ -165,7 +167,7 @@ public class DocumentClass {
 	
 	private void reCalculateDenominators() {
 		if (null == denominatorL2Norm) {
-			denominatorL2Norm = VectorMath.euclidianNormInt(termFrequencies.getFrequencies());
+			denominatorL2Norm = VectorMath.euclidianNorm(termFrequencies.getFrequencies());
 			List<Double> normlizedFrequencies = new ArrayList<>();
 			for (String currentTerm : termFrequencies.getTerms()) {
 				normlizedFrequencies.add(termFrequencies.getNormalizedFrequency(currentTerm));
@@ -190,5 +192,38 @@ public class DocumentClass {
 
 	public String getName() {
 		return name;
+	}
+
+	public Map<String, Double> getTfIdfWeightedFrequencies() {
+		checkIsTrained();
+		return new HashMap<>(weightedFrequencies);
+	}
+	
+	public Double getTfIdfWeightedFrequency(String term) {
+		checkIsTrained();
+		return weightedFrequencies.get(term);
+	}
+	
+	public void weightFrequenciesWithIDF(Map<String, Double> inverseDocumentFrequency) {
+		if (!trained) {
+			for (Entry<String, Double> term : inverseDocumentFrequency.entrySet()) {
+				Double tfidf = termFrequencies.getNormalizedFrequencyL2Norm(term.getKey()) * term.getValue();
+				weightedFrequencies.put(term.getKey(), tfidf);
+				//TODO Should also unify the MultiDimBag stuff?!
+			}
+			trained = true;
+		}
+	}
+	
+	//Vector lenght
+	public Double getWeightedEuclidianNorm() {
+		checkIsTrained();
+		return VectorMath.euclidianNorm(weightedFrequencies.values());
+	}
+	
+	private void checkIsTrained() {
+		if (!trained) {
+			throw new IllegalStateException("Document class not yet trained with a IDF vector! Use weigthFrequencies() first.");
+		}
 	}
 }
