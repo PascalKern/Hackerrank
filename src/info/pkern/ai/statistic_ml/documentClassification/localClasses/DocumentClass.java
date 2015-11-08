@@ -18,11 +18,11 @@ import javax.print.attribute.standard.MediaSize.Other;
 public class DocumentClass {
 
 	private final String name;
-	private Integer totalNumberOfBags = 0;
 	private BagOfWords termFrequencies = new BagOfWords();
-	
 	private boolean trained = false;
 	private Map<String, Double> weightedFrequencies = new HashMap<>();
+	
+	private Integer totalNumberOfBags = 0;
 	
 	//TODO Not nice to keep the terms twice! Once in each bag.
 	//Not the proper OOP way! This violates the SRP of the BagOfWords. Here not words/terms where counted instead bags!
@@ -41,8 +41,8 @@ public class DocumentClass {
 	private List<String> indices = new ArrayList<>();
 	private List<List<Double>> tfPerBag = new ArrayList<>();
 	
-	private Double denominatorL2Norm;
-	private Double denominatorL2NormNormalized;
+//	private Double denominatorL2Norm;
+//	private Double denominatorL2NormNormalized;
 	
 	public DocumentClass(String name) {
 		this.name = name;
@@ -60,8 +60,8 @@ public class DocumentClass {
 		termFrequencies.add(bagOfWords);
 		totalNumberOfBags++;
 		bagFrequencies.addTerms(bagOfWords.getTerms());
-		denominatorL2Norm = null;
-		denominatorL2NormNormalized = null;
+//		denominatorL2Norm = null;
+//		denominatorL2NormNormalized = null;
 		
 		//MultiDimBag
 		if (indices.isEmpty()) {
@@ -73,7 +73,7 @@ public class DocumentClass {
 		List<Double> newBagFrequencies = populateZeroedList(indices.size());
 		for (String term : bagOfWords.getTerms()) {
 			int index = indices.indexOf(term);
-			newBagFrequencies.set(index, bagOfWords.getNormalizedFrequency(term));
+			newBagFrequencies.set(index, bagOfWords.getL2NormalizedFrequency(term));
 		}
 		tfPerBag.add(newBagFrequencies);
 	}
@@ -142,39 +142,39 @@ public class DocumentClass {
 		bagFrequencies.add(anotherClass.bagFrequencies);
 	}
 	
-	public Double getFrequency(String term) {
-		return termFrequencies.getFrequency(term) * getBagFraction(term);
-	}
-
-	public Double getNormalizedFrequency(String term) {
-		return termFrequencies.getNormalizedFrequency(term) * getBagFraction(term);
-	}
-
-	private Double getBagFraction(String term) {
-		return bagFrequencies.getFrequency(term) / totalNumberOfBags.doubleValue();
-	}
-	
-	public Double getL2NormFromFrequency(String term) {
-		reCalculateDenominators();
-		return termFrequencies.getFrequency(term) / denominatorL2Norm;
-	}
-
-	@Deprecated
-	public Double getL2NormFromNormalizedFrequency(String term) {
-		reCalculateDenominators();
-		return termFrequencies.getNormalizedFrequency(term) / denominatorL2NormNormalized;
-	}
-	
-	private void reCalculateDenominators() {
-		if (null == denominatorL2Norm) {
-			denominatorL2Norm = VectorMath.euclidianNorm(termFrequencies.getFrequencies());
-			List<Double> normlizedFrequencies = new ArrayList<>();
-			for (String currentTerm : termFrequencies.getTerms()) {
-				normlizedFrequencies.add(termFrequencies.getNormalizedFrequency(currentTerm));
-			}
-			denominatorL2NormNormalized = VectorMath.euclidianNorm(normlizedFrequencies);
-		}
-	}
+//	public Double getFrequency(String term) {
+//		return termFrequencies.getFrequency(term) * getBagFraction(term);
+//	}
+//
+//	public Double getNormalizedFrequency(String term) {
+//		return termFrequencies.getFrequencyNormalizedWithMaxTermFrequency(term) * getBagFraction(term);
+//	}
+//
+//	private Double getBagFraction(String term) {
+//		return bagFrequencies.getFrequency(term) / totalNumberOfBags.doubleValue();
+//	}
+//	
+//	public Double getL2NormFromFrequency(String term) {
+//		reCalculateDenominators();
+//		return termFrequencies.getFrequency(term) / denominatorL2Norm;
+//	}
+//
+//	@Deprecated
+//	public Double getL2NormFromNormalizedFrequency(String term) {
+//		reCalculateDenominators();
+//		return termFrequencies.getL2NormalizedFrequency(term) / denominatorL2NormNormalized;
+//	}
+//	
+//	private void reCalculateDenominators() {
+//		if (null == denominatorL2Norm) {
+//			denominatorL2Norm = VectorMath.euclidianLength(termFrequencies.getFrequencies());
+//			List<Double> normlizedFrequencies = new ArrayList<>();
+//			for (String currentTerm : termFrequencies.getTerms()) {
+//				normlizedFrequencies.add(termFrequencies.getFrequencyNormalizedWithMaxTermFrequency(currentTerm));
+//			}
+//			denominatorL2NormNormalized = VectorMath.euclidianLength(normlizedFrequencies);
+//		}
+//	}
 	
 	/**
 	 * Gets a copy of the terms in this document class. Changes to this set are <strong>not</strong> reflected</br>
@@ -183,7 +183,7 @@ public class DocumentClass {
 	 * @return the terms in this document class.
 	 */
 	public Set<String> getTerms() {
-		return termFrequencies.getTerms();
+		return new HashSet<>(termFrequencies.getTerms());
 	}
 
 	public boolean contains(String term) {
@@ -204,21 +204,32 @@ public class DocumentClass {
 		return weightedFrequencies.get(term);
 	}
 	
-	public void weightFrequenciesWithIDF(Map<String, Double> inverseDocumentFrequency) {
+	public void calculateWeightedFrequenciesWithIDF(Map<String, Double> inverseDocumentFrequency) {
 		if (!trained) {
-			for (Entry<String, Double> term : inverseDocumentFrequency.entrySet()) {
-				Double tfidf = termFrequencies.getNormalizedFrequencyL2Norm(term.getKey()) * term.getValue();
-				weightedFrequencies.put(term.getKey(), tfidf);
+			for (String term : inverseDocumentFrequency.keySet()) {
+				/* Idea to increase the "weight" of terms which appears in all documents when calculated for probability comparsion. 
+				Integer bagFrequency = bagFrequencies.getFrequency(term);
+				Double tf;
+				if (null == bagFrequency || 0 == bagFrequency) {
+					tf = 0d;
+				} else {
+					tf = termFrequencies.getFrequency(term) * new Double(totalNumberOfBags / bagFrequency);
+				}
+				Double tfidf = tf * inverseDocumentFrequency.get(term);
+				*/
+				Double tfidf = termFrequencies.getFrequency(term) * inverseDocumentFrequency.get(term);
+				weightedFrequencies.put(term, tfidf);
 				//TODO Should also unify the MultiDimBag stuff?!
 			}
+			weightedFrequencies = VectorMath.normlizeVectorEuclideanNorm(weightedFrequencies);
 			trained = true;
 		}
 	}
 	
 	//Vector lenght
-	public Double getWeightedEuclidianNorm() {
+	public Double getWeightedEuclidianLength() {
 		checkIsTrained();
-		return VectorMath.euclidianNorm(weightedFrequencies.values());
+		return VectorMath.lengthEuclideanNorm(weightedFrequencies.values());
 	}
 	
 	private void checkIsTrained() {

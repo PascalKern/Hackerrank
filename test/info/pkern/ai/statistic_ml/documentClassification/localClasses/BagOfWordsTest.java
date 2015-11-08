@@ -40,9 +40,9 @@ public class BagOfWordsTest {
 		Double exptectedNormalizedFrequence = 1d;
 		
 		assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("has"));
+		assertEquals(exptectedNormalizedFrequence, testBag.getFrequencyNormalizedWithMaxTermFrequency("has"));
 		exptectedNormalizedFrequence = 0.5d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("He"));
+		assertEquals(exptectedNormalizedFrequence, testBag.getFrequencyNormalizedWithMaxTermFrequency("He"));
 	}
 	
 	@Test
@@ -56,9 +56,9 @@ public class BagOfWordsTest {
 		
 		assertFalse(testBag.contains("has"));
 		assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("has"));
+		assertEquals(exptectedNormalizedFrequence, testBag.getFrequencyNormalizedWithMaxTermFrequency("has"));
 		exptectedNormalizedFrequence = 0.5d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("He"));
+		assertEquals(exptectedNormalizedFrequence, testBag.getFrequencyNormalizedWithMaxTermFrequency("He"));
 	}
 
 	@Test
@@ -72,11 +72,11 @@ public class BagOfWordsTest {
 		Double exptectedNormalizedFrequence = 1d;
 		
 		assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("he"));
+		assertEquals(exptectedNormalizedFrequence, testBag.getFrequencyNormalizedWithMaxTermFrequency("he"));
 		exptectedNormalizedFrequence = 0.4d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("has"));
+		assertEquals(exptectedNormalizedFrequence, testBag.getFrequencyNormalizedWithMaxTermFrequency("has"));
 		exptectedNormalizedFrequence = 0.2d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("hat"));
+		assertEquals(exptectedNormalizedFrequence, testBag.getFrequencyNormalizedWithMaxTermFrequency("hat"));
 	}
 	
 	
@@ -93,9 +93,9 @@ public class BagOfWordsTest {
 		Double exptectedNormalizedFrequence = 1d;
 		
 		assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("has"));
+		assertEquals(exptectedNormalizedFrequence, testBag.getFrequencyNormalizedWithMaxTermFrequency("has"));
 		exptectedNormalizedFrequence = 0.5d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("child"));
+		assertEquals(exptectedNormalizedFrequence, testBag.getFrequencyNormalizedWithMaxTermFrequency("child"));
 	}
 
 	@Test
@@ -106,25 +106,25 @@ public class BagOfWordsTest {
 		System.out.println(testBag.getFrequency("he"));
 		System.out.println(testBag.getFrequency("He"));
 		System.out.println(testBag.getFrequency("has"));
-		System.out.println(testBag.getNormalizedFrequency("He"));
-		System.out.println(testBag.getNormalizedFrequency("has"));
+		System.out.println(testBag.getFrequencyNormalizedWithMaxTermFrequency("He"));
+		System.out.println(testBag.getFrequencyNormalizedWithMaxTermFrequency("has"));
 		
 		int freq = testBag.removeTerm("since");
 		System.out.println(freq);
 		System.out.println(testBag.getTerms());
-		System.out.println(testBag.getNormalizedFrequency("has"));
+		System.out.println(testBag.getFrequencyNormalizedWithMaxTermFrequency("has"));
 		freq = testBag.removeTerm("has");
 		System.out.println(testBag.getTerms());
-		System.out.println(testBag.getNormalizedFrequency("has"));
-		System.out.println(testBag.getNormalizedFrequency("he"));
-		System.out.println(testBag.getNormalizedFrequency("He"));
+		System.out.println(testBag.getFrequencyNormalizedWithMaxTermFrequency("has"));
+		System.out.println(testBag.getFrequencyNormalizedWithMaxTermFrequency("he"));
+		System.out.println(testBag.getFrequencyNormalizedWithMaxTermFrequency("He"));
 		testBag.addTerm("he", 3);
 		
 		testBag.addTerm("blubber");
 		System.out.println(testBag.getTerms());
-		System.out.println(testBag.getNormalizedFrequency("has"));
-		System.out.println(testBag.getNormalizedFrequency("he"));
-		System.out.println(testBag.getNormalizedFrequency("blubber"));
+		System.out.println(testBag.getFrequencyNormalizedWithMaxTermFrequency("has"));
+		System.out.println(testBag.getFrequencyNormalizedWithMaxTermFrequency("he"));
+		System.out.println(testBag.getFrequencyNormalizedWithMaxTermFrequency("blubber"));
 	}
 
 	@Test

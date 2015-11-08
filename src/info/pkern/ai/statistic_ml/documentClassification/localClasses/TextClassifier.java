@@ -4,6 +4,7 @@ import info.pkern.hackerrank.tools.MapUtil;
 
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InvalidObjectException;
 import java.io.Writer;
 import java.nio.file.Path;
 import java.util.AbstractMap.SimpleEntry;
@@ -48,8 +49,8 @@ public class TextClassifier {
 	private int lastClassifiedBag;
 	
 	//TODO Remove all not normalized Methods! Use only L2-Norm over all classes!!!
-	@Deprecated
-	private boolean useNormalizedFrequences = false;
+//	@Deprecated
+//	private boolean useNormalizedFrequences = false;
 
 	
 	public TextClassifier() {
@@ -64,7 +65,10 @@ public class TextClassifier {
 		}
 	}
 	
-	//Deprecated due the not yet MultiDimBag implementation of add() within the DocumentClass! 
+	/**
+	 * Deprecated due the not yet MultiDimBag implementation of add() within the DocumentClass! 
+	 * @param docClass
+	 */
 	@Deprecated
 	public void train(DocumentClass docClass) {
 		String className = docClass.getName();
@@ -132,17 +136,34 @@ public class TextClassifier {
 		if (lastClassifiedBag == queryBag.hashCode()) {
 			classifications = new ArrayList<>(lastClassificationResult);
 		} else {
-			DocumentClass query = new DocumentClass("Query");
-			query.add(queryBag);
-			
-			query.weightFrequenciesWithIDF(inverseDocumentFrequency);
-			
 			classifications = new ArrayList<>(docClasses.size());
 			
+			//Same result as bellow!
+			/*
+			DocumentClass query = new DocumentClass("Query");
+			query.add(queryBag);
+			query.calculateWeightedFrequenciesWithIDF(inverseDocumentFrequency);
 			for (DocumentClass docClass : docClasses.values()) {
-				Double dotProduct = VectorMath.dotProduct(query.getTfIdfWeightedFrequencies(), docClass.getTfIdfWeightedFrequencies());
-				Double classificationProbability = dotProduct /
-						query.getWeightedEuclidianNorm() * docClass.getWeightedEuclidianNorm();
+				Double classificationProbability = null;
+				try {
+					classificationProbability = VectorMath.cosineSimilarity(query.getTfIdfWeightedFrequencies(), docClass.getTfIdfWeightedFrequencies());
+				} catch (InvalidObjectException e) {
+					e.printStackTrace();
+				}
+				classifications.add(new SimpleEntry<>(docClass.getName(), classificationProbability));
+			}
+			*/
+			
+			for (DocumentClass docClass : docClasses.values()) {
+
+				Double classificationProbability = null;
+				try {
+					classificationProbability = VectorMath.cosineSimilarity(
+							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()), 
+							docClass.getTfIdfWeightedFrequencies());
+				} catch (InvalidObjectException e) {
+					e.printStackTrace();
+				}
 				classifications.add(new SimpleEntry<>(docClass.getName(), classificationProbability));
 			}
 			lastClassificationResult = new ArrayList<>(classifications);
@@ -151,15 +172,15 @@ public class TextClassifier {
 		return classifications;
 	}
 	
-	@Deprecated
-	public boolean isUseNormalizedFrequences() {
-		return useNormalizedFrequences;
-	}
-
-	@Deprecated
-	public void setUseNormalizedFrequences(boolean useNormalizedFrequences) {
-		this.useNormalizedFrequences = useNormalizedFrequences;
-	}
+//	@Deprecated
+//	public boolean isUseNormalizedFrequences() {
+//		return useNormalizedFrequences;
+//	}
+//
+//	@Deprecated
+//	public void setUseNormalizedFrequences(boolean useNormalizedFrequences) {
+//		this.useNormalizedFrequences = useNormalizedFrequences;
+//	}
 
 	@Deprecated
 	public Double getIDF(String term) {
@@ -177,7 +198,7 @@ public class TextClassifier {
 
 	private void processDocumentClasses() {
 		for (DocumentClass docClass : docClasses.values()) {
-			docClass.weightFrequenciesWithIDF(inverseDocumentFrequency);
+			docClass.calculateWeightedFrequenciesWithIDF(inverseDocumentFrequency);
 		}
 	}
 
@@ -206,16 +227,17 @@ public class TextClassifier {
 
 	private void reduceIdfToMaxNumberOfTerms() {
 		if (! maxNumberAllowedTerms.equals(Integer.MAX_VALUE)) {
+			int maxTerms = Math.min(maxNumberAllowedTerms, inverseDocumentFrequency.size());
 			List<Entry<String, Double>> sortedList = MapUtil.sortByValuesDescending(inverseDocumentFrequency);
-			Map<String, Double> reducedMap = new HashMap<>(maxNumberAllowedTerms);
-			for (int i = 0; i < maxNumberAllowedTerms && i < sortedList.size(); i++) {
-				Entry<String, Double> entry = sortedList.get(i);
+			Map<String, Double> reducedMap = new HashMap<>(maxTerms);
+			for (Entry<String, Double> entry : sortedList.subList(0, maxTerms)) {
 				reducedMap.put(entry.getKey(), entry.getValue());
 			}
 			inverseDocumentFrequency = reducedMap;
 		}
 	}
 	
+	@Deprecated
 	private Double getIDFOrZero(String term) {
 		Double idf = inverseDocumentFrequency.get(term);
 		if (null == idf) {
