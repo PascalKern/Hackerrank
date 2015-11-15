@@ -18,11 +18,14 @@ public class SimpleTable<T extends Number> {
 	private Integer rows = 0;
 	private Integer columns = 0;
 	
-	public SimpleTable() {
-		this(0,0);
+	private Class<T> type;
+	
+	public SimpleTable(Class<T> type) {
+		this(0,0, type);
 	}
 	
-	public SimpleTable(Integer initColumnSize, Integer initRowSize) {
+	public SimpleTable(Integer initColumnSize, Integer initRowSize, Class<T> type) {
+		this.type = type;
 		List<T> baseRow = populateZeroedList(initColumnSize);
 		for (int i = 0; i < initRowSize; i++) {
 			List<T> row = new ArrayList<>();
@@ -114,7 +117,7 @@ public class SimpleTable<T extends Number> {
 				removedElements.add(row.remove((int)column));
 			}
 		}
-		SimpleTable<T> table = new SimpleTable<>();
+		SimpleTable<T> table = new SimpleTable<>(type);
 		table.table = removedColumns;
 		table.columns = columnIndices.size();
 		table.rows = rows;
@@ -173,15 +176,14 @@ public class SimpleTable<T extends Number> {
 	}
 	
 	
-	//TODO Put in to ListUtil(s). From DocumentClass
+	//TODO Put in to ListUtil(s). From DocumentClass. Or NumberUtils class?
 	private List<T> populateZeroedList(int elementsCount) {
 		//Does not work! Will throw a UnsuportedOperationException due the list is write through to the backed up array!!!
 //		List<T> newBagFrequencies = Arrays.asList(new Double[indices.size()]);
 		List<T> list = new ArrayList<>(elementsCount);
 		while (0 < elementsCount) {
-			//TODO Write numberZeroExtractor(T) -> returns 0 for the given type T
 //			list.add(0d);
-			list.add(null);
+			list.add(SimpleTable.<T>zeroNumberCrator(type));
 			elementsCount--;
 		}
 		return list;
@@ -258,9 +260,9 @@ public class SimpleTable<T extends Number> {
 		for (int i = 0, j = 1; i < row.size(); i++, j++) {
 			T currentValue = row.get(i);
 			if (null == currentValue) {
-				//TODO Write numberZeroExtractor(T) -> returns 0 for the given type T
+				currentValue = zeroNumberCrator(type);
 //				currentValue = 0d; 
-				currentValue = null; 
+//				currentValue = null; 
 			}
 			sb.append(String.format(formatString, currentValue));
 			if (j < row.size()) {
@@ -268,6 +270,21 @@ public class SimpleTable<T extends Number> {
 			}
 		}
 		return sb;
+	}
+	
+	//TODO Separate in NumberUtil class
+	@SuppressWarnings("unchecked")
+	public static <T extends Number> T zeroNumberCrator(Class<?> numberType) {
+		if (null == numberType) {
+			throw new IllegalArgumentException("Can not set NULL to zero!");
+		}
+		if (Integer.class.equals(numberType)) {
+			return (T) new Integer(0);
+		} else if (Double.class.equals(numberType)) {
+			return (T) new Double(0);
+		} else {
+			throw new RuntimeException("Only integer and double supported yet! [type="+numberType.getClass()+"]");
+		}
 	}
 	
 	public StringBuilder dumpTable(Integer precision) {
@@ -286,7 +303,7 @@ public class SimpleTable<T extends Number> {
 	}
 
 	public SimpleTable<T> copy() {
-		SimpleTable<T> copy = new SimpleTable<>();
+		SimpleTable<T> copy = new SimpleTable<>(type);
 		copy.columns = columns;
 		copy.rows = rows;
 		copy.table = new ArrayList<List<T>>();
@@ -296,5 +313,9 @@ public class SimpleTable<T extends Number> {
 			copy.table.add(newRow);
 		}
 		return copy;
+	}
+
+	public Class<?> getType() {
+		return type;
 	}
 }

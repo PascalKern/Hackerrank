@@ -10,11 +10,11 @@ import org.junit.Test;
 
 public class SimpleTableTest {
 
-	private static SimpleTable table;
+	private static SimpleTable<Double> table;
 
 	@Test
 	public void testExtendTableShape() throws Exception {
-		table = new SimpleTable(5, 2);
+		table = new SimpleTable<>(5, 2, Double.class);
 		assertEquals(new Integer(5), table.getColumnsCount());
 		assertEquals(new Integer(2), table.getRowsCount());
 		Integer newColumns = 8;
@@ -36,7 +36,7 @@ public class SimpleTableTest {
 
 	@Test
 	public void testAddRow() throws Exception {
-		table = new SimpleTable(5, 2);
+		table = new SimpleTable<>(5, 2, Double.class);
 		List<Double> newRow = new ArrayList<>();
 		newRow.add(1d);
 		newRow.add(2d);
@@ -70,7 +70,7 @@ public class SimpleTableTest {
 	
 	@Test
 	public void testAddColumn() throws Exception {
-		table = new SimpleTable(5, 2);
+		table = new SimpleTable<>(5, 2, Double.class);
 		List<Double> newColumn = new ArrayList<>();
 		newColumn.add(1d);
 		try {
@@ -100,7 +100,7 @@ public class SimpleTableTest {
 
 	@Test
 	public void testRemoveRow() throws Exception {
-		table = new SimpleTable(5, 2);
+		table = new SimpleTable<>(5, 2, Double.class);
 		table.removeRow(0);
 		assertEquals(new Integer(1), table.getRowsCount());
 		List<Double> newRow = Arrays.asList(1d,2d,3d,4d,5d);
@@ -112,7 +112,7 @@ public class SimpleTableTest {
 
 	@Test
 	public void testRemoveColumn() throws Exception {
-		table = new SimpleTable(5, 1);
+		table = new SimpleTable<>(5, 1, Double.class);
 		List<Double> newRow = Arrays.asList(1d,2d,3d,4d,5d);
 		table.addRow(newRow);
 		table.removeColumn(0);
@@ -126,7 +126,7 @@ public class SimpleTableTest {
 
 	@Test
 	public void testSetRow() throws Exception {
-		table = new SimpleTable(5, 3);
+		table = new SimpleTable<>(5, 3, Double.class);
 		List<Double> siblingRow = Arrays.asList(0d,0d,0d,0d,0d);
 		List<Double> newRow = Arrays.asList(1d,2d,3d,4d,5d);
 		table.setRow(newRow, 1);
@@ -137,7 +137,7 @@ public class SimpleTableTest {
 	
 	@Test
 	public void emptyTableInstantiation() {
-		table = new SimpleTable(0, 0);
+		table = new SimpleTable<>(0, 0, Double.class);
 		assertTrue(0 == table.getColumnsCount());
 		assertTrue(0 == table.getRowsCount());
 		System.out.println(table.dumpTable(3));

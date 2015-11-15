@@ -15,8 +15,8 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	private List<String> header;
 	private Integer maxHeaderNameLength = 0;
 	
-	public SimpleTableNamedColumnAdapter() {
-		this(new SimpleTable<T>(0, 0), new ArrayList<String>());
+	public SimpleTableNamedColumnAdapter(Class<T> type) {
+		this(new SimpleTable<T>(0, 0, type), new ArrayList<String>());
 	}
 	
 	public SimpleTableNamedColumnAdapter(SimpleTable<T> table, List<String> columnNames) {
@@ -68,9 +68,7 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 			String name = headerIter.next();
 			T value = row.get(name);
 			if (null == value) {
-				//TODO Write numberZeroExtractor(T) -> returns 0 for the given type T
-//				value = 0d;
-				value = null;
+				value = SimpleTable.<T>zeroNumberCrator(table.getType());
 			}
 			orderedRow.add(value);
 		}

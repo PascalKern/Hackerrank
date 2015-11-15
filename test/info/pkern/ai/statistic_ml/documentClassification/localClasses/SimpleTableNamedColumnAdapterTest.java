@@ -16,8 +16,8 @@ import org.junit.Test;
 
 public class SimpleTableNamedColumnAdapterTest {
 
-	private static SimpleTableNamedColumnAdapter tableNamed;
-	private static SimpleTable table;
+	private static SimpleTableNamedColumnAdapter<Double> tableNamed;
+	private static SimpleTable<Double> table;
 	private static Map<String, Double> newRow;
 	private static List<String> header;
 	
@@ -35,12 +35,13 @@ public class SimpleTableNamedColumnAdapterTest {
 		header.add("one");
 		header.add("two");
 		header.add("three");
-		table = new SimpleTable(3, 2);
+		table = new SimpleTable<>(3, 2, Double.class);
+		tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
 	}
 	
 	@Test
 	public void testHumanVisible() {
-		tableNamed = new SimpleTableNamedColumnAdapter(table, header);
+		tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
 		System.out.println(tableNamed);
 		System.out.println(tableNamed.dumpTableWithHeader(3));
 	}
@@ -81,7 +82,6 @@ public class SimpleTableNamedColumnAdapterTest {
 	
 	@Test
 	public void testAddColumn() throws Exception {
-		tableNamed = new SimpleTableNamedColumnAdapter(table, header);
 		List<Double> newColumn = new ArrayList<>();
 		newColumn.add(1d);
 		try {
@@ -111,7 +111,6 @@ public class SimpleTableNamedColumnAdapterTest {
 
 	@Test
 	public void testRemoveRow() throws Exception {
-		tableNamed = new SimpleTableNamedColumnAdapter(table, header);
 		tableNamed.removeRow(0);
 		assertEquals(new Integer(1), tableNamed.getRowsCount());
 		tableNamed.addRow(newRow);
@@ -122,7 +121,6 @@ public class SimpleTableNamedColumnAdapterTest {
 
 	@Test
 	public void testRemoveColumn() throws Exception {
-		tableNamed = new SimpleTableNamedColumnAdapter(table, header);
 		tableNamed.addRow(newRow);
 		tableNamed.removeColumn("one");
 		Map<String, Double> exptected = new HashMap<>();
@@ -138,7 +136,6 @@ public class SimpleTableNamedColumnAdapterTest {
 
 	@Test
 	public void testSetColumn() throws Exception {
-		tableNamed = new SimpleTableNamedColumnAdapter(table, header);
 		tableNamed.addRow(newRow);
 		List<Double> newColumn = Arrays.asList(1d,2d,3d);
 		tableNamed.setColumn(newColumn, "two");
