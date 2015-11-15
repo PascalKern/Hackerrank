@@ -1,5 +1,7 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
+import info.pkern.hackerrank.tools.MapUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -73,11 +75,12 @@ public class DocumentClass {
 		List<Double> newBagFrequencies = populateZeroedList(indices.size());
 		for (String term : bagOfWords.getTerms()) {
 			int index = indices.indexOf(term);
-			newBagFrequencies.set(index, bagOfWords.getL2NormalizedFrequency(term));
+			newBagFrequencies.set(index, bagOfWords.getFrequencyNormalizedEucliedeanNorm(term));
 		}
 		tfPerBag.add(newBagFrequencies);
 	}
 	
+	//TODO Put in to ListUtil(s)
 	//MultiDimBag
 	private List<Double> populateZeroedList(int elementsCount) {
 		//Does not work! Will throw a UnsuportedOperationException due the list is write through to the backed up array!!!
@@ -104,11 +107,119 @@ public class DocumentClass {
 
 	//MultiDimBag
 	public List<List<Double>> getAllTermFrequencyBags() {
-		List<List<Double>> listCopy = new ArrayList<List<Double>>();
-		listCopy.addAll(tfPerBag);
+		List<List<Double>> listCopy = new ArrayList<List<Double>>(tfPerBag);
+		return listCopy;
+	}
+	
+	//Visualization (MultiDimBag)
+	public List<double[]> getAllTermFrequencyBagsForVisualization() {
+		List<double[]> listCopy = new ArrayList<double[]>();
+		
+		for (List<Double> bagTermFrequencies : getAllTermFrequencyBags()) {
+			//Try ONE
+//			double[] adjustedBag = frequencyListAdjustedToWeightedFreqAsArray(bag);
+//			listCopy.add(adjustedBag);
+			
+			/*
+			//Try TWO-a.1
+//			bagTermFrequencies = new ArrayList<>(bagTermFrequencies);
+//			bagTermFrequencies = VectorMath.normlizeVectorEuclideanNorm(bagTermFrequencies);
+			//Try TWO-a
+			int size = bagTermFrequencies.size();
+			size = (size < weightedFrequencies.size())?size:weightedFrequencies.size();
+			double[] adjustedBag = new double[weightedFrequencies.size()];
+			List<Double> subList = bagTermFrequencies.subList(0, size);
+//			subList = VectorMath.normlizeVectorEuclideanNorm(subList);		//May be used or not
+			for (int i = 0; i < size; i++) {
+				adjustedBag[i] = subList.get(i);	//OK but different "scales" = unusable. With or without normalization TWO-a.1
+				
+//				adjustedBag[i] = subList.get(i) * bagFrequencies.getFrequency(indices.get(i));	//Not OK - need to normalize vector after multiplication!?
+				
+				//Try TWO-b
+//				Double weightedFreq = weightedFrequencies.get(indices.get(i));
+//				adjustedBag[i] = subList.get(i) * ((null == weightedFreq)?0d:weightedFreq);
+			}
+			listCopy.add(adjustedBag);
+			*/
+			
+
+			//!?!?
+			//Try THREE
+			double[] adjustedBag = new double[weightedFrequencies.size()];
+			int counter = 0;
+			Double frequencyPowerSum = 0d;
+//			for (String term : indices) {
+			for (String term : weightedFrequencies.keySet()) {
+				int index = indices.indexOf(term);
+				Double frequency = 0d;
+				if (weightedFrequencies.containsKey(term) && index != -1 && index < bagTermFrequencies.size()) {
+					frequency = bagTermFrequencies.get(index);
+				} 
+				adjustedBag[counter] = frequency;
+				frequencyPowerSum += Math.pow(frequency, 2);
+				counter++;
+			}
+			//Manually normalize!
+			Double length = Math.sqrt(frequencyPowerSum);
+			if (length <= 0) {
+				for (int i = 0; i < adjustedBag.length; i++) {
+					adjustedBag[i] = adjustedBag[i] / length;
+				}
+				listCopy.add(adjustedBag);
+				System.out.println("Freqencys ok.");
+			} else {
+				System.out.println("Contains no frequency matching to weighted freqs!");
+			}
+			
+			//Alle weighted termen abarbeiten. Für jede Terme das IDF zurückrechnen (weighted / frequenz)
+			//dann die term frequenc des Bags mit dem IDF verrechnen. Terme nicht im weighted auf 0d setzten!?
+			//Schlussendlich die liste noch normalisieren und in array umwandeln.
+			//
+			//Evt. Noch Bag-Weight * anzahl gesamt doks mit Term in der Klasse? Danach normalisieren!
+			//
+			//Ziel: Die gleich Scale für alle Bag-Dimensionen erhalten!
+			
+		}
 		return listCopy;
 	}
 
+	//TODO Keep ordering?
+	//TODO Do it with Classifier: normalizeBagWithVocabularyForVisualization?
+	
+	public double[] getWeighthedFrequenciesForVisualization() {
+		List<Double> weightedFreqs =  new ArrayList<>(weightedFrequencies.values());
+//		return frequencyListAdjustedToWeightedFreqAsArray(weightedFreqs);
+		return listToArray(weightedFreqs);
+	}
+	
+	private double[] listToArray(List<Double> values) {
+		double[] valuesArray = new double[values.size()];
+		for (int i = 0; i < valuesArray.length; i++) {
+			valuesArray[i] = values.get(i);
+		}
+		return valuesArray;
+	}
+	
+	//Visualization (MultiDimBag)
+	private double[] frequencyListAdjustedToWeightedFreqAsArray(List<Double> bag) {
+		List<Double> bagNormalized = VectorMath.normlizeVectorEuclideanNorm(bag);
+		double[] adjustedBag = new double[weightedFrequencies.size()];
+		int counter = 0;
+		//Ordering important?!
+		for (String term : weightedFrequencies.keySet()) {
+			int index = indices.indexOf(term);
+			if (index < bagNormalized.size() && -1 != index) {
+				adjustedBag[counter] = bagNormalized.get(index);
+			} else {
+				adjustedBag[counter] = 0d;
+			}
+			counter++;
+		}
+		return adjustedBag;
+	}
+
+	
+	
 	//MultiDimBag
 	public void cleanUpTfPerBag(Collection<String> termsToKeep) {
 		Set<String> termsToRemove = new HashSet<>(indices);
@@ -217,9 +328,10 @@ public class DocumentClass {
 				}
 				Double tfidf = tf * inverseDocumentFrequency.get(term);
 				*/
-				Double tfidf = termFrequencies.getFrequency(term) * inverseDocumentFrequency.get(term);
+				Double idf = inverseDocumentFrequency.get(term);
+				Double tfidf = termFrequencies.getFrequency(term) * ((null == idf)?0d:idf);
 				weightedFrequencies.put(term, tfidf);
-				//TODO Should also unify the MultiDimBag stuff?!
+				//TODO Should also unify the MultiDimBag stuff here instead under getAllTermFrequencyBagsForVisualization()?!
 			}
 			weightedFrequencies = VectorMath.normlizeVectorEuclideanNorm(weightedFrequencies);
 			trained = true;
