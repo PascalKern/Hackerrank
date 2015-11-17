@@ -13,26 +13,26 @@ public class SimpleTableTest {
 	private static SimpleTable<Double> table;
 
 	@Test
-	public void testExtendTableShape() throws Exception {
-		table = new SimpleTable<>(5, 2, Double.class);
-		assertEquals(new Integer(5), table.getColumnsCount());
-		assertEquals(new Integer(2), table.getRowsCount());
-		Integer newColumns = 8;
-		Integer newRows = 3;
-		table.extendTableColumns(newColumns);
-		assertEquals(newColumns, table.getColumnsCount());
-		table.extendTableRows(newRows);
-		assertEquals(newRows, table.getRowsCount());
-		newColumns = 10;
-		newRows = 5;
-		table.extendTableShape(newColumns, newRows);
-		assertEquals(newColumns, table.getColumnsCount());
-		assertEquals(newRows, table.getRowsCount());
-		newRows = 8;
-		table.extendTableShape(null, newRows);
-		assertEquals(newColumns, table.getColumnsCount());
-		assertEquals(newRows, table.getRowsCount());
-	}
+		public void testExtendTableToShape() throws Exception {
+			table = new SimpleTable<>(5, 2, Double.class);
+			assertEquals(new Integer(5), table.getColumnsCount());
+			assertEquals(new Integer(2), table.getRowsCount());
+			Integer newColumns = 8;
+			Integer newRows = 3;
+			table.extendTableToColumnsCount(newColumns);
+			assertEquals(newColumns, table.getColumnsCount());
+			table.extendTableRows(newRows);
+			assertEquals(newRows, table.getRowsCount());
+			newColumns = 10;
+			newRows = 5;
+			table.extendTableToShape(newColumns, newRows);
+			assertEquals(newColumns, table.getColumnsCount());
+			assertEquals(newRows, table.getRowsCount());
+			newRows = 8;
+			table.extendTableToShape(null, newRows);
+			assertEquals(newColumns, table.getColumnsCount());
+			assertEquals(newRows, table.getRowsCount());
+		}
 
 	@Test
 	public void testAddRow() throws Exception {
@@ -141,7 +141,7 @@ public class SimpleTableTest {
 		assertTrue(0 == table.getColumnsCount());
 		assertTrue(0 == table.getRowsCount());
 		System.out.println(table.dumpTable(3));
-		table.extendTableShape(2, 3);
+		table.extendTableToShape(2, 3);
 		assertTrue(2 == table.getColumnsCount());
 		assertTrue(3 == table.getRowsCount());
 		System.out.println(table.dumpTable(3));
