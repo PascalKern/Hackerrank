@@ -108,6 +108,22 @@ public class SimpleTable<T extends Number> {
 		return oldColumn;
 	}
 	
+	/**
+	 * Should return return all columns not in the given list. Means keep all columns in the list if they exist 
+	 * in this table. There is no information about the order of the remaining columns.
+	 * @param columnIndices
+	 * @return
+	 */
+	public SimpleTable<T> filterColumns(List<Integer> columnIndices) {
+		throw new RuntimeException("Not yet implemented!");
+	}
+	
+	/**
+	 * Removes all given columns from this table and return the "deleted" columns as a new table. The order of the
+	 * columns in the returned table is the same as within the given list of indices. 
+	 * @param columnIndices
+	 * @return
+	 */
 	public SimpleTable<T> removeColumns(List<Integer> columnIndices) {
 		checkTableColumnSize(columnIndices);
 		List<List<T>> removedColumns = new ArrayList<>();
@@ -117,7 +133,7 @@ public class SimpleTable<T extends Number> {
 				removedElements.add(row.remove((int)column));
 			}
 		}
-		SimpleTable<T> table = new SimpleTable<>(type);
+		SimpleTable<T> table = copy();
 		table.table = removedColumns;
 		table.columns = columnIndices.size();
 		table.rows = rows;
@@ -144,9 +160,9 @@ public class SimpleTable<T extends Number> {
 		return columns;
 	}
 	
-	public void extendTableShape(Integer newColumnCount, Integer newRowCount) {
+	public void extendTableToShape(Integer newColumnCount, Integer newRowCount) {
 		if (null != newColumnCount) {
-			extendTableColumns(newColumnCount);
+			extendTableToColumnsCount(newColumnCount);
 		}
 		if (null != newRowCount) {
 			extendTableRows(newRowCount);
@@ -164,7 +180,11 @@ public class SimpleTable<T extends Number> {
 		}
 	}
 
-	public void extendTableColumns(Integer newColumnCount) {
+	public void extendTabltColumnsBy(Integer additionalColumnsCount) {
+		extendTableToColumnsCount(additionalColumnsCount + columns);
+	}
+	
+	public void extendTableToColumnsCount(Integer newColumnCount) {
 		if (newColumnCount > columns) {
 			List<T> zeroedColumn = populateZeroedList(rows);
 			while (columns < newColumnCount) {
@@ -292,14 +312,14 @@ public class SimpleTable<T extends Number> {
 		for (List<T> row : table) {
 			sb.append(formatTableRow(row, precision)).append(System.lineSeparator());
 		}
-		sb.append(toString());
+//		sb.append(toString());
 //		sb.delete(sb.lastIndexOf(System.lineSeparator()), sb.length());
 		return sb;
 	}
 	
 	@Override
 	public String toString() {
-		return "Shape: columns=" + columns + ", rows=" + rows;
+		return "Shape: columns=" + columns + ", rows=" + rows + ", type=" + type;
 	}
 
 	public SimpleTable<T> copy() {
@@ -317,5 +337,9 @@ public class SimpleTable<T extends Number> {
 
 	public Class<?> getType() {
 		return type;
+	}
+
+	public List<List<T>> getContent() {
+		return copy().table;
 	}
 }

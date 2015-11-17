@@ -2,6 +2,7 @@ package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -24,8 +25,10 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 			throw new IllegalArgumentException("The table and the given column names must have the same count!"
 					+ "[table="+table.getColumnsCount()+", columnNames="+columnNames.size()+"]");
 		}
-		this.table = table;
-		this.header = columnNames;
+		this.table = table.copy();
+		List<String> header = new ArrayList<>();
+		header.addAll(columnNames);
+		this.header = header;
 		for (String name : columnNames) {
 			setMaxHeaderNameLength(name);
 		}
@@ -46,7 +49,7 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 		return header.indexOf(name);
 	}
 	
-	private Integer removeIndexOf(String name) {
+	private Integer removeIndexFor(String name) {
 		Integer index = getIndexOf(name);
 		header.remove((int)index);
 		return index;
@@ -60,7 +63,8 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 		Set<String> names = new HashSet<>(row.keySet());
 		names.removeAll(header);
 		if (! names.isEmpty()) {
-			throw new IllegalArgumentException("One or more column names are not yet in this table! [new names="+names+"]");
+			throw new IllegalArgumentException("One or more column names are not yet in this table! Extend the table "
+					+ "first with extendTableColumns(). [new names="+names+"]");
 		}
 		List<T> orderedRow = new ArrayList<>();
 		ListIterator<String> headerIter = header.listIterator();
@@ -101,13 +105,36 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	}
 
 	public List<T> removeColumn(String name) {
-		return table.removeColumn(removeIndexOf(name));
+		return table.removeColumn(removeIndexFor(name));
 	}
 
+	/**
+	 * Should return a new {@link SimpleTableNamedColumnAdapter} with only the given columns.
+	 * @param columnNames
+	 * @return
+	 */
+	//TODO TEST!!!
+	//TODO Also Set or better Collection possible? Order doesn't matter? Yes if one will track the old index/position outside this class!
+	public SimpleTableNamedColumnAdapter<T> filterColumns(List<String> columnNames) {
+		SimpleTableNamedColumnAdapter<T> copy = copy();
+		List<String> toRemove = new ArrayList<>();
+		toRemove.addAll(copy.header);
+		toRemove.removeAll(columnNames);
+		copy.removeColumns(toRemove);
+		return copy;
+	}
+	
+	/**
+	 * Removes the given columns and return's them!
+	 * @param columnNames
+	 * @return
+	 */
+	//TODO TEST!!!
+	//TODO Also Set or better Collection possible? Order doesn't matter? Yes if one will track the old index/position outside this class!
 	public SimpleTableNamedColumnAdapter<T> removeColumns(List<String> columnNames) {
 		List<Integer> indicesToRemove = new ArrayList<>();
 		for (String name : columnNames) {
-			indicesToRemove.add(removeIndexOf(name));
+			indicesToRemove.add(removeIndexFor(name));
 		}
 		SimpleTable<T> removedTable = table.removeColumns(indicesToRemove); 
 		return new SimpleTableNamedColumnAdapter<T>(removedTable, columnNames);
@@ -122,11 +149,11 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	}
 
 	public Integer getRowsCount() {
-		return table.getRowsCount();
+		return new Integer(table.getRowsCount());
 	}
 
 	public Integer getColumnsCount() {
-		return table.getColumnsCount();
+		return new Integer(table.getColumnsCount());
 	}
 
 	public void extendTableRows(Integer newRowCount) {
@@ -140,10 +167,10 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 		for (String name : newNames) {
 			addToHeaderAndGetIndex(name);
 		}
-		table.extendTableColumns(newNames.size());
+		table.extendTabltColumnsBy(newNames.size());
 	}
 
-	public SimpleTable getSimpleTable() {
+	public SimpleTable<T> getSimpleTable() {
 		return table.copy();
 	}
 	
@@ -171,6 +198,10 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	
 	@Override
 	public String toString() {
-		return table.toString();
+		return table.toString() + System.lineSeparator() + "header= " + header;
+	}
+
+	public SimpleTableNamedColumnAdapter<T> copy() {
+		return new SimpleTableNamedColumnAdapter<>(table, header);
 	}
 }
