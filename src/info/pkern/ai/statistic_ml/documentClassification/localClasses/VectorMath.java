@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+//TODO Split into three classes one per List, Array (both primitive and Object types) and Map or
+//extend in here. Do not convert between types due of performance and unwanted iterations!
+//TODO Move to ..../tools or ..../utils package!
 public class VectorMath {
 
 	/**
@@ -21,10 +24,7 @@ public class VectorMath {
 	 * @throws IllegalArgumentException if both vectors do not have the same count of elements.
 	 */
 	public static <T extends Number, E extends Number> Double dotProduct(List<T> vectorA, List<E> vectorB) {
-		if (vectorA.size() != vectorB.size()) {
-			throw new IllegalArgumentException("Vectors must have the same count of elements! "
-					+ "[vectorA="+vectorA.size()+", vectorB="+vectorB.size()+"]");
-		}
+		checkIdenticalVectorElementCounts(vectorA, vectorB);
 		Double dotProd = 0d;
 		for (int i = 0; i < vectorA.size(); i++) {
 			Double elementA = doubleExtractor(vectorA.get(i));
@@ -58,24 +58,37 @@ public class VectorMath {
 		return dotProd;
 	}
 
-	public static Double cosineSimilarity(List<Double> vectorA, List<Double> vectorB) throws InvalidObjectException {
+	public static Double cosineSimilarityEuclideanNorm(List<Double> vectorA, List<Double> vectorB) throws InvalidObjectException {
+		checkIdenticalVectorElementCounts(vectorA, vectorB);
 		Double dotProd = dotProduct(vectorA, vectorB);
 		Double euclidianNormProduct = lengthEuclideanNorm(vectorA) * lengthEuclideanNorm(vectorB);
 		if (null != euclidianNormProduct && 0 != euclidianNormProduct) {
 			return dotProd / euclidianNormProduct;
 		} else {
-			throw new InvalidObjectException("Division by zero not allowed! [deonomiator euclidianNormProduct="+euclidianNormProduct+"]");
+			throw new InvalidObjectException("Division by zero not allowed! [deonomiator euclidianLengthProduct="+euclidianNormProduct+"]");
 		}
 	}
 
-	public static Double cosineSimilarity(Map<String, Double> vectorA, Map<String, Double> vectorB) throws InvalidObjectException {
+	public static Double cosineSimilarityEuclideanNorm(Map<String, Double> vectorA, Map<String, Double> vectorB) throws InvalidObjectException {
 		Double dotProd = dotProduct(vectorA, vectorB);
-		Double euclidianNormProduct = lengthEuclideanNorm(vectorA.values()) * lengthEuclideanNorm(vectorB.values());
-		if (null != euclidianNormProduct && 0 != euclidianNormProduct) {
-			return dotProd / euclidianNormProduct;
+		Double lengthProduct = lengthEuclideanNorm(vectorA.values()) * lengthEuclideanNorm(vectorB.values());
+		if (null != lengthProduct && 0 != lengthProduct) {
+			return dotProd / lengthProduct;
 		} else {
-			throw new InvalidObjectException("Division by zero not allowed! [deonomiator euclidianNormProduct="+euclidianNormProduct+"]");
+			throw new InvalidObjectException("Division by zero not allowed! [deonomiator euclidianLengthProduct="+lengthProduct+"]");
 		}
+	}
+	
+	public static <T extends Number, E extends Number> Double distanceBetweenEuclideanNorm(Map<String, T> vectorA, Map<String, E> vectorB) {
+		Double elementDiffSum = 0d;
+		for (String term : vectorA.keySet()) {
+			Double elementA = doubleExtractor(vectorA.get(term));
+			Double elementB = doubleExtractor(vectorB.get(term));
+			if (null != elementA && null != elementB) {
+				elementDiffSum +=  Math.pow(elementA - elementB, 2);
+			}
+		}
+		return Math.sqrt(elementDiffSum);
 	}
 
 	/**
@@ -197,7 +210,7 @@ public class VectorMath {
 		return x;
 	}
 	
-	
+	//TODO Separate in NumberUtil class
 	private static <T extends Number> Double doubleExtractor(T number) {
 		if (null == number) {
 			return 0d;
@@ -213,6 +226,13 @@ public class VectorMath {
 				throw new RuntimeException("Support for type not yet supported! [type="+number.getClass().getSimpleName()+"]");
 			}
 			return result;
+		}
+	}
+
+	private static <T extends Number, E extends Number> void checkIdenticalVectorElementCounts(Collection<T> vectorA, Collection<E> vectorB) {
+		if (vectorA.size() != vectorB.size()) {
+			throw new IllegalArgumentException("Vectors must have the same count of elements! "
+					+ "[vectorA="+vectorA.size()+", vectorB="+vectorB.size()+"]");
 		}
 	}
 	

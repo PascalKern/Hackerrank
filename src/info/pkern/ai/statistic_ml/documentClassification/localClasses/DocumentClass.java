@@ -1,5 +1,6 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
+import info.pkern.hackerrank.tools.ListTypeConverter;
 import info.pkern.hackerrank.tools.MapUtil;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Scanner;
 import java.util.Set;
 
 import javax.print.attribute.standard.MediaSize.Other;
@@ -39,9 +41,14 @@ public class DocumentClass {
 	 *  
 	 * Could also use a MashMap for each row with the index as key.
 	 */
+	
+	private SimpleTableNamedColumnAdapter<Double> tfPerBag = new SimpleTableNamedColumnAdapter<>(Double.class);
+	
+	/*
 //	private Map<String,Integer> indices = new HashMap<>();
 	private List<String> indices = new ArrayList<>();
 	private List<List<Double>> tfPerBag = new ArrayList<>();
+	*/
 	
 //	private Double denominatorL2Norm;
 //	private Double denominatorL2NormNormalized;
@@ -66,6 +73,10 @@ public class DocumentClass {
 //		denominatorL2NormNormalized = null;
 		
 		//MultiDimBag
+		tfPerBag.extendTableColumns(bagOfWords.getTerms());
+		tfPerBag.addRow(VectorMath.normlizeVectorEuclideanNorm(bagOfWords.getFrequencies()));
+		
+		/*
 		if (indices.isEmpty()) {
 			addNewTerms(bagOfWords.getTerms());
 		} else {
@@ -78,8 +89,10 @@ public class DocumentClass {
 			newBagFrequencies.set(index, bagOfWords.getFrequencyNormalizedEucliedeanNorm(term));
 		}
 		tfPerBag.add(newBagFrequencies);
+		*/
 	}
 	
+	/*
 	//TODO Put in to ListUtil(s)
 	//MultiDimBag
 	private List<Double> populateZeroedList(int elementsCount) {
@@ -106,11 +119,43 @@ public class DocumentClass {
 	}
 
 	//MultiDimBag
+	// COULD NEVER WORK! Returns always a empty List!
 	public List<List<Double>> getAllTermFrequencyBags() {
 		List<List<Double>> listCopy = new ArrayList<List<Double>>(tfPerBag);
 		return listCopy;
 	}
+	*/
+	@Deprecated
+	public List<List<Double>> getAllTermFrequencyBags() {
+		return tfPerBag.getSimpleTable().getContent();
+	}
 	
+	public SimpleTableNamedColumnAdapter<Double> getAllBagsAsNamedTable() {
+		return tfPerBag.copy();
+	}
+	
+	
+	public List<double[]> getAllTermFrequencyBagsForVisualization(int verticesSize) {
+		List<double[]> listCopy = new ArrayList<double[]>();
+		
+		List<String> headers = new ArrayList<>();
+		headers.addAll(weightedFrequencies.keySet());
+		SimpleTableNamedColumnAdapter<Double> filtered = tfPerBag.filterColumns(headers);
+		
+		SimpleTable<Double> filteredSimple = filtered.getSimpleTable();
+		filteredSimple.extendTableToColumnsCount(verticesSize);
+		
+		try (Scanner scanner = new Scanner(filteredSimple.dumpTable(10).toString())) {
+			while (scanner.hasNextLine()) {
+				String[] stringArray = scanner.nextLine().split(",");
+				listCopy.add(ListTypeConverter.toPrimitiveDouble(stringArray));
+			}
+		}
+		
+		return listCopy;
+	}
+	
+	/*
 	//Visualization (MultiDimBag)
 	public List<double[]> getAllTermFrequencyBagsForVisualization() {
 		List<double[]> listCopy = new ArrayList<double[]>();
@@ -120,7 +165,7 @@ public class DocumentClass {
 //			double[] adjustedBag = frequencyListAdjustedToWeightedFreqAsArray(bag);
 //			listCopy.add(adjustedBag);
 			
-			/*
+			*//*
 			//Try TWO-a.1
 //			bagTermFrequencies = new ArrayList<>(bagTermFrequencies);
 //			bagTermFrequencies = VectorMath.normlizeVectorEuclideanNorm(bagTermFrequencies);
@@ -140,7 +185,7 @@ public class DocumentClass {
 //				adjustedBag[i] = subList.get(i) * ((null == weightedFreq)?0d:weightedFreq);
 			}
 			listCopy.add(adjustedBag);
-			*/
+			*//*
 			
 
 			//!?!?
@@ -182,7 +227,8 @@ public class DocumentClass {
 		}
 		return listCopy;
 	}
-
+	*/
+	
 	//TODO Keep ordering?
 	//TODO Do it with Classifier: normalizeBagWithVocabularyForVisualization?
 	
@@ -200,6 +246,7 @@ public class DocumentClass {
 		return valuesArray;
 	}
 	
+	/*
 	//Visualization (MultiDimBag)
 	private double[] frequencyListAdjustedToWeightedFreqAsArray(List<Double> bag) {
 		List<Double> bagNormalized = VectorMath.normlizeVectorEuclideanNorm(bag);
@@ -236,6 +283,7 @@ public class DocumentClass {
 			}
 		}
 	}
+	*/
 	
 	
 	/**

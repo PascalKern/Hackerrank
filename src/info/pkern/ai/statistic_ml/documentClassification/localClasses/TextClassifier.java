@@ -1,5 +1,6 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
+import info.pkern.hackerrank.tools.ListTypeConverter;
 import info.pkern.hackerrank.tools.MapUtil;
 
 import java.io.FileWriter;
@@ -157,20 +158,27 @@ public class TextClassifier {
 			for (DocumentClass docClass : docClasses.values()) {
 
 				Double classificationProbability = null;
+//				Double distance = null;
 				try {
-					classificationProbability = VectorMath.cosineSimilarity(
+					classificationProbability = VectorMath.cosineSimilarityEuclideanNorm(
 							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()), 
 							docClass.getTfIdfWeightedFrequencies());
+//					distance = VectorMath.distanceBetweenEuclideanNorm(
+//							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()), 
+//							docClass.getTfIdfWeightedFrequencies());
 				} catch (InvalidObjectException e) {
 					e.printStackTrace();
 				}
 				classifications.add(new SimpleEntry<>(docClass.getName(), classificationProbability));
+//				classifications.add(new SimpleEntry<>(docClass.getName() + " dist.", distance));
 			}
 			lastClassificationResult = new ArrayList<>(classifications);
 			lastClassifiedBag = queryBag.hashCode();
 		}
 		return classifications;
 	}
+	
+	
 	
 //	@Deprecated
 //	public boolean isUseNormalizedFrequences() {
@@ -254,6 +262,29 @@ public class TextClassifier {
 	}
 	
 	
+	public List<DocumentClass> getDocumenClasses() {
+		List<DocumentClass> docClasses = new ArrayList<>();
+		docClasses.addAll(this.docClasses.values());
+		return docClasses;
+	}
+	
+	//TODO Ordering matters?
+	public double[] normalizeBagWithVocabularyForVisualization(BagOfWords bag) {
+		List<Integer> bagVector = new ArrayList<>();
+		for (String term : inverseDocumentFrequency.keySet()) {
+			Integer value;
+			if (null != (value = bag.getFrequency(term))) {
+				bagVector.add(value);
+			} else {
+				bagVector.add(0);
+			}
+		}
+		List<Double> bagVectorNorm = VectorMath.normlizeVectorEuclideanNorm(bagVector);
+		
+		return ListTypeConverter.toPrimitiveDouble(bagVectorNorm);
+		
+	}
+
 	
 	
 	
@@ -262,11 +293,14 @@ public class TextClassifier {
 	
 	
 	
+	
+	@Deprecated
 	public void writeOutVectorsForVisualisation(Path location, String filename) {
 		Path vertices = location.resolve(filename);
 		Path lables = location.resolve("labels_" + filename);
 		try (FileWriter fwLables = new FileWriter(lables.toFile()); FileWriter fwVertices = new FileWriter(vertices.toFile())) {
-			List<String> terms = new ArrayList<>(docClassFrequencies.getTerms());
+//		List<String> terms = new ArrayList<>(docClassFrequencies.getTerms());
+			List<String> terms = new ArrayList<>(inverseDocumentFrequency.keySet());
 			//Header. Only right for doc class term weights!
 			/*
 			StringBuilder header = new StringBuilder();
@@ -330,7 +364,8 @@ public class TextClassifier {
 		while (-1 != (nullIndex = termFrequencyVector.indexOf(null))) {
 			termFrequencyVector.set(nullIndex, 0d);
 		}
-		int missingTermsCount = docClassFrequencies.getTerms().size() - termFrequencyVector.size();
+//		int missingTermsCount = docClassFrequencies.getTerms().size() - termFrequencyVector.size();
+		int missingTermsCount = inverseDocumentFrequency.size() - termFrequencyVector.size();
 		while (missingTermsCount > 0) {
 			termFrequencyVector.add(0d);
 			missingTermsCount--;
