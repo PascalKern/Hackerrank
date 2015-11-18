@@ -66,36 +66,11 @@ public class TextClassifier {
 		}
 	}
 	
-	/**
-	 * Deprecated due the not yet MultiDimBag implementation of add() within the DocumentClass! 
-	 * @param docClass
-	 */
-	@Deprecated
+
 	public void train(DocumentClass docClass) {
-		String className = docClass.getName();
-		DocumentClass docClassEdit = docClasses.get(className);
-		if (null == docClassEdit) {
-			 docClasses.put(className, docClass);
-			 docClassFrequencies.addTerms(docClass.getTerms());
-		} else {
-			docClassEdit.add(docClass);
-			docClasses.put(className, docClassEdit);
-			Set<String> newTerms = docClass.getTerms();
-			newTerms.removeAll(docClassEdit.getTerms());
-			if (! newTerms.isEmpty()) {
-				docClassFrequencies.addTerms(newTerms);
-			}
-		}
-		docClassEdit.setTrained(false);
-		trainingFinished = false;
+		throw new RuntimeException("Not yet implemented!");
 	}
 	
-	//Old when used with the newly deprecated train(DocumentClass) method!
-//	public void train(BagOfWords bag, String docClassName) {
-//		DocumentClass docClass = new DocumentClass(docClassName);
-//		docClass.add(bag);
-//		train(docClass);
-//	}
 
 	public void train(BagOfWords bag, String docClassName) {
 		DocumentClass docClass = docClasses.get(docClassName);
@@ -139,38 +114,17 @@ public class TextClassifier {
 		} else {
 			classifications = new ArrayList<>(docClasses.size());
 			
-			//Same result as bellow!
-			/*
-			DocumentClass query = new DocumentClass("Query");
-			query.add(queryBag);
-			query.calculateWeightedFrequenciesWithIDF(inverseDocumentFrequency);
-			for (DocumentClass docClass : docClasses.values()) {
-				Double classificationProbability = null;
-				try {
-					classificationProbability = VectorMath.cosineSimilarity(query.getTfIdfWeightedFrequencies(), docClass.getTfIdfWeightedFrequencies());
-				} catch (InvalidObjectException e) {
-					e.printStackTrace();
-				}
-				classifications.add(new SimpleEntry<>(docClass.getName(), classificationProbability));
-			}
-			*/
-			
 			for (DocumentClass docClass : docClasses.values()) {
 
 				Double classificationProbability = null;
-//				Double distance = null;
 				try {
 					classificationProbability = VectorMath.cosineSimilarityEuclideanNorm(
 							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()), 
-							docClass.getTfIdfWeightedFrequencies());
-//					distance = VectorMath.distanceBetweenEuclideanNorm(
-//							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()), 
-//							docClass.getTfIdfWeightedFrequencies());
+							VectorMath.normlizeVectorEuclideanNorm(docClass.getTfIdfWeightedFrequencies()));
 				} catch (InvalidObjectException e) {
 					e.printStackTrace();
 				}
 				classifications.add(new SimpleEntry<>(docClass.getName(), classificationProbability));
-//				classifications.add(new SimpleEntry<>(docClass.getName() + " dist.", distance));
 			}
 			lastClassificationResult = new ArrayList<>(classifications);
 			lastClassifiedBag = queryBag.hashCode();
@@ -178,25 +132,21 @@ public class TextClassifier {
 		return classifications;
 	}
 	
-	
-	
-//	@Deprecated
-//	public boolean isUseNormalizedFrequences() {
-//		return useNormalizedFrequences;
-//	}
-//
-//	@Deprecated
-//	public void setUseNormalizedFrequences(boolean useNormalizedFrequences) {
-//		this.useNormalizedFrequences = useNormalizedFrequences;
-//	}
-
-	@Deprecated
-	public Double getIDF(String term) {
-		checkReadyForClassification();
-		return getIDFOrZero(term);
+	public Integer getMaxNumberAllowedTerms() {
+		return maxNumberAllowedTerms;
 	}
 
-	//Calculate all data for performance classification. This again adds a state what is not realy good!
+	public Double getIDFOrZero(String term) {
+		checkReadyForClassification();
+		Double idf = inverseDocumentFrequency.get(term);
+		if (null == idf) {
+			return 0d;
+		} else {
+			return idf;
+		}
+	}
+
+	//Calculate all data for performance classification. This again adds a state what is not really good!
 	public void finishTraining() {
 		inverseDocumentFrequency = calculateIDF();
 		reduceIdfToMaxNumberOfTerms();
@@ -210,27 +160,18 @@ public class TextClassifier {
 		}
 	}
 
-	/**
-	 * Use {@link TextClassifier#getIDF(String)} after a call to {@link TextClassifier#finishTraining()} instead!</br></br>
-	 * 
-	 * This method will become private soon!
-	 * @param term to get its IDF (inverse document frequency) in this classifier.
-	 * @return the IDF.
-	 */
-	@Deprecated
-	public Double calculateIDF(String term) {
-		Integer docFrequency = docClassFrequencies.getFrequency(term);
-		Double docFraction = docClasses.size() / (1 + docFrequency.doubleValue());
-		return Math.log10(docFraction);
-	}
-	
-	//Do not add zero calculated IDFs!? Then remove "&& idf > 0d" within calculateTfIdf(DocClass terms) bellow.
 	private Map<String, Double> calculateIDF() {
 		Map<String, Double> inverseDocumentFrequency = new HashMap<>(docClassFrequencies.getNumberOfTerms());
 		for (String term : docClassFrequencies.getTerms()) {
 			inverseDocumentFrequency.put(term, calculateIDF(term));
 		}
 		return inverseDocumentFrequency;
+	}
+
+	private Double calculateIDF(String term) {
+		Integer docFrequency = docClassFrequencies.getFrequency(term);
+		Double docFraction = docClasses.size() / (1 + docFrequency.doubleValue());
+		return Math.log10(docFraction);
 	}
 
 	private void reduceIdfToMaxNumberOfTerms() {
@@ -245,16 +186,6 @@ public class TextClassifier {
 		}
 	}
 	
-	@Deprecated
-	private Double getIDFOrZero(String term) {
-		Double idf = inverseDocumentFrequency.get(term);
-		if (null == idf) {
-			return 0d;
-		} else {
-			return idf;
-		}
-	}
-
 	private void checkReadyForClassification() {
 		if (! trainingFinished) {
 			throw new IllegalStateException("The training of this classifier was not yet finished! Use finishTrainig() first.");
@@ -280,9 +211,7 @@ public class TextClassifier {
 			}
 		}
 		List<Double> bagVectorNorm = VectorMath.normlizeVectorEuclideanNorm(bagVector);
-		
 		return ListTypeConverter.toPrimitiveDouble(bagVectorNorm);
-		
 	}
 
 	
@@ -331,44 +260,16 @@ public class TextClassifier {
 				fwLables.append(System.lineSeparator());
 				fwVertices.append(System.lineSeparator());
 //				docClasses.get(className).cleanUpTfPerBag(termWeightVectorsPerClass.get(className).keySet());
-				for (List<Double> currentValues : docClass.getAllTermFrequencyBags()) {
+				SimpleTable<Double> simpleTable = docClass.getNormalizedTermFrequenciesOfAllBags().getSimpleTable();
+				fwVertices.append(simpleTable.dumpTable(10));
+				int rows = simpleTable.getRowsCount();
+				while (rows > 0) {
 					fwLables.append(className.substring(0, 2)).append(System.lineSeparator());
-					writeClassOfTfAsRow(fwVertices, currentValues);
-					fwVertices.append(System.lineSeparator());
+					rows--;
 				}
 			}
 		} catch (Exception ex) {
 			throw new RuntimeException("Could not write lables or vertices file!", ex);
-		}
-	}
-	
-	//TODO Use only terms from the idf vector and only the weighted vectors in the classes.
-	//As noted in the doc class clean the bags in the classes.
-	private void writeClassOfTfAsRow(Writer writer, List<Double> values) {
-		completeMissingTermsAndNullValues(values);
-		for (int i = 0; i < values.size(); i++) {
-			try {
-				writer.append(String.format("%.10E", values.get(i)));
-				if (i < values.size()) {
-					writer.append(", ");
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} 
-		}
-	}
-
-	//TODO Does the order matter!?
-	public void completeMissingTermsAndNullValues(List<Double> termFrequencyVector) {
-		int nullIndex = -1;
-		while (-1 != (nullIndex = termFrequencyVector.indexOf(null))) {
-			termFrequencyVector.set(nullIndex, 0d);
-		}
-//		int missingTermsCount = docClassFrequencies.getTerms().size() - termFrequencyVector.size();
-		int missingTermsCount = inverseDocumentFrequency.size() - termFrequencyVector.size();
-		while (missingTermsCount > 0) {
-			termFrequencyVector.add(0d);
-			missingTermsCount--;
 		}
 	}
 }

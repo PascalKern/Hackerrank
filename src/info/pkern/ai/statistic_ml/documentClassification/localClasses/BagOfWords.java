@@ -14,7 +14,6 @@ public class BagOfWords {
 
 	private Integer maxTermFrequency = 0;
 	private Map<String, Integer> termFrequencies = new HashMap<>();
-	private Double freqVectorLength;
 	
 	public void addTerm(String term, Integer frequency) {
 		int newFrequency = frequency;
@@ -25,7 +24,6 @@ public class BagOfWords {
 			termFrequencies.put(term, newFrequency);
 		}
 		maxTermFrequency = Math.max(newFrequency, maxTermFrequency);
-		freqVectorLength = null;
 	}
 	
 	public void addTerm(String term) {
@@ -70,13 +68,6 @@ public class BagOfWords {
 		return terms;
 	}
 	
-	//	public List<Double> getNormalizedFrequenciesL2Norm() {
-	//		if (null == normalizedFrequenciesL2Norm) {
-	//			normalizedFrequenciesL2Norm = VectorMath.normlizeVectorWithEuclidianNorm(termFrequencies.values());
-	//		}
-	//		return normalizedFrequenciesL2Norm;
-	//	}
-
 	/**
 	 * Gets a copy of the terms in this bag. Changes to this set are <strong>not</strong> be reflected to this bag!
 	 *
@@ -101,56 +92,9 @@ public class BagOfWords {
 			return 0;
 		}
 	}
-	
-//	public Set<Integer> getFrequencies() {
-//		return new HashSet<Integer>(termFrequencies.values());
-//	}
-
-	/**
-	 * Better use {@link BagOfWords#getL2NormalizedFrequency(String)} instead!
-	 * @param term
-	 * @return
-	 */
-	@Deprecated
-	public Double getFrequencyNormalizedWithMaxTermFrequency(String term) {
-		Integer frequency = termFrequencies.get(term);
-		if (null == frequency) {
-			return 0d;
-		} else {
-			return new Double((double)frequency/maxTermFrequency);
-		}
-	}
-	
-	public Double getL2NormalizedFrequency(String term) {
-		if (null == freqVectorLength) {
-			freqVectorLength = VectorMath.lengthEuclideanNorm(termFrequencies.values());
-		}
-		//TODO CHECK ok?
-		Integer tf;
-		if (null == (tf = termFrequencies.get(term))) {
-			return 0d;
-		} else {
-			//euclidNorm^2 is inverse of sqrt() used to calculate the vector length!
-			return tf / Math.pow(freqVectorLength, 2d);
-		}
-	}
-	
-	public Double getEuclidianLength() {
-		if (null == freqVectorLength) {
-			freqVectorLength = VectorMath.lengthEuclideanNorm(termFrequencies.values());
-		}
-		return freqVectorLength;
-	}
-	
-//	public List<Double> getNormalizedFrequenciesL2Norm() {
-//		if (null == normalizedFrequenciesL2Norm) {
-//			normalizedFrequenciesL2Norm = VectorMath.normlizeVectorWithEuclidianNorm(termFrequencies.values());
-//		}
-//		return normalizedFrequenciesL2Norm;
-//	}
 
 	public Set<String> termsNotIn(BagOfWords otherBag) {
-		return termsNotIn(getTerms());
+		return termsNotIn(otherBag.getTerms());
 	}
 	
 	public Set<String> termsNotIn(Collection<String> terms) {

@@ -113,9 +113,8 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	 * @param columnNames
 	 * @return
 	 */
-	//TODO TEST!!!
-	//TODO Also Set or better Collection possible? Order doesn't matter? Yes if one will track the old index/position outside this class!
-	public SimpleTableNamedColumnAdapter<T> filterColumns(List<String> columnNames) {
+	//TODO TEST!!! Was with List<String> before! Order doesn't matter? Yes if one will track the old index/position outside this class!
+	public SimpleTableNamedColumnAdapter<T> filterColumns(Collection<String> columnNames) {
 		SimpleTableNamedColumnAdapter<T> copy = copy();
 		List<String> toRemove = new ArrayList<>();
 		toRemove.addAll(copy.header);
@@ -129,8 +128,7 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	 * @param columnNames
 	 * @return
 	 */
-	//TODO TEST!!!
-	//TODO Also Set or better Collection possible? Order doesn't matter? Yes if one will track the old index/position outside this class!
+	//TODO TEST!!! ALso with Collection as above?! Order doesn't matter? Yes? if one will track the old index/position outside this class!
 	public SimpleTableNamedColumnAdapter<T> removeColumns(List<String> columnNames) {
 		List<Integer> indicesToRemove = new ArrayList<>();
 		for (String name : columnNames) {
@@ -174,6 +172,12 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 		return table.copy();
 	}
 	
+	public Collection<String> getHeader() {
+		List<String> headerCopy = new ArrayList<>();
+		headerCopy.addAll(header);
+		return headerCopy;
+	}
+
 	private void checkColumnExists(String name) {
 		if (! header.contains(name)) {
 			throw new IllegalArgumentException("The table does not contain a column with this name! [name="+name+"]");
