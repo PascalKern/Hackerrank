@@ -10,6 +10,7 @@ package info.pkern.hackerrank.tools;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
+//TODO Move to ../environment?
 /**
  * @version 0.1 - (Hackerrank Solution-Tools)
  * @author Pascal Kern

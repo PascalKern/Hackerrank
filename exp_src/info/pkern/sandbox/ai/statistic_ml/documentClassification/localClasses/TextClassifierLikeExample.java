@@ -31,16 +31,18 @@ public class TextClassifierLikeExample {
 		textClassifier.train(n2, "N2");
 		textClassifier.train(n3, "N3");
 		
+		textClassifier.finishTraining();
+		
 		Double delta = 0.00001d;
 		Double expected = 0.0d;
-		Double actual = textClassifier.calculateIDF("a");
+		Double actual = textClassifier.getIDFOrZero("a");
 		System.out.println(String.format("IDF of %-10s: %.5f", "a", actual));
 		expected = 0.17609d;
-		actual = textClassifier.calculateIDF("arrived");
+		actual = textClassifier.getIDFOrZero("arrived");
 		assertEquals(expected, actual, delta);
 		System.out.println(String.format("IDF of %-10s: %.5f", "arrived", actual));
 		expected = 0.47712d;
-		actual = textClassifier.calculateIDF("damaged");
+		actual = textClassifier.getIDFOrZero("damaged");
 		assertEquals(expected, actual, delta);
 		System.out.println(String.format("IDF of %-10s: %.5f", "damaged", actual));
 		assertEquals(expected, actual, delta);
@@ -64,16 +66,18 @@ public class TextClassifierLikeExample {
 		textClassifier.train(n2b, "N2");
 		textClassifier.train(n3, "N3");
 		
+		textClassifier.finishTraining();
+		
 		Double delta = 0.00001d;
 		Double expected = 0.0d;
-		Double actual = textClassifier.calculateIDF("a");
+		Double actual = textClassifier.getIDFOrZero("a");
 		System.out.println(String.format("IDF of %-10s: %.5f", "a", actual));
 		expected = 0.17609d;
-		actual = textClassifier.calculateIDF("arrived");
+		actual = textClassifier.getIDFOrZero("arrived");
 		assertEquals(expected, actual, delta);
 		System.out.println(String.format("IDF of %-10s: %.5f", "arrived", actual));
 		expected = 0.47712d;
-		actual = textClassifier.calculateIDF("damaged");
+		actual = textClassifier.getIDFOrZero("damaged");
 		assertEquals(expected, actual, delta);
 		System.out.println(String.format("IDF of %-10s: %.5f", "damaged", actual));
 		assertEquals(expected, actual, delta);
@@ -98,7 +102,7 @@ public class TextClassifierLikeExample {
 		textClassifier.train(n3, "N3");
 		
 		try {
-			textClassifier.getIDF("a");
+			textClassifier.getIDFOrZero("a");
 			fail();
 		} catch (Exception ex) {
 			String exptected = "The training of this classifier was not yet finished! Use finishTrainig() first.";
@@ -109,14 +113,14 @@ public class TextClassifierLikeExample {
 		
 		Double delta = 0.00001d;
 		Double expected = 0.0d;
-		Double actual = textClassifier.calculateIDF("a");
+		Double actual = textClassifier.getIDFOrZero("a");
 		System.out.println(String.format("IDF of %-10s: %.5f", "a", actual));
 		expected = 0.17609d;
-		actual = textClassifier.calculateIDF("arrived");
+		actual = textClassifier.getIDFOrZero("arrived");
 		assertEquals(expected, actual, delta);
 		System.out.println(String.format("IDF of %-10s: %.5f", "arrived", actual));
 		expected = 0.47712d;
-		actual = textClassifier.calculateIDF("damaged");
+		actual = textClassifier.getIDFOrZero("damaged");
 		assertEquals(expected, actual, delta);
 		System.out.println(String.format("IDF of %-10s: %.5f", "damaged", actual));
 		assertEquals(expected, actual, delta);
@@ -143,7 +147,7 @@ public class TextClassifierLikeExample {
 		textClassifier.train(n3, "N3");
 		
 		try {
-			textClassifier.getIDF("a");
+			textClassifier.getIDFOrZero("a");
 			fail();
 		} catch (Exception ex) {
 			String exptected = "The training of this classifier was not yet finished! Use finishTrainig() first.";

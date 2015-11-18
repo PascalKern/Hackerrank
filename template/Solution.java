@@ -46,8 +46,8 @@ public class Solution {
 	 * Specific implementations of general helper classes (see bellow). When working on the solution locally this
 	 * classes can be separately unit tested.
 	 **************************************************************************************************************/
-	//Must be public when a inner class of Solution to be instantiated in the TestdataHandler.
-	public class Testdata extends AbstractTestdata {
+	//Must be package level (default) when a inner class of Solution to be instantiated in the TestdataHandler.
+	class Testdata extends AbstractTestdata {
 
 		@SuppressWarnings("unchecked")
 		@Override
@@ -76,7 +76,7 @@ public class Solution {
 	 * General helper classes for the submission of a hackerrank solution. When working on the solution locally
 	 * those classes are available within the project. 
 	 **************************************************************************************************************/
-//	public class TestdataHandler<T extends AbstractTestdata> {
+//	class TestdataHandler<T extends AbstractTestdata> {
 	/**
 	 * @version 0.1 - (Hackerrank Solution-Environment)
 	 * @author Pascal Kern

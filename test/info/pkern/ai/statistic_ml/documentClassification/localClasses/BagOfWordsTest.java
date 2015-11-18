@@ -37,12 +37,14 @@ public class BagOfWordsTest {
 		testBag.addTerms(words);
 		
 		Integer expectedNrOfWords = 9;
-		Double exptectedNormalizedFrequence = 1d;
+		Double exptectedNormalizedFrequence = 0.471404520d;
+		Integer exptecedFrequency = 2;
 		
 		assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("has"));
-		exptectedNormalizedFrequence = 0.5d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("He"));
+		assertEquals(exptectedNormalizedFrequence, VectorMath.normlizeVectorEuclideanNorm(testBag.getFrequencies()).get("has"), 0.0000001d);
+		assertEquals(exptecedFrequency, testBag.getFrequency("has"));
+		exptecedFrequency = 1;
+		assertEquals(exptecedFrequency, testBag.getFrequency("He"));
 	}
 	
 	@Test
@@ -52,13 +54,13 @@ public class BagOfWordsTest {
 		testBag.removeTerm("has");
 
 		Integer expectedNrOfWords = 8;
-		Double exptectedNormalizedFrequence = 0d;
+		Integer exptectedFrequence = 0;
 		
 		assertFalse(testBag.contains("has"));
 		assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("has"));
-		exptectedNormalizedFrequence = 0.5d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("He"));
+		assertEquals(exptectedFrequence, testBag.getFrequency("has"));
+		exptectedFrequence = 1;
+		assertEquals(exptectedFrequence, testBag.getFrequency("He"));
 	}
 
 	@Test
@@ -69,14 +71,14 @@ public class BagOfWordsTest {
 		testBag.addTerm("he", 3);
 		
 		Integer expectedNrOfWords = 9;
-		Double exptectedNormalizedFrequence = 1d;
+		Integer exptectedFrequency = 5;
 		
 		assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("he"));
-		exptectedNormalizedFrequence = 0.4d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("has"));
-		exptectedNormalizedFrequence = 0.2d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("hat"));
+		assertEquals(exptectedFrequency, testBag.getFrequency("he"));
+		exptectedFrequency = 2;
+		assertEquals(exptectedFrequency, testBag.getFrequency("has"));
+		exptectedFrequency = 1;
+		assertEquals(exptectedFrequency, testBag.getFrequency("hat"));
 	}
 	
 	
@@ -90,12 +92,14 @@ public class BagOfWordsTest {
 		testBag.add(secondTestBag);
 		
 		Integer expectedNrOfWords = 9;
-		Double exptectedNormalizedFrequence = 1d;
+		Double exptectedNormalizedFrequence = 0.471404520d;
+		Integer exptectedFrequency = 4;
 		
 		assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("has"));
-		exptectedNormalizedFrequence = 0.5d;
-		assertEquals(exptectedNormalizedFrequence, testBag.getNormalizedFrequency("child"));
+		assertEquals(exptectedFrequency, testBag.getFrequency("has"));
+		assertEquals(exptectedNormalizedFrequence, VectorMath.normlizeVectorEuclideanNorm(testBag.getFrequencies()).get("has"), 0.0000001d);
+		exptectedFrequency = 2;
+		assertEquals(exptectedFrequency, testBag.getFrequency("child"));
 	}
 
 	@Test
@@ -106,41 +110,44 @@ public class BagOfWordsTest {
 		System.out.println(testBag.getFrequency("he"));
 		System.out.println(testBag.getFrequency("He"));
 		System.out.println(testBag.getFrequency("has"));
-		System.out.println(testBag.getNormalizedFrequency("He"));
-		System.out.println(testBag.getNormalizedFrequency("has"));
+		System.out.println(testBag.getFrequency("He"));
+		System.out.println(testBag.getFrequency("has"));
 		
 		int freq = testBag.removeTerm("since");
 		System.out.println(freq);
 		System.out.println(testBag.getTerms());
-		System.out.println(testBag.getNormalizedFrequency("has"));
+		System.out.println(testBag.getFrequency("has"));
 		freq = testBag.removeTerm("has");
 		System.out.println(testBag.getTerms());
-		System.out.println(testBag.getNormalizedFrequency("has"));
-		System.out.println(testBag.getNormalizedFrequency("he"));
-		System.out.println(testBag.getNormalizedFrequency("He"));
+		System.out.println(testBag.getFrequency("has"));
+		System.out.println(testBag.getFrequency("he"));
+		System.out.println(testBag.getFrequency("He"));
 		testBag.addTerm("he", 3);
 		
 		testBag.addTerm("blubber");
 		System.out.println(testBag.getTerms());
-		System.out.println(testBag.getNormalizedFrequency("has"));
-		System.out.println(testBag.getNormalizedFrequency("he"));
-		System.out.println(testBag.getNormalizedFrequency("blubber"));
+		System.out.println(testBag.getFrequency("has"));
+		System.out.println(testBag.getFrequency("he"));
+		System.out.println(testBag.getFrequency("blubber"));
 	}
 
 	@Test
-			public void testTermsOnlyInOtherBag() throws Exception {
-				BagOfWords bagA = new BagOfWords();
-				BagOfWords bagB = new BagOfWords();
-				bagA.addTerm("one");
-				bagA.addTerm("two");
-				bagA.addTerm("three");
-				bagB.addTerm("two");
-				bagB.addTerm("three");
-				bagB.addTerm("four");
-				bagB.addTerm("five");
-				Set<String> expected = new HashSet<>(Arrays.asList(new String[]{"four","five"}));
-				assertEquals(expected, bagA.termsOnlyInOtherBag(bagB));
-				
-			}
+	public void testTermsNotIn() throws Exception {
+		BagOfWords bagA = new BagOfWords();
+		BagOfWords bagB = new BagOfWords();
+		bagA.addTerm("one");
+		bagA.addTerm("two");
+		bagA.addTerm("three");
+		
+		bagB.addTerm("two");
+		bagB.addTerm("three");
+		bagB.addTerm("four");
+		bagB.addTerm("five");
+		Set<String>  expected = new HashSet<>(Arrays.asList("one"));
+		assertEquals(expected, bagA.termsNotIn(bagB));
+		expected = new HashSet<>(Arrays.asList("four", "five"));
+		assertEquals(expected, bagB.termsNotIn(bagA));
+
+	}
 	
 }

@@ -14,7 +14,7 @@ public class BagOfWords {
 
 	private Integer maxTermFrequency = 0;
 	private Map<String, Integer> termFrequencies = new HashMap<>();
-
+	
 	public void addTerm(String term, Integer frequency) {
 		int newFrequency = frequency;
 		if (termFrequencies.keySet().contains(term)) {
@@ -68,23 +68,6 @@ public class BagOfWords {
 		return terms;
 	}
 	
-	public Integer getFrequency(String term) {
-		if (termFrequencies.containsKey(term)) {
-			return termFrequencies.get(term);
-		} else { 
-			return 0;
-		}
-	}
-	
-	public Double getNormalizedFrequency(String term) {
-		Integer frequency = termFrequencies.get(term);
-		if (null == frequency) {
-			return 0d;
-		} else {
-			return new Double((double)frequency/maxTermFrequency);
-		}
-	}
-	
 	/**
 	 * Gets a copy of the terms in this bag. Changes to this set are <strong>not</strong> be reflected to this bag!
 	 *
@@ -93,19 +76,35 @@ public class BagOfWords {
 	public Set<String> getTerms() {
 		return new HashSet<>(this.termFrequencies.keySet());
 	}
-	
+
 	public Integer getNumberOfTerms() {
 		return termFrequencies.size();
 	}
-	
+
 	public boolean contains(String term) {
 		return termFrequencies.containsKey(term);
 	}
 
-	public Set<String> termsOnlyInOtherBag(BagOfWords otherBag) {
-		Set<String> bagTerms = new HashSet<>(otherBag.termFrequencies.keySet());
-		bagTerms.removeAll(termFrequencies.keySet());
-		return bagTerms;
+	public Integer getFrequency(String term) {
+		if (termFrequencies.containsKey(term)) {
+			return termFrequencies.get(term);
+		} else { 
+			return 0;
+		}
+	}
+
+	public Set<String> termsNotIn(BagOfWords otherBag) {
+		return termsNotIn(otherBag.getTerms());
+	}
+	
+	public Set<String> termsNotIn(Collection<String> terms) {
+		Set<String> notYetInThisBag = new HashSet<>(getTerms());
+		notYetInThisBag.removeAll(terms);
+		return notYetInThisBag;
+	}
+	
+	public Map<String, Integer> getFrequencies() {
+		return new HashMap<>(termFrequencies);
 	}
 	
 	@Override
@@ -139,5 +138,18 @@ public class BagOfWords {
 		} else if (!termFrequencies.equals(other.termFrequencies))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("BagOfWords [maxTermFrequency=");
+		builder.append(maxTermFrequency);
+		builder.append(", termCount=");
+		builder.append(getNumberOfTerms());
+		builder.append(", termFrequencies=");
+		builder.append(termFrequencies);
+		builder.append("]");
+		return builder.toString();
 	}
 }

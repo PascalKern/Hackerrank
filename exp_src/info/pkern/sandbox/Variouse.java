@@ -1,18 +1,152 @@
 package info.pkern.sandbox;
 
+import static org.junit.Assert.*;
+
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+
+import javax.swing.plaf.ListUI;
 
 import org.junit.Test;
 
 public class Variouse {
 
+	@Test
+	public void stringBuilder() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("Line one").append(System.lineSeparator());
+		sb.append("Line two, a bit longer");
+		System.out.println("All:\n|"+sb+"|");
+		StringBuilder line = sb.delete(0, sb.indexOf(System.lineSeparator())+1);
+		System.out.println("Second line only:\n|"+sb+"|");
+		System.out.println("First line was: "+line);
+	}
+	
+	@Test
+	public void numberDouble() {
+		Number num = new Integer(10);
+		System.out.println(num.intValue());
+		System.out.println(num.doubleValue());
+	}
+	
+	@Test
+	public void copyList() {
+		List<List<Integer>> baseList = new ArrayList<>();
+		List<Integer> listA = Arrays.asList(1,2,3,4);
+		List<Integer> listB = Arrays.asList(10,20,30,40);
+		baseList.add(listA);
+		baseList.add(listB);
+		
+		System.out.println("BaseList: " + baseList);
+		
+		List<List<Integer>> copyList = new ArrayList<>();
+		copyList.addAll(baseList);
+		copyList.get(0).set(1, 20);
+		copyList.get(1).set(1, 2);
+		
+		System.out.println("BaseList: " + baseList);
+		System.out.println("CopyList: " + copyList);
+		
+		List<List<Integer>> copyDeepList = new ArrayList<>();
+		for (List<Integer> list : baseList) {
+			List<Integer> newList = new ArrayList<>();
+			newList.addAll(list);
+			copyDeepList.add(newList);
+		}
+		
+		copyDeepList.get(0).set(2, 30);
+		copyDeepList.get(1).set(2, 3);
+
+		System.out.println("BaseList: " + baseList);
+		System.out.println("CopyDeep: " + copyDeepList);
+	}
+	
+	
+	
+	@Test
+	public void stringMatching() {
+		String testString = "My <brother> brother@me.com is worth 10$ per day! But what about"
+				+ " my (stiff) mother's?";
+		String exptected = "My _brother_ brother@me.com is worth 10_ per day_ But what about"
+				+ " my (stiff) mother's_";
+		
+		//All punctuation except on in the char group [()@.']. Punctuation is from:
+		//descripted in javadoc of the Pattern.class and contains: !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ 
+		String actual = testString.replaceAll("[\\p{Punct}&&[^\\(\\)@\\.']]", "_");
+		
+		assertEquals(exptected, actual);
+	}
+	
+	@Test
+	public void things() {
+		Map<String, List<String>> test = new HashMap<>();
+		List<String> testList = new ArrayList<>();
+		testList.add("one");
+		testList.add("two");
+		test.put("test", testList);
+		System.out.println(test);
+		testList.add("three");
+		System.out.println(test);
+	}
+
+	
+	@Test
+	public void setRemove() {
+		Set<String> setA = new HashSet<>(Arrays.asList(new String[]{"one","two","three"}));
+		Set<String> setB = new HashSet<>(setA);
+		setB.remove("two");
+		System.out.println(setA);
+	}
+	
+	@Test
+	public void addElementToArrysGeneratedList() {
+		List<String> list = Arrays.asList(new String[2]);
+		try {
+			list.add("test");
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		System.out.println(list);
+		List<Double> listDouble = Arrays.asList(new Double[]{0d,1d});
+		try {
+			listDouble.add(2d);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
+		System.out.println(listDouble);
+		assertTrue(list.size() == 2);
+		assertTrue(list.get(2).equals("test"));
+	}
+	
+	@Test
+	public void noValueInitializedList() {
+		List<Double> list = Arrays.asList(new Double[10]);
+		System.out.println(list);
+	}
+	
+	@Test
+	public void listGetIndexOfNull() {
+		List<String> list = Arrays.asList(new String[]{"one","two",null,"four",null,"five"});
+		assertTrue(list.indexOf(null) == 2);
+		assertTrue(list.contains(null));
+	}
+	
+	@Test
+	public void setEmpty() {
+		Set<String> set = new HashSet<>(3);
+		assertFalse(set.size() > 0);
+		assertTrue(set.isEmpty());
+	}
 	
 	@Test
 	public void setRetainAll() {

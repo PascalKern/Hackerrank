@@ -43,7 +43,7 @@ public class Solution {
 	 * General helper classes for the submission of a hackerrank solution. When working on the solution locally
 	 * those classes are available within the project. 
 	 **************************************************************************************************************/
-//    public class ListTypeConverter {
+//    private class ListTypeConverter {
     
     
 }

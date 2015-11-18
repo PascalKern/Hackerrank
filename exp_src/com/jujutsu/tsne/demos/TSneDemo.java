@@ -26,8 +26,8 @@ import com.jujutsu.utils.MatrixUtils;
 public class TSneDemo {
 	
 	static double perplexity = 20.0;
-//	private static int initial_dims = 50;
-	private static int initial_dims = 6;
+	private static int initial_dims = 50;
+//	private static int initial_dims = 6;
 
 	public static void saveFile(File file, String text) {
 		saveFile(file,text,false);

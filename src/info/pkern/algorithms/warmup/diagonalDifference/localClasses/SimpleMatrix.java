@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+//TODO Make generic! Use NumberUtil (from VectorMath.java) with X type extractor and X number adder.
+//TODO Maybe move to ..../tools package
 public class SimpleMatrix {
 
 	private List<List<Integer>> rows;

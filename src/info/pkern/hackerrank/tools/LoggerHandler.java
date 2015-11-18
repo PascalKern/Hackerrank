@@ -6,6 +6,8 @@ import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
+//TODO Rename to LoggerController / SimpleLoggingManager(Util)
+//TODO Maybe Move to ./util(s)
 public class LoggerHandler {
 
 	private static final String LOG_FORMAT = "%1$tF %1$tT,%1$tL %4$-7s [%3$s] %2$s - %5$s%6$s%n";

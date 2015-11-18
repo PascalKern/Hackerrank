@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import javax.swing.SortOrder;
 
 //TODO Rename: remove ...AsMap..., add AsList to other two methods!
-
+//TODO Move to ./util(s)
 /**
  * @version 0.1 - (Hackerrank Solution-Tools)
  * @author Pascal Kern
@@ -54,6 +54,7 @@ public class MapUtil {
 		return sortAsMapByValuesDescending(map, null);
 	}
 
+	//TODO Rename! sortAsMapByValuesDescending -> sortAsMapByValues
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortAsMapByValuesDescending(Map<K, V> map, final SORT_ORDER sortOrder) {
 		List<Entry<K, V>> sorted = sortByValues(map, sortOrder);
 		Map<K, V> sortedMap = new LinkedHashMap<>(sorted.size());
