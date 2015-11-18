@@ -1,0 +1,317 @@
+# http://snowball.tartarus.org/algorithms/english/stop.txt
+# An English stop word list. Comments begin with vertical bar. Each stop
+# word is at the start of a line.
+# Many of the forms below are quite rare (e.g. "yourselves") but included for
+#  completeness.
+# PRONOUNS FORMS
+# subject, always in upper case of course
+# 1st person sing
+i
+# object            
+me
+# possessive adjective
+my
+# the possessive pronoun `mine' is best suppressed, because of the
+# sense of coal-mine etc.
+# reflexive
+myself
+# 1st person plural
+# subject
+we
+# object
+us
+# care is required here because US = United States. It is usually
+# safe to remove it if it is in lower case.
+# possessive adjective
+our
+# possessive pronoun
+ours
+# reflexive
+ourselves
+# second person (archaic `thou' forms not included)
+# subject and object
+you
+# possessive adjective
+your
+# possessive pronoun
+yours
+# reflexive (singular)
+yourself
+# third person singular
+# reflexive (plural)
+yourselves
+# subject
+he
+# object
+him
+# possessive adjective and pronoun
+his
+# reflexive
+himself
+# subject
+she
+# object and possessive adjective
+her
+# possessive pronoun
+hers
+# reflexive
+herself
+# subject and object
+it
+# possessive adjective
+its
+# reflexive
+itself
+# third person plural
+# subject
+they
+# object
+them
+# possessive adjective
+their
+# possessive pronoun
+theirs
+# reflexive
+themselves
+# other forms (demonstratives, interrogatives)
+what
+which
+who
+whom
+this
+that
+these
+those
+# VERB FORMS (using F.R. Palmer's nomenclature)
+# BE
+# 1st person, present
+am
+# -s form (3rd person, present)
+is
+# present
+are
+# 1st person, past
+was
+# past
+were
+# infinitive
+be
+# past participle
+been
+# -ing form
+being
+# HAVE
+# simple
+have
+# -s form
+has
+# past
+had
+# -ing form
+having
+# DO
+# simple
+do
+# -s form
+does
+# past
+did
+# -ing form
+doing
+# The forms below are, I believe, best omitted, because of the significant
+# homonym forms:
+#  He made a WILL
+#  old tin CAN
+#  merry month of MAY
+#  a smell of MUST
+#  fight the good fight with all thy MIGHT
+# would, could, should, ought might however be included
+#          # AUXILIARIES
+#            # WILL
+will
+would
+#            # SHALL
+shall
+should
+#            # CAN
+# can
+could
+#            # MAY
+may
+might
+#            # MUST
+must
+#            # OUGHT
+ought
+# COMPOUND FORMS, increasingly encountered nowadays in 'formal' writing
+# pronoun + verb
+i'm
+you're
+he's
+she's
+it's
+we're
+they're
+i've
+you've
+we've
+they've
+i'd
+you'd
+he'd
+she'd
+we'd
+they'd
+i'll
+you'll
+he'll
+she'll
+we'll
+they'll
+# verb + negation
+isn't
+aren't
+wasn't
+weren't
+hasn't
+haven't
+hadn't
+doesn't
+don't
+didn't
+# auxiliary + negation
+won't
+wouldn't
+shan't
+shouldn't
+can't
+cannot
+couldn't
+mustn't
+# miscellaneous forms
+let's
+that's
+who's
+what's
+here's
+there's
+when's
+where's
+why's
+how's
+# rarer forms
+# daren't needn't
+# doubtful forms
+# oughtn't mightn't
+# ARTICLES
+a
+an
+the
+# THE REST (Overlap among prepositions, conjunctions, adverbs etc is so
+# high, that classification is pointless.)
+and
+but
+if
+or
+because
+as
+until
+while
+of
+at
+by
+for
+with
+about
+against
+between
+into
+through
+during
+before
+after
+above
+below
+to
+from
+up
+down
+in
+out
+on
+off
+over
+under
+again
+further
+then
+once
+here
+there
+when
+where
+why
+how
+all
+any
+both
+each
+few
+more
+most
+other
+some
+such
+no
+nor
+not
+only
+own
+same
+so
+than
+too
+very
+# Just for the record, the following words are among the commonest in English
+# one
+# every
+# least
+# less
+# many
+# now
+# ever
+# never
+# say
+# says
+# said
+# also
+# get
+# go
+# goes
+# just
+# made
+# make
+# put
+# see
+# seen
+# whether
+# like
+# well
+# back
+# even
+# still
+# way
+# take
+# since
+# another
+# however
+# two
+# three
+# four
+# five
+# first
+# second
+# new
+# old
+# high
+# long

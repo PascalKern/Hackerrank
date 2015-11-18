@@ -59,7 +59,11 @@ public class TextClassifierTestBigerExample {
 				plotter.addVector(lable, ListTypeConverter.getPrimitive(simpleTable.getRow(rowIndex-1)));
 				rowIndex--;
 			}
-//			plotter.addVector(docClass.getName().toUpperCase(), docClass.getWeighthedFrequenciesForVisualization());
+			/*//This "disturbs" the clustering of the visualisation
+			List<Double> weightedTerms = new ArrayList<>();
+			weightedTerms.addAll(docClass.getTfIdfWeightedFrequencies().values());		
+			plotter.addVector(docClass.getName().toUpperCase(), ListTypeConverter.getPrimitive(weightedTerms));
+			*/
 		}
 
 		BagOfWords bagGood = new BagOfWords();
