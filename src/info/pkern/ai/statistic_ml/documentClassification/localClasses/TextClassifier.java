@@ -21,38 +21,19 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-//TODO Use the VectorMath where possible!
 public class TextClassifier {
 
 	//Maybe make changeable?
 	private final Integer maxNumberAllowedTerms;
 	private Map<String, DocumentClass> docClasses = new HashMap<>();
 
-	//TODO Not nice to keep the terms multiple times! Once in each bag and Map.
-	/*
-	 * Optional to cache the calculated IDF if the calculation is to slow else! After
-	 * training the classifier this can be calculated for faster classification of bags/documents. 
-	 * BUT! This implements a state for this classifier which is not preferred. Especially not
-	 * for to use this classifier in a multithreading environment!
-	 */
-	//NOTE: This is some kind of "cached"! 
 	private Map<String, Double> inverseDocumentFrequency;
-	//Could maybe added to the document class itself! Or better calculate it inside the document class with a 
-	//given IDF Map. Also the vector length!
-	
 	private boolean trainingFinished = false;
-
-	//Not the proper OOP way! This violates the SRP of the BagOfWords. Here not words/terms where counted instead doc classes!
 	private  BagOfWords docClassFrequencies = new BagOfWords();
 	
 	//For littlest caching
 	private List<Entry<String, Double>> lastClassificationResult;
 	private int lastClassifiedBag;
-	
-	//TODO Remove all not normalized Methods! Use only L2-Norm over all classes!!!
-//	@Deprecated
-//	private boolean useNormalizedFrequences = false;
-
 	
 	public TextClassifier() {
 		this(null);
@@ -214,62 +195,4 @@ public class TextClassifier {
 		return ListTypeConverter.toPrimitiveDouble(bagVectorNorm);
 	}
 
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	@Deprecated
-	public void writeOutVectorsForVisualisation(Path location, String filename) {
-		Path vertices = location.resolve(filename);
-		Path lables = location.resolve("labels_" + filename);
-		try (FileWriter fwLables = new FileWriter(lables.toFile()); FileWriter fwVertices = new FileWriter(vertices.toFile())) {
-//		List<String> terms = new ArrayList<>(docClassFrequencies.getTerms());
-			List<String> terms = new ArrayList<>(inverseDocumentFrequency.keySet());
-			//Header. Only right for doc class term weights!
-			/*
-			StringBuilder header = new StringBuilder();
-			for (String term : terms) {
-				header.append(String.format("%-16s", term + ",")).append("  ");
-			}
-			header.delete(header.lastIndexOf(","),header.length());
-			fwVertices.append(header);
-			fwVertices.append(System.lineSeparator());
-			*/
-			
-//			int classCounter = 1;
-			for (DocumentClass docClass : docClasses.values()) {
-				String className = docClass.getName();
-				fwLables.append(className.toUpperCase());
-				Double currentValue;
-				for (int i = 0, j = 1; i < terms.size(); i++, j++) {
-					currentValue = docClass.getTfIdfWeightedFrequency(terms.get(i));
-					if (null == currentValue) {
-						fwVertices.append(String.format("%.10E", 0d)); 
-					} else {
-						fwVertices.append(String.format("%.10E", currentValue));
-					}
-					if (j < terms.size()) {
-						fwVertices.append(", ");
-					}
-				}
-				fwLables.append(System.lineSeparator());
-				fwVertices.append(System.lineSeparator());
-//				docClasses.get(className).cleanUpTfPerBag(termWeightVectorsPerClass.get(className).keySet());
-				SimpleTable<Double> simpleTable = docClass.getNormalizedTermFrequenciesOfAllBags().getSimpleTable();
-				fwVertices.append(simpleTable.dumpTable(10));
-				int rows = simpleTable.getRowsCount();
-				while (rows > 0) {
-					fwLables.append(className.substring(0, 2)).append(System.lineSeparator());
-					rows--;
-				}
-			}
-		} catch (Exception ex) {
-			throw new RuntimeException("Could not write lables or vertices file!", ex);
-		}
-	}
 }
