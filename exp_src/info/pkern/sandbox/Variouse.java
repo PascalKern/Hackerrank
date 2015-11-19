@@ -159,6 +159,33 @@ public class Variouse {
 	}
 	
 	@Test
+	public void normVectorLength() {
+		List<Double> vector = Arrays.asList(new Double[]{0.5d,1d,0d,0.25,0.75d,0.2d,0.3d});
+		
+		Double vectorLength = 0d;
+		for (Double element : vector) {
+			vectorLength += Math.pow(element, 2);
+		}
+		vectorLength = Math.sqrt(vectorLength);
+		System.out.println("Vector: " + vector);
+		System.out.println("Vector length: " + vectorLength);
+		
+		List<Double> vectorNormalized = new ArrayList<>(vector.size());
+		for (Double element : vector) {
+//			System.out.println(element);
+			vectorNormalized.add(element / vectorLength);
+		}
+		
+		vectorLength = 0d;
+		for (Double element : vectorNormalized) {
+			vectorLength += Math.pow(element, 2);
+		}
+		vectorLength = Math.sqrt(vectorLength);
+		System.out.println("Unity vector: " + vectorNormalized);
+		System.out.println("Unity (Euclidean-Norm / L2-Norm) vector length: " + vectorLength);
+	}
+	
+	@Test
 	public void formatDoubleAsScientificString() {
 		Double d = 0.0000012354252342346231463452134d;
 		System.out.println(String.format("%g",d));
