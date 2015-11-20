@@ -17,12 +17,9 @@
         <dependency org="com.github.yannrichet" name="JMathPlot" rev="1.0.1" conf="compile->default,sources,javadoc"/> <!-- 1.0 can't resolve dependencies! -->
 
         <dependency org="com.jujutsu.tsne" name="tsne" rev="0.0.2" conf="compile->default,sources,javadoc"/>
-        <!-- OR - includes all dependencies? 
-        <dependency org="com.jujutsu.tsne" name="tsne" rev="0.0.2" />
-        <dependency org="com.jujutsu.tsne" name="tsne-package" rev="0.0.1-SNAPSHOT"/>
-        -->
         
-        <!-- This dependencies should already be included within the tsne.jar!? 
+        <!-- This dependencies should already be included within the tsne.jar!? At least in the shaded jar!
+             It looks that they are also within default tsne jar.
              But the source or javadoc will not be included there!-->
         <dependency org="gov.nist.math" name="jama" rev="1.0.2" conf="compile->default,sources,javadoc"/>
         <dependency org="org.ejml" name="equation" rev="0.27" conf="compile->default,sources,javadoc"/>
@@ -37,6 +34,7 @@
         <!-- test dependencies -->
         <dependency org="org.openjdk.jmh" name="jmh-core" rev="1.11.2" conf="runtime->default,sources,javadoc"/>
         <dependency org="org.openjdk.jmh" name="jmh-generator-annprocess" rev="1.11.2" conf="runtime->default,sources,javadoc"/>
+        <dependency org="org.openjdk.jmh" name="jmh-samples" rev="1.11.2" conf="runtime->default,sources,javadoc"/>
         <!-- <dependency org="org.openjdk.jmh" name="jmh-core-benchmarks" rev="1.11.2"  conf="runtime->default,sources,javadoc"/> -->
         <!-- ...conf="test->default"/> -->
  	</dependencies>	

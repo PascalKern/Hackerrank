@@ -1,21 +1,19 @@
 <ivysettings>
-    <settings defaultResolver="chain_1"/>
+    <settings defaultResolver="main"/>
     <resolvers>
-        <chain name="chain_1" returnFirst="true">
+        <chain name="main" returnFirst="true">
 			<!-- Works when the T-SNE Maven project was build with: package install with the maven-attache-source and
 			javadoc plugin configured on tsne-core and tsne-demo. Eventuelly existing tsne jars cached by ivy must be
 			delete to get the sources loaded! 
 			-->
-	        <filesystem name="local-maven-2" m2compatible="true" force="false" local="true" checkmodified="true">
-	           <artifact pattern="${user.home}/.m2/repository/[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]"/>
-	           <ivy pattern="${user.home}/.m2/repository/[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).pom"/>
-	        </filesystem>
-	        <!-- 
-			<filesystem name="local_libs" checkmodified="true" >
-				<ivy pattern="${ivy.settings.dir}/libs/[organisation]/[module]/[revision]/[conf]/[module]-[revision](-[classifier]).[ext]" />
-				<artifact pattern="${ivy.settings.dir}/libs/[organisation]/[module]/[revision]/[conf]/[module]-[revision](-[classifier]).[ext]" />
+<!-- 	        <filesystem name="local-maven-2" m2compatible="true" force="false" local="true" checkmodified="true"> -->
+<!-- 	           <artifact pattern="${user.home}/.m2/repository/[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]"/> -->
+<!-- 	           <ivy pattern="${user.home}/.m2/repository/[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).pom"/> -->
+<!-- 	        </filesystem> -->
+			<filesystem name="local_libs" checkmodified="true" local="false">
+				<ivy pattern="${ivy.settings.dir}/libs/[module]-[revision]/[module]-[revision](-[classifier]).[ext]" />
+				<artifact pattern="${ivy.settings.dir}/libs/[module]-[revision]/[module]-[revision](-[classifier]).[ext]" />
 			</filesystem>
-			-->
 	        <ibiblio name="central" m2compatible="true"/>
 		</chain>
     </resolvers>
