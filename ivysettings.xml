@@ -1,20 +1,56 @@
 <ivysettings>
+    <!-- 
+    http://ant.apache.org/ivy/history/latest-milestone/concept.html
+    [organisation] the organisation name
+	[orgPath] (since 2.3) the organisation name where '.' has been replaced by '/'. This can be used to configure maven2-like repositories.
+	[module] the module name
+	[branch] the branch name
+	[revision] the revision name
+	[artifact] the artifact name (or id)
+	[type] the artifact type
+	[ext] the artifact file extension
+	[conf] the configuration name
+	[originalname] (since 1.4) the original artifact name (including the extension)
+     -->
+    <property name="pattern.repo.mavenLocal" value="[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]" />
+    <property name="pattern.repo.ivyMavenstyle" value="[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]" />
+    <property name="pattern.repo.ivyShort" value="[module]-[revision]/[module]-[revision](-[classifier]).[ext]" />
+    
+    <property name="ivy.shared.dir" value="${ivy.settings.dir}/libs" />
+    <property name="maven.local.root" value="${user.home}/.m2/repository" />
+
     <settings defaultResolver="main"/>
     <resolvers>
-        <chain name="main" returnFirst="true">
-			<!-- Works when the T-SNE Maven project was build with: package install with the maven-attache-source and
-			javadoc plugin configured on tsne-core and tsne-demo. Eventuelly existing tsne jars cached by ivy must be
-			delete to get the sources loaded! 
-			-->
-<!-- 	        <filesystem name="local-maven-2" m2compatible="true" force="false" local="true" checkmodified="true"> -->
-<!-- 	           <artifact pattern="${user.home}/.m2/repository/[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).[ext]"/> -->
-<!-- 	           <ivy pattern="${user.home}/.m2/repository/[orgPath]/[module]/[revision]/[module]-[revision](-[classifier]).pom"/> -->
-<!-- 	        </filesystem> -->
-			<filesystem name="local_libs" checkmodified="true" local="false">
-				<ivy pattern="${ivy.settings.dir}/libs/[module]-[revision]/[module]-[revision](-[classifier]).[ext]" />
-				<artifact pattern="${ivy.settings.dir}/libs/[module]-[revision]/[module]-[revision](-[classifier]).[ext]" />
-			</filesystem>
-	        <ibiblio name="central" m2compatible="true"/>
+	    <filesystem name="maven.local" m2compatible="true" force="false" local="true" checkmodified="true">
+           <artifact pattern="${maven.local.root}/${pattern.repo.mavenLocal}" />
+           <ivy pattern="${maven.local.root}/${pattern.repo.mavenLocal}" />
+        </filesystem>
+		<filesystem name="libs.local" checkmodified="true" local="false">
+			<ivy pattern="${ivy.shared.dir}/${pattern.repo.ivyShort}" />
+			<artifact pattern="${ivy.shared.dir}/${pattern.repo.ivyShort}" />
+		</filesystem>
+		<filesystem name="libs.local.mvnstyle" m2compatible="true" checkmodified="true" local="true">
+		    <!-- These pattern could also be used within a filesystem resolver without m2compatibility attribute -->
+			<ivy pattern="${ivy.shared.dir}/${pattern.repo.ivyMavenstyle}" />
+			<artifact pattern="${ivy.shared.dir}/${pattern.repo.ivyMavenstyle}" />
+		</filesystem>
+        <ibiblio name="mavn.central" m2compatible="true"/>
+
+	    <chain name="internal">
+	        <resolver ref="libs.local" />
+	    </chain>
+	    <chain name="local">
+	        <resolver ref="maven.local" />
+	        <resolver ref="libs.local.mvnstyle" />
+	    </chain>	        
+	    <chain name="external">
+	        <resolver ref="mavn.central" />
+	    </chain>
+
+  	    <chain name="main" returnFirst="true">
+	        <resolver ref="internal" />
+	        <resolver ref="local" />
+	        <resolver ref="external" />
 		</chain>
     </resolvers>
 </ivysettings>
