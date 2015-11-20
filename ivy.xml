@@ -8,6 +8,7 @@
         <conf name="compile" description="Required to compile application"/>
         <conf name="runtime" description="Additional run-time dependencies" extends="compile"/>
         <conf name="test"    description="Required for test only" extends="runtime"/>
+        <conf name="benchmark"    description="Required for benchmarking only" extends="runtime"/>
     </configurations>
     
     <!-- <dependencies defaultconfmapping="*->default,sources,javadoc">  -->
@@ -31,6 +32,12 @@
         <!-- ...conf="runtime->default"/> -->
         
         <!-- test dependencies -->
+        <!-- ...conf="test->default"/> -->
+
+        <!-- test dependencies -->
+        <dependency org="org.openjdk.jmh" name="jmh-core" rev="1.11.2" conf="runtime->default,sources,javadoc"/>
+        <dependency org="org.openjdk.jmh" name="jmh-generator-annprocess" rev="1.11.2" conf="runtime->default,sources,javadoc"/>
+        <!-- <dependency org="org.openjdk.jmh" name="jmh-core-benchmarks" rev="1.11.2"  conf="runtime->default,sources,javadoc"/> -->
         <!-- ...conf="test->default"/> -->
  	</dependencies>	
 </ivy-module>	   
