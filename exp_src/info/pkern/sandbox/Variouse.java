@@ -24,12 +24,15 @@ public class Variouse {
 	@Test
 	public void stringBuilder() {
 		StringBuilder sb = new StringBuilder();
+		System.out.println("Empty string builder: |"+sb.toString() +"|");
 		sb.append("Line one").append(System.lineSeparator());
 		sb.append("Line two, a bit longer");
 		System.out.println("All:\n|"+sb+"|");
 		StringBuilder line = sb.delete(0, sb.indexOf(System.lineSeparator())+1);
 		System.out.println("Second line only:\n|"+sb+"|");
 		System.out.println("First line was: "+line);
+		sb.delete(sb.lastIndexOf(" "), sb.length());
+		System.out.println("Second line without last word (longer) |"+sb+"|");
 	}
 	
 	@Test

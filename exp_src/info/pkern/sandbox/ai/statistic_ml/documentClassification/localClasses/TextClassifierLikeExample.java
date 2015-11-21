@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.BagOfWords;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.TextClassifier;
-import info.pkern.hackerrank.tools.MapUtil;
+import info.pkern.hackerrank.commons.MapUtil;
 
 public class TextClassifierLikeExample {
 
@@ -161,7 +161,7 @@ public class TextClassifierLikeExample {
 		
 		List<Entry<String, Double>> probabilities = textClassifier.getClassificationProbabilities(q);
 		
-		MapUtil.sortEntryListByValueDescending(probabilities);
+		MapUtil.sortByValueDescending(probabilities);
 		System.out.println(probabilities);
 		
 		Double delta = 0.0002d;

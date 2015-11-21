@@ -59,6 +59,7 @@ public class IconScatterPlot extends ScatterPlot {
         }
     }
 	
+//	Example from T-SNE Project
 //	public static void main(String[] args) {
 //		Plot2DPanel p2 = new Plot2DPanel();
 //		for (int i = 0; i < 1; i++) {
@@ -91,7 +92,6 @@ public class IconScatterPlot extends ScatterPlot {
 //		p.addPlotable(new RasterImage(new File("imgs/img0.jpg"), 0.5f, new double[] {0.0,0.0,0.0},new double[] {1,0,0.0},new double[] {0.0,0,1}));
 //		p.addPlotable(new RasterImage(new File("imgs/img1.jpg"), 0.5f, new double[] {0.0,0.0,0.0},new double[] {0,1,0.0},new double[] {0,0.0,1}));
 //		p.addPlotable(new RasterImage(new File("imgs/img2.jpg"), 0.5f, new double[] {0.0,0.0,0.0},new double[] {1,0,0.0},new double[] {0,1.0,0}));
-//		// TODO this following case is not totally supported...
 //		//p.addPlotable(new PlotImage(new File("test.jpg"),0.5f,  new double[] {1,0,0},new double[] {1,1,0},new double[] {0,0,1}));
 //
 //		

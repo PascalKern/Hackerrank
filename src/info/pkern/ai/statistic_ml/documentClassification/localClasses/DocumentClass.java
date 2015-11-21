@@ -1,7 +1,7 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
-import info.pkern.hackerrank.tools.ListTypeConverter;
-import info.pkern.hackerrank.tools.MapUtil;
+import info.pkern.hackerrank.commons.ListTypeConverter;
+import info.pkern.hackerrank.commons.MapUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;

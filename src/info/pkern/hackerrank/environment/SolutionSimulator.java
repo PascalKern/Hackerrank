@@ -1,4 +1,4 @@
-package info.pkern.hackerrank.tools;
+package info.pkern.hackerrank.environment;
 /* ============================================================================
  * Copyright (c) 2015 Pascal Kern
  * 
@@ -10,7 +10,6 @@ package info.pkern.hackerrank.tools;
 import java.io.InputStream;
 import java.lang.reflect.Method;
 
-//TODO Move to ../environment?
 /**
  * @version 0.1 - (Hackerrank Solution-Tools)
  * @author Pascal Kern

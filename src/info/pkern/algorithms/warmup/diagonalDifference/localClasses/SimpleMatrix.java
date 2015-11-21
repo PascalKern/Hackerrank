@@ -5,8 +5,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-//TODO Make generic! Use NumberUtil (from VectorMath.java) with X type extractor and X number adder.
-//TODO Maybe move to ..../tools package
 public class SimpleMatrix {
 
 	private List<List<Integer>> rows;
@@ -18,11 +16,6 @@ public class SimpleMatrix {
 	private Integer antiDiagonalSum;
 	private List<Integer> mainDiagonal;
 	private List<Integer> antiDiagonal;
-	
-//	public SimpleMatrix(List<Integer> matrixContent, int columnCount) {
-//		columnCount = columnCount;
-//		calculateDiagonalSumsAndPopulateDiagonales(matrixContent, columnCount);
-//	}
 	
 	public SimpleMatrix(List<List<Integer>> rows) {
 		this.rows = rows;
@@ -101,14 +94,6 @@ public class SimpleMatrix {
 		return column;
 	}
 
-//	private List<List<Integer>> calculateDiagonalSumsAndPopulateDiagonales(List<Integer> matrixContent, int columnCount) {
-//	
-//	}
-//	OR - But then keep the matrixContent as list in the rows member!
-//	private void calculateDiagonalSumsAndPopulateDiagonales(List<Integer> matrixContent, int columnCount) { 
-//		
-//	}
-	
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder();

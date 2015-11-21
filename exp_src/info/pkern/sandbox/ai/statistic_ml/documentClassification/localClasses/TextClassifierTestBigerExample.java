@@ -6,9 +6,9 @@ import info.pkern.ai.statistic_ml.documentClassification.localClasses.DocumentCl
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.SimpleTable;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.SimpleTableNamedColumnAdapter;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.TextClassifier;
-import info.pkern.hackerrank.tools.ListTypeConverter;
-import info.pkern.hackerrank.tools.MapUtil;
-import info.pkern.hackerrank.tools.RecursiveSimpleFileVisitor;
+import info.pkern.hackerrank.commons.ListTypeConverter;
+import info.pkern.hackerrank.commons.MapUtil;
+import info.pkern.hackerrank.commons.RecursiveSimpleFileVisitor;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -56,7 +56,7 @@ public class TextClassifierTestBigerExample {
 			String lable = docClass.getName().substring(0, 2);
 			int rowIndex = simpleTable.getRowsCount();
 			while (rowIndex > 0) {
-				plotter.addVector(lable, ListTypeConverter.getPrimitive(simpleTable.getRow(rowIndex-1)));
+				plotter.addVector(lable, ListTypeConverter.toPrimitive(simpleTable.getRow(rowIndex-1)));
 				rowIndex--;
 			}
 			/*//This "disturbs" the clustering of the visualisation
@@ -70,8 +70,8 @@ public class TextClassifierTestBigerExample {
 		bagGood.addTerms(testcase.tokanize(testcase.basePath.resolve(testcase.test).resolve("lawyer/lawyer23.txt")));
 		BagOfWords bagBad = new BagOfWords();
 		bagBad.addTerms(testcase.tokanize(testcase.basePath.resolve(testcase.test).resolve("lawyer/lawyer303.txt")));
-		plotter.addVector("Laweyer23", testcase.textClassifier.normalizeBagWithVocabularyForVisualization(bagGood));
-		plotter.addVector("Laweyer303", testcase.textClassifier.normalizeBagWithVocabularyForVisualization(bagBad));
+		plotter.addVector("Laweyer23", testcase.textClassifier.normalizeBagWithIDFVocabulary(bagGood));
+		plotter.addVector("Laweyer303", testcase.textClassifier.normalizeBagWithIDFVocabulary(bagBad));
 		
 		Long writeData = System.nanoTime() - start;
 		System.out.println("Write data: " + writeData/10E6);
@@ -126,7 +126,7 @@ public class TextClassifierTestBigerExample {
 			testBag.addTerms(tokanize(file));
 			
 			List<Entry<String, Double>> probabilities = textClassifier.getClassificationProbabilities(testBag);
-			MapUtil.sortEntryListByValueDescending(probabilities);
+			MapUtil.sortByValueDescending(probabilities);
 			
 			Result res = new Result();
 			res.fileName = file.getFileName().toString();

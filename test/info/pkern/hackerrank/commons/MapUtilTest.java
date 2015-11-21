@@ -1,8 +1,8 @@
-package info.pkern.hackerrank.tools;
+package info.pkern.hackerrank.commons;
 
 import static org.junit.Assert.*;
-import info.pkern.hackerrank.tools.MapUtil;
-import info.pkern.hackerrank.tools.MapUtil.SORT_ORDER;
+import info.pkern.hackerrank.commons.MapUtil;
+import info.pkern.hackerrank.commons.MapUtil.SORT_ORDER;
 
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +29,7 @@ public class MapUtilTest {
 	
 	@Test
 	public void sortMapByValueDescending() {
-		sortedList = MapUtil.sortByValuesDescending(probAllClasses);
+		sortedList = MapUtil.sortAsListByValuesDescending(probAllClasses);
 		assertEquals(sortedList.get(0).getValue(), (probAllClasses.get("F")));
 		assertEquals(sortedList.get(2).getValue(), (probAllClasses.get("E")));
 		assertEquals(sortedList.get(5).getValue(), (probAllClasses.get("B")));
@@ -38,7 +38,7 @@ public class MapUtilTest {
 
 	@Test
 	public void sortMapByValueAscending() {
-		sortedList = MapUtil.sortByValues(probAllClasses, SORT_ORDER.ASC);
+		sortedList = MapUtil.sortAsListByValues(probAllClasses, SORT_ORDER.ASC);
 		assertEquals(sortedList.get(0).getValue(), (probAllClasses.get("B")));
 		assertEquals(sortedList.get(2).getValue(), (probAllClasses.get("C")));
 		assertEquals(sortedList.get(5).getValue(), (probAllClasses.get("F")));

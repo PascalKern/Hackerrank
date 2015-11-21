@@ -1,7 +1,7 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
-import info.pkern.hackerrank.tools.ListTypeConverter;
-import info.pkern.hackerrank.tools.MapUtil;
+import info.pkern.hackerrank.commons.ListTypeConverter;
+import info.pkern.hackerrank.commons.MapUtil;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -158,7 +158,7 @@ public class TextClassifier {
 	private void reduceIdfToMaxNumberOfTerms() {
 		if (! maxNumberAllowedTerms.equals(Integer.MAX_VALUE)) {
 			int maxTerms = Math.min(maxNumberAllowedTerms, inverseDocumentFrequency.size());
-			List<Entry<String, Double>> sortedList = MapUtil.sortByValuesDescending(inverseDocumentFrequency);
+			List<Entry<String, Double>> sortedList = MapUtil.sortAsListByValuesDescending(inverseDocumentFrequency);
 			Map<String, Double> reducedMap = new HashMap<>(maxTerms);
 			for (Entry<String, Double> entry : sortedList.subList(0, maxTerms)) {
 				reducedMap.put(entry.getKey(), entry.getValue());
@@ -180,8 +180,9 @@ public class TextClassifier {
 		return docClasses;
 	}
 	
+	//TODO Keep IDF in BagOfWords (Generic) and remove dependencies here with getter on this bag! At least the deps on ListTypeConverter!
 	//TODO Ordering matters?
-	public double[] normalizeBagWithVocabularyForVisualization(BagOfWords bag) {
+	public double[] normalizeBagWithIDFVocabulary(BagOfWords bag) {
 		List<Integer> bagVector = new ArrayList<>();
 		for (String term : inverseDocumentFrequency.keySet()) {
 			Integer value;
@@ -192,7 +193,7 @@ public class TextClassifier {
 			}
 		}
 		List<Double> bagVectorNorm = VectorMath.normlizeVectorEuclideanNorm(bagVector);
-		return ListTypeConverter.toPrimitiveDouble(bagVectorNorm);
+		return ListTypeConverter.toPrimitive(bagVectorNorm);
 	}
 
 }

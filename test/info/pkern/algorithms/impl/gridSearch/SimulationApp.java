@@ -3,8 +3,8 @@ package info.pkern.algorithms.impl.gridSearch;
 import info.pkern.algorithms.impl.gridSearch.Solution;
 import info.pkern.algorithms.impl.gridSearch.localClasses.DataGridTest;
 import info.pkern.algorithms.impl.gridSearch.localClasses.Testdata;
+import info.pkern.hackerrank.environment.SolutionSimulator;
 import info.pkern.hackerrank.environment.TestdataHandler;
-import info.pkern.hackerrank.tools.SolutionSimulator;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;

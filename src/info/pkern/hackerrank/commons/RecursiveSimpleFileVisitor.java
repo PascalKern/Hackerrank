@@ -1,4 +1,4 @@
-package info.pkern.hackerrank.tools;
+package info.pkern.hackerrank.commons;
 /* ============================================================================
  * Copyright (c) 2015 Pascal Kern
  * 

@@ -1,5 +1,7 @@
 package info.pkern.sandbox;
 
+import info.pkern.hackerrank.commons.NumberUtil;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -52,7 +54,7 @@ public class SimpleToGenericType {
 		}
 		
 		public T addLeftAndRightAt(int index) {
-			return NumberAdder.add(leftColumn.get(index) , rightColumn.get(index));
+			return NumberUtil.numberAdder(leftColumn.get(index) , rightColumn.get(index));
 		}
 	}
 

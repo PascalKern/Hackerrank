@@ -1,5 +1,7 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
+import info.pkern.hackerrank.commons.NumberUtil;
+
 import java.io.InvalidObjectException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,7 +12,6 @@ import java.util.Set;
 
 //TODO Split into three classes one per List, Array (both primitive and Object types) and Map or
 //extend in here. Do not convert between types due of performance and unwanted iterations!
-//TODO Move to ..../tools or ..../utils package!
 public class VectorMath {
 
 	/**
@@ -27,11 +28,9 @@ public class VectorMath {
 		checkIdenticalVectorElementCounts(vectorA, vectorB);
 		Double dotProd = 0d;
 		for (int i = 0; i < vectorA.size(); i++) {
-			Double elementA = doubleExtractor(vectorA.get(i));
-			Double elementB = doubleExtractor(vectorB.get(i));
-			if (null != elementA && null != elementB) {
-				dotProd += elementA * elementB;
-			}
+			Double elementA = doubleValueOrZero(vectorA.get(i));
+			Double elementB = doubleValueOrZero(vectorB.get(i));
+			dotProd += elementA * elementB;
 		}
 		return dotProd;
 	}
@@ -49,11 +48,9 @@ public class VectorMath {
 		Set<String> longer = (vectorA.size() >= vectorB.size())?vectorA.keySet():vectorB.keySet();
 		Double dotProd = 0d;
 		for (String term : longer) {
-			Double elementA = doubleExtractor(vectorA.get(term));
-			Double elementB = doubleExtractor(vectorB.get(term));
-			if (null != elementA && null != elementB) {
-				dotProd += elementA * elementB;
-			}
+			Double elementA = doubleValueOrZero(vectorA.get(term));
+			Double elementB = doubleValueOrZero(vectorB.get(term));
+			dotProd += elementA * elementB;
 		}
 		return dotProd;
 	}
@@ -82,11 +79,9 @@ public class VectorMath {
 	public static <T extends Number, E extends Number> Double distanceBetweenEuclideanNorm(Map<String, T> vectorA, Map<String, E> vectorB) {
 		Double elementDiffSum = 0d;
 		for (String term : vectorA.keySet()) {
-			Double elementA = doubleExtractor(vectorA.get(term));
-			Double elementB = doubleExtractor(vectorB.get(term));
-			if (null != elementA && null != elementB) {
-				elementDiffSum +=  Math.pow(elementA - elementB, 2);
-			}
+			Double elementA = doubleValueOrZero(vectorA.get(term));
+			Double elementB = doubleValueOrZero(vectorB.get(term));
+			elementDiffSum +=  Math.pow(elementA - elementB, 2);
 		}
 		return Math.sqrt(elementDiffSum);
 	}
@@ -130,7 +125,7 @@ public class VectorMath {
 		Double length = lengthWithNorm(vector, norm);
 		for (Number element : vector) {
 			if (null != element) {
-				normalized.add(doubleExtractor(element) / length);
+				normalized.add(doubleValueOrZero(element) / length);
 			}
 		}
 		return normalized;
@@ -151,7 +146,7 @@ public class VectorMath {
 		Double length = lengthWithNorm(vector.values(), norm);
 		for (String element : vector.keySet()) {
 			if (null != element) {
-				normalized.put(element, doubleExtractor(vector.get(element)) / length);
+				normalized.put(element, doubleValueOrZero(vector.get(element)) / length);
 			}
 		}
 		return normalized;
@@ -169,7 +164,7 @@ public class VectorMath {
 		Double length= 0d;
 		for (T element : vector) {
 			if (null != element) {
-				length += Math.pow(doubleExtractor(element), 2d);
+				length += Math.pow(doubleValueOrZero(element), 2d);
 			}
 		}
 		return Math.sqrt(length);
@@ -187,7 +182,7 @@ public class VectorMath {
 		Double length= 0d;
 		for (T element : vector) {
 			if (null != element) {
-				length += Math.pow(doubleExtractor(element), norm);
+				length += Math.pow(doubleValueOrZero(element), norm);
 			}
 		}
 		return nthroot(norm, length, 0.0001);
@@ -210,29 +205,21 @@ public class VectorMath {
 		return x;
 	}
 	
-	//TODO Separate in NumberUtil class
-	private static <T extends Number> Double doubleExtractor(T number) {
+	private static Double doubleValueOrZero(Number number) {
 		if (null == number) {
 			return 0d;
-		} else if(number instanceof Double) {
-			return number.doubleValue();
 		} else {
-			Double result;
-			if (number instanceof Integer) {
-				result = new Double(number.intValue());
-			} else if (number instanceof Float) {
-				result = new Double(number.floatValue());
-			} else {
-				throw new RuntimeException("Support for type not yet supported! [type="+number.getClass().getSimpleName()+"]");
-			}
-			return result;
+			return number.doubleValue();
 		}
 	}
-
-	private static <T extends Number, E extends Number> void checkIdenticalVectorElementCounts(Collection<T> vectorA, Collection<E> vectorB) {
+	
+	private static <T extends Number, E extends Number> void checkIdenticalVectorElementCounts(
+			Collection<T> vectorA, Collection<E> vectorB) {
 		if (vectorA.size() != vectorB.size()) {
-			throw new IllegalArgumentException("Vectors must have the same count of elements! "
-					+ "[vectorA="+vectorA.size()+", vectorB="+vectorB.size()+"]");
+			throw new IllegalArgumentException(
+					"Vectors must have the same count of elements! "
+							+ "[vectorA=" + vectorA.size() + ", vectorB="
+							+ vectorB.size() + "]");
 		}
 	}
 	

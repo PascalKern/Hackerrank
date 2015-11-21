@@ -12,9 +12,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
-/*
- * TODO Better use a interface? Use a factory method to create the instances and force the InputStream as parameter!
- */
 /**
  * @version 0.1 - (Hackerrank Solution-Environment)
  * @author Pascal Kern

@@ -1,5 +1,7 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
+import info.pkern.hackerrank.commons.NumberUtil;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -33,7 +35,6 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 			setMaxHeaderNameLength(name);
 		}
 	}
-	
 	
 	private Integer addToHeaderAndGetIndex(String name) {
 		checkColumnNotExists(name);
@@ -72,7 +73,7 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 			String name = headerIter.next();
 			T value = row.get(name);
 			if (null == value) {
-				value = SimpleTable.<T>zeroNumberCrator(table.getType());
+				value = NumberUtil.<T>zeroValueCreator(table.getType());
 			}
 			orderedRow.add(value);
 		}
@@ -197,7 +198,7 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 			sbHeader.append(String.format("%-"+ fieldWith +"s", term)).append(", ");
 		}
 		sbHeader.delete(sbHeader.lastIndexOf(","),sbHeader.length());
-		return sbHeader.append(System.lineSeparator()).append(table.dumpTable(precision));
+		return sbHeader.append(System.lineSeparator()).append(table.dumpTable(precision, fieldWith));
 	}
 	
 	@Override

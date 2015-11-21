@@ -1,5 +1,7 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
+import info.pkern.hackerrank.commons.NumberUtil;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +28,7 @@ public class SimpleTable<T extends Number> {
 	
 	public SimpleTable(Integer initColumnSize, Integer initRowSize, Class<T> type) {
 		this.type = type;
-		List<T> baseRow = populateZeroedList(initColumnSize);
+		List<T> baseRow = NumberUtil.populateZeroedList(initColumnSize, type);
 		for (int i = 0; i < initRowSize; i++) {
 			List<T> row = new ArrayList<>();
 			row.addAll(baseRow);
@@ -43,7 +45,7 @@ public class SimpleTable<T extends Number> {
 	public Integer addRow(List<T> row, Integer index) {
 		checkColumnsInRow(row);
 		checkTableRowSize(index);
-		List<T> newRow = createListWithFixElementCountFilledUpWithZero(row, columns);
+		List<T> newRow = NumberUtil.extendListWithZeroToFixElementCount(row, columns);
 		table.add(index, newRow);
 		rows++;
 		return table.size();
@@ -75,7 +77,7 @@ public class SimpleTable<T extends Number> {
 	public void addColumn(List<T> column, Integer index) {
 		checkRowsInColumn(column);
 		checkTableColumnSize(index);
-		List<T> newColumn = createListWithFixElementCountFilledUpWithZero(column, rows);
+		List<T> newColumn = NumberUtil.extendListWithZeroToFixElementCount(column, rows);
 		for (int i = 0; i < newColumn.size(); i++) {
 			getRow(i).add(index, newColumn.get(i));
 		}
@@ -171,7 +173,7 @@ public class SimpleTable<T extends Number> {
 
 	public void extendTableRows(Integer newRowCount) {
 		if (newRowCount > rows) {
-			List<T> zeroedRow = populateZeroedList(columns);
+			List<T> zeroedRow = NumberUtil.populateZeroedList(columns, type);
 			while (rows < newRowCount) {
 				List<T> newRow = new ArrayList<>();
 				newRow.addAll(zeroedRow);
@@ -186,39 +188,13 @@ public class SimpleTable<T extends Number> {
 	
 	public void extendTableToColumnsCount(Integer newColumnCount) {
 		if (newColumnCount > columns) {
-			List<T> zeroedColumn = populateZeroedList(rows);
+			List<T> zeroedColumn = NumberUtil.populateZeroedList(rows, type);
 			while (columns < newColumnCount) {
 				List<T> newColumn = new ArrayList<>();
 				newColumn.addAll(zeroedColumn);
 				addColumn(newColumn);
 			}
 		}
-	}
-	
-	
-	//TODO Put in to ListUtil(s). From DocumentClass. Or NumberUtils class?
-	private List<T> populateZeroedList(int elementsCount) {
-		//Does not work! Will throw a UnsuportedOperationException due the list is write through to the backed up array!!!
-//		List<T> newBagFrequencies = Arrays.asList(new Double[indices.size()]);
-		List<T> list = new ArrayList<>(elementsCount);
-		while (0 < elementsCount) {
-//			list.add(0d);
-			list.add(SimpleTable.<T>zeroNumberCrator(type));
-			elementsCount--;
-		}
-		return list;
-	}
-	
-	//TODO Put in to ListUtil(s). From DocumentClass
-	private List<T> createListWithFixElementCountFilledUpWithZero(List<T> list, int finalElementCount) {
-		int missingElementsCount = finalElementCount - list.size();
-		List<T> newList = new ArrayList<>();
-		if (null != list) {
-			newList.addAll(list);
-		}
-		List<T> listFillup = populateZeroedList(missingElementsCount);
-		newList.addAll(newList.size(), listFillup);
-		return newList;
 	}
 	
 	private void checkTableSize(Integer row, Integer column) {
@@ -268,52 +244,26 @@ public class SimpleTable<T extends Number> {
 		}
 	}
 	
-	//TODO Put in ListsUtil / ListTypeConverter / ...
-	private StringBuilder formatTableRow(List<T> row, Integer precision) {
+	//Could use the StringArrayNumberConverter#joinWithSeparator() but this introduces a new dependency!
+	private StringBuilder formatTableRow(List<T> row, Integer precision, Integer fieldWith) {
+		String[] formatedRow = NumberUtil.toFormatedStringArray(row, precision, fieldWith);
 		StringBuilder sb = new StringBuilder();
-		String formatString;
-		if (null != precision) {
-			formatString = "%." + precision + "E";
-		} else {
-			formatString = "%.10E";
+		for (int i = 0; i < formatedRow.length; i++) {
+			sb.append(formatedRow[i]).append(", ");
 		}
-		for (int i = 0, j = 1; i < row.size(); i++, j++) {
-			T currentValue = row.get(i);
-			if (null == currentValue) {
-				currentValue = zeroNumberCrator(type);
-//				currentValue = 0d; 
-//				currentValue = null; 
-			}
-			sb.append(String.format(formatString, currentValue));
-			if (j < row.size()) {
-				sb.append(", ");
-			}
-		}
+		sb.delete(sb.lastIndexOf(", "), sb.length());
 		return sb;
 	}
 	
-	//TODO Separate in NumberUtil class
-	@SuppressWarnings("unchecked")
-	public static <T extends Number> T zeroNumberCrator(Class<?> numberType) {
-		if (null == numberType) {
-			throw new IllegalArgumentException("Can not set NULL to zero!");
-		}
-		if (Integer.class.equals(numberType)) {
-			return (T) new Integer(0);
-		} else if (Double.class.equals(numberType)) {
-			return (T) new Double(0);
-		} else {
-			throw new RuntimeException("Only integer and double supported yet! [type="+numberType.getClass()+"]");
-		}
+	public StringBuilder dumpTable(Integer precision) {
+		return dumpTable(precision, null);
 	}
 	
-	public StringBuilder dumpTable(Integer precision) {
+	public StringBuilder dumpTable(Integer precision, Integer fieldWith) {
 		StringBuilder sb = new StringBuilder();
 		for (List<T> row : table) {
-			sb.append(formatTableRow(row, precision)).append(System.lineSeparator());
+			sb.append(formatTableRow(row, precision, fieldWith)).append(System.lineSeparator());
 		}
-//		sb.append(toString());
-//		sb.delete(sb.lastIndexOf(System.lineSeparator()), sb.length());
 		return sb;
 	}
 	
@@ -335,7 +285,7 @@ public class SimpleTable<T extends Number> {
 		return copy;
 	}
 
-	public Class<?> getType() {
+	public Class<T> getType() {
 		return type;
 	}
 

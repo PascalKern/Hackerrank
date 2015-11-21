@@ -2,8 +2,8 @@ package info.pkern.algorithms.impl.gridSearch.localClasses;
 
 import static org.junit.Assert.*;
 import info.pkern.algorithms.impl.gridSearch.Solution;
+import info.pkern.hackerrank.commons.SimpleLoggingController;
 import info.pkern.hackerrank.environment.TestdataHandler;
-import info.pkern.hackerrank.tools.LoggerHandler;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -31,7 +31,7 @@ public class DataGridTest {
 	
 	@BeforeClass
 	public static void init() throws IOException {
-		LoggerHandler.enableSingleLineFineConsoleLogging();
+		SimpleLoggingController.enableSingleLineFineConsoleLogging();
 		
 		Path file = Paths.get("test", DataGridTest.class.getPackage().getName().replace(".", "/"), 
 				TestdataHandler.TESTDATA_FILE_NAME);
@@ -42,7 +42,7 @@ public class DataGridTest {
 	
 	@Test
 	public void testAllInTestdata() {
-		LoggerHandler.disableLogging();
+		SimpleLoggingController.disableLogging();
 		for (Testdata testdata : testdataHandler.getAllTestdata()) {
 			String exptected  = testdata.getExpectedString();
 			String actual = Solution.evaluateHackerrankResultString(testdata.getGrid().contains(testdata.getPattern()));

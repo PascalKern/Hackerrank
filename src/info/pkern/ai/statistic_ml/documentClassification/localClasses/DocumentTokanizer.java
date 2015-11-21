@@ -61,7 +61,7 @@ public class DocumentTokanizer {
 		return tokens.size();
 	}
 	
-	//TODO Could also use some command classes (Analyzer) like with the filters to tokanize the string with different analyzers.
+	//TODO Could also use some command classes (Analyzer) like with the filters to tokanize the string with different analyzers (words, n-grams, ...).
 	private List<String> tokanizeText(String text) {
 		
 		//TODO Move to filter/analyzer class(es)
