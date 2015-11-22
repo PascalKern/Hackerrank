@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.regex.Pattern;
 
 public class DocumentTokanizer {
 
@@ -13,6 +14,10 @@ public class DocumentTokanizer {
 	private List<String> tokens;
 	private Integer nextToken = 0;
 	private List<WordFilter> filters = new ArrayList<>();
+	//Punctuation: One of !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+	private Pattern removeCharPattern = Pattern.compile("\\p{Punct}\\p{Space}\\p{Digit}");
+	//Exclude: One of
+	private Pattern excludedRemoveCharPattern = Pattern.compile("'-");
 	
 	public DocumentTokanizer(String text) {
 		this.text = text;
@@ -23,10 +28,6 @@ public class DocumentTokanizer {
 		this("");
 	}
 	
-	public List<String> tokanize(String text) {
-		return tokanizeText(text);
-	}
-	
 	public void addFilter(WordFilter filter) {
 		filters.add(filter);
 		tokens = filterWords(tokens);
@@ -34,7 +35,7 @@ public class DocumentTokanizer {
 	
 	public void replaceFilters(List<WordFilter> filters) {
 		this.filters = filters;
-		tokens = tokanizeText(text);
+		tokens = tokanize(text);
 	}
 	
 	public List<WordFilter> getFilters() {
@@ -61,51 +62,24 @@ public class DocumentTokanizer {
 		return tokens.size();
 	}
 	
-	//TODO Could also use some command classes (Analyzer) like with the filters to tokanize the string with different analyzers (words, n-grams, ...).
-	private List<String> tokanizeText(String text) {
+	private List<String> tokanize(String text) {
 		
-		//TODO Move to filter/analyzer class(es)
-		/* Could also replace ALL non character chars with a space and remove double spaces afterwards?! */
-		//Simplify the text
+		//Remove unwanted chars like punctuation and more.
+		text = text.replaceAll("["+removeCharPattern+"&&[^"+excludedRemoveCharPattern+"]]", " ");
+		
+		//Treat text specific constructs
+		//negative lookahead = Word boundary NOT followed by a upper case char. Could also be pos. lookahead: (?=\\p{Lower})
+		text = text.replaceAll("\\b-\\b(?!\\p{Upper})", "");	
+		//positive lookahead = Word boundary followed by a upper case char.
+		text = text.replaceAll("\\b-\\b(?=\\p{Upper})", " ");
+		
+		//Normalize spacings and case
+		text = text.replaceAll("\\p{Space}{2,}", " ");
 		text = text.toLowerCase();
-		text = text.replaceAll("\\t", " ");
-		text = text.replaceAll("\\r\\n", " ");
 		
-		//Treat punctuation
-		text = text.replaceAll("\\b[,\\.:;!?] ", " ");
-		
-		//Treat text specific constructs - Experimental
-		text = text.replaceAll("\\b-\\b", "");
-		text = text.replaceAll("-", " ");
-		text = text.replaceAll("[\"]", "");
-		
-		//Normalize spacings
-		text = text.replaceAll(" {1,}", " ");
-		
-		
-		
-//		List<String> tokens = Arrays.asList(text.split("[\\s,\\.;:]"));
-		List<String> tokens = Arrays.asList(text.trim().split("[\\s]"));
+		List<String> tokens = Arrays.asList(text.trim().split("\\p{Space}"));
 		return filterWords(tokens);
 		
-		/*
-		StringTokenizer tokenizer = new StringTokenizer(text, "\n ,.;:'", false);
-		List<String> filteredTokens = new ArrayList<>();
-		boolean passFilter;
-		while (tokenizer.hasMoreTokens()) {
-			Iterator<WordFilter> filterIter = filters.iterator();
-			String token = tokenizer.nextToken();
-			passFilter = true;
-			while (passFilter && filterIter.hasNext()) {
-				passFilter = filterIter.next().doesPass(token);
-			}
-			if (passFilter) {
-				filteredTokens.add(token);
-			}
-		}
-		isDirty = false;
-		return filteredTokens;
-		*/
 	}
 
 	private List<String> filterWords(List<String> words) {
@@ -126,7 +100,7 @@ public class DocumentTokanizer {
 	
 	private void checkTokanizerIsInitialized() {
 		if (null == tokens) {
-			tokens = tokanizeText(text);
+			tokens = tokanize(text);
 		}
 	}
 }

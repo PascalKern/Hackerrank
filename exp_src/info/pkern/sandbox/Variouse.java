@@ -1,8 +1,11 @@
 package info.pkern.sandbox;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import info.pkern.ai.statistic_ml.documentClassification.localClasses.DocumentTokanizer;
+import info.pkern.ai.statistic_ml.documentClassification.localClasses.NGrammCreator;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
@@ -11,16 +14,48 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import javax.swing.plaf.ListUI;
+import java.util.regex.Pattern;
 
 import org.junit.Test;
 
 public class Variouse {
 
+	@Test
+	public void regexPatterns() {
+		String text = "A new text writen by me@gmail.com. This isn't a long text; so what! It should "
+				+ "be enought to (check) if all \"does what it should do\". Does it? Also this	tab should be done! "
+				+ "And what is with muliple spaces? Here are three   , and again five     .\nWhat about newlines and "
+				+ "what is with String-Concatenated words. On the other side just space-sparated words should be connected";
+		//Punctuation: One of !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+		Pattern removeCharPattern = Pattern.compile("\\p{Punct}");
+		//A whitespace character: [ \t\n\x0B\f\r]
+//		removeCharPattern = Pattern.compile(removeCharPattern+"\\p{Space}");
+		removeCharPattern = Pattern.compile("["+removeCharPattern+"\\p{Space}]");
+		//Exclude: One of
+		Pattern excludedRemoveCharPattern = Pattern.compile("'.");
+		System.out.println("["+removeCharPattern+"&&[^"+excludedRemoveCharPattern+"]]");
+		
+		String text2 = text.replaceAll("["+removeCharPattern+"&&[^"+excludedRemoveCharPattern+"]]", " ");
+		System.out.println(text2);
+		System.out.println(text2.replaceAll("\\p{Space}{2,}", " "));
+		
+		
+		
+		DocumentTokanizer tokanizer = new DocumentTokanizer(text);
+		System.out.println(tokanizer.getTokens());
+		NGrammCreator creator = new NGrammCreator(5);
+		System.out.println(creator.process(tokanizer.getTokens()));
+	}
+	
+	@Test
+	public void listAsString() {
+		List<String> theList = Arrays.asList("A", "word", "is", "here");
+		System.out.println(theList);
+		System.out.println(theList.toString().replaceAll("[\\[\\],]", ""));
+	}
+	
 	@Test
 	public void stringBuilder() {
 		StringBuilder sb = new StringBuilder();
