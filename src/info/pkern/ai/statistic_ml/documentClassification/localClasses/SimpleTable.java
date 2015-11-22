@@ -45,7 +45,7 @@ public class SimpleTable<T extends Number> {
 	public Integer addRow(List<T> row, Integer index) {
 		checkColumnsInRow(row);
 		checkTableRowSize(index);
-		List<T> newRow = NumberUtil.extendListWithZeroToFixElementCount(row, columns);
+		List<T> newRow = NumberUtil.extendListToFixElementCountWithZeroedValues(row, columns);
 		table.add(index, newRow);
 		rows++;
 		return table.size();
@@ -77,7 +77,12 @@ public class SimpleTable<T extends Number> {
 	public void addColumn(List<T> column, Integer index) {
 		checkRowsInColumn(column);
 		checkTableColumnSize(index);
-		List<T> newColumn = NumberUtil.extendListWithZeroToFixElementCount(column, rows);
+		List<T> newColumn;
+		if (0 == rows) {
+			newColumn = NumberUtil.populateZeroedList(rows, type);
+		} else {
+			newColumn = NumberUtil.extendListToFixElementCountWithZeroedValues(column, rows);
+		}
 		for (int i = 0; i < newColumn.size(); i++) {
 			getRow(i).add(index, newColumn.get(i));
 		}

@@ -45,7 +45,7 @@ public class NumberUtil {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public static <T extends Number> List<T> extendListWithZeroToFixElementCount(List<T> list, int finalElementCount) {
+	public static <T extends Number> List<T> extendListToFixElementCountWithZeroedValues(List<T> list, int finalElementCount) {
 		if (list.isEmpty()) {
 			throw new IllegalArgumentException("The list to be extended must contain at least one element! "
 					+ "Maybe pupulateZeroedList(int, Class<T>) can be used instead?");
