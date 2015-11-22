@@ -34,7 +34,7 @@ import org.junit.Test;
 public class TextClassifierWithFinalTestData {
 
 	private final static String TRAININGS_DATA_FILE = "orig_trainingdata.txt";
-	private final static Integer TESTS_COUNT = 20;
+	private final static Integer TESTS_COUNT = 10;
 
 	private static List<TestDataEntry> testData = new ArrayList<>(TESTS_COUNT);
 	private static Path tempTrainingsData;
@@ -48,7 +48,7 @@ public class TextClassifierWithFinalTestData {
 	public void simulateSolutionTest() throws IOException {
 		
 		DocumentTokanizer tokanizer = new DocumentTokanizer();
-//		tokanizer.addFilter(new ENStopwordFilter());
+		tokanizer.addFilter(new ENStopwordFilter());
 		
 		TextClassifier classifier = new TextClassifier(5000);
 		
@@ -106,7 +106,9 @@ public class TextClassifierWithFinalTestData {
 			for (Result result : results) {
 				sb.append(result).append(System.lineSeparator());
 			}
-			sb.delete(sb.length() -1, sb.length());
+			if (!results.isEmpty()) {
+				sb.delete(sb.lastIndexOf(System.lineSeparator())-1, sb.length());
+			}
 			return sb.toString();
 		}
 	}
@@ -120,11 +122,13 @@ public class TextClassifierWithFinalTestData {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
+			sb.append(String.format("%-12s%.5e ", "diff max touple: " , results.get(0).getValue() - results.get(1).getValue()));
 			for (Entry<String, Double> entry : results) {
 				sb.append(String.format("%-9s%.10e", entry.getKey() + ":", entry.getValue())).append(", ");
 			}
 			sb.delete(sb.lastIndexOf(","), sb.length());
-			return String.format("%-6s %-14s %s%s", isRight, exptected, sb.toString(), (isRight)?"":"\n"+falseContent);
+//			return String.format("%-6s %-14s %s%s", isRight, exptected, sb.toString(), (isRight)?"":"\n"+falseContent);
+			return String.format("%-6s %-14s %s", isRight, exptected, sb.toString());
 		}
 	}
 	

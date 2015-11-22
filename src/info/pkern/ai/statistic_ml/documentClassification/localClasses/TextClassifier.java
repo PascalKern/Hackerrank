@@ -30,16 +30,22 @@ public class TextClassifier {
 	private Map<String, Double> inverseDocumentFrequency;
 	private boolean trainingFinished = false;
 	private  BagOfWords docClassFrequencies = new BagOfWords();
+	private final boolean trackDocClassDetails;
 	
 	//For littlest caching
 	private List<Entry<String, Double>> lastClassificationResult;
 	private int lastClassifiedBag;
 	
 	public TextClassifier() {
-		this(null);
+		this(null, false);
 	}
 	
 	public TextClassifier(Integer maxNumberOfTerms) {
+		this(null, false);
+	}
+
+	public TextClassifier(Integer maxNumberOfTerms, boolean trackDocClassDetails) {
+		this.trackDocClassDetails = trackDocClassDetails;
 		if (null == maxNumberOfTerms) {
 			this.maxNumberAllowedTerms = Integer.MAX_VALUE;
 		} else {
@@ -56,7 +62,7 @@ public class TextClassifier {
 	public void train(BagOfWords bag, String docClassName) {
 		DocumentClass docClass = docClasses.get(docClassName);
 		if (null == docClass) {
-			docClass = new DocumentClass(docClassName);
+			docClass = new DocumentClass(docClassName, trackDocClassDetails);
 			docClass.add(bag);
 			docClasses.put(docClassName, docClass);
 			docClassFrequencies.addTerms(docClass.getTerms());
@@ -101,8 +107,12 @@ public class TextClassifier {
 				try {
 					classificationProbability = VectorMath.cosineSimilarityEuclideanNorm(
 							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()),
-//							VectorMath.normlizeVectorEuclideanNorm(docClass.getTfIdfWeightedFrequencies())
-							VectorMath.normlizeVectorEuclideanNorm(docClass.getTermFrequencies().getFrequencies())
+							//Only used by BiggerExample - better result without StopWordFilter!
+							VectorMath.normlizeVectorEuclideanNorm(docClass.getTfIdfWeightedFrequencies())	//Result not perfect about 30% false
+//							VectorMath.normlizeVectorEuclideanNorm(docClass.getTermFrequencies().getFrequencies())	//Result better about 20% false
+							
+							//Used currently with best results
+//							VectorMath.normlizeVectorEuclideanNorm(docClass.getInternalWeightedFrequencies())	//Result better about 10-20% false. Only with stopWordFilter!
 							);
 				} catch (InvalidObjectException e) {
 					e.printStackTrace();
@@ -131,12 +141,24 @@ public class TextClassifier {
 
 	//Calculate all data for performance classification. This again adds a state what is not really good!
 	public void finishTraining() {
+		if (docClasses.isEmpty()) {
+			throw new IllegalStateException("Can not finish training! The classifier does not contain any document classes.");
+		}
 		inverseDocumentFrequency = calculateIDF();
 		reduceIdfToMaxNumberOfTerms();
 		processDocumentClasses();
+		processDocumentClasses2();
 		trainingFinished = true;
 	}
 
+	private void processDocumentClasses2() {
+		for (DocumentClass docClass : docClasses.values()) {
+			docClass.getInternalWeightedFrequencies();
+		}
+	}
+	
+	//Used currently only for the BigerExample for visualization.
+	@Deprecated
 	private void processDocumentClasses() {
 		for (DocumentClass docClass : docClasses.values()) {
 			docClass.calculateWeightedFrequenciesWithIDF(inverseDocumentFrequency);

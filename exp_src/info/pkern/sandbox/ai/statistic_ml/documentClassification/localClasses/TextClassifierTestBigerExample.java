@@ -3,6 +3,7 @@ package info.pkern.sandbox.ai.statistic_ml.documentClassification.localClasses;
 import static org.junit.Assert.assertFalse;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.BagOfWords;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.DocumentClass;
+import info.pkern.ai.statistic_ml.documentClassification.localClasses.DocumentClassDetails;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.DocumentTokanizer;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.ENStopwordFilter;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.MinLengthFilter;
@@ -53,16 +54,17 @@ public class TextClassifierTestBigerExample {
 		
 		Long start = System.nanoTime();
 		for (DocumentClass docClass : testcase.textClassifier.getDocumenClasses()) {
-			SimpleTableNamedColumnAdapter<Double> table = docClass.getNormalizedTermFrequenciesOfAllBags();
-			table.filterColumns(docClass.getTfIdfWeightedFrequencies().keySet());
-			SimpleTable<Double> simpleTable = table.getSimpleTable();
-			simpleTable.extendTableToColumnsCount(testcase.textClassifier.getMaxNumberAllowedTerms());
-			
-			String lable = docClass.getName().substring(0, 2);
-			int rowIndex = simpleTable.getRowsCount();
-			while (rowIndex > 0) {
-				plotter.addVector(lable, ListTypeConverter.toPrimitive(simpleTable.getRow(rowIndex-1)));
-				rowIndex--;
+			if (docClass.hasDocClassDetials()) {
+				SimpleTableNamedColumnAdapter<Double> table = docClass.getDocClassDetails().getNormalizedTermFrequenciesOfAllBags();
+				table.filterColumns(docClass.getTfIdfWeightedFrequencies().keySet());
+				SimpleTable<Double> simpleTable = table.getSimpleTable();
+				simpleTable.extendTableToColumnsCount(testcase.textClassifier.getMaxNumberAllowedTerms());
+				String lable = docClass.getName().substring(0, 2);
+				int rowIndex = simpleTable.getRowsCount();
+				while (rowIndex > 0) {
+					plotter.addVector(lable, ListTypeConverter.toPrimitive(simpleTable.getRow(rowIndex-1)));
+					rowIndex--;
+				}
 			}
 			/*//This "disturbs" the clustering of the visualisation
 			List<Double> weightedTerms = new ArrayList<>();
@@ -94,13 +96,13 @@ public class TextClassifierTestBigerExample {
 		Path testBase = basePath.resolve(test);
 		
 //		textClassifier = new TextClassifier();
-		textClassifier = new TextClassifier(5000);
+		textClassifier = new TextClassifier(5000, true);
 		
 		FileVisitor<Path> fileProcessor = new RecursiveSimpleFileVisitor("txt");
 		Files.walkFileTree(learnBase, fileProcessor);
 		
 		tokanizer = new DocumentTokanizer();
-		tokanizer.addFilter(new ENStopwordFilter());
+//		tokanizer.addFilter(new ENStopwordFilter());
 		
 		Long start = System.nanoTime();
 		
@@ -119,9 +121,10 @@ public class TextClassifierTestBigerExample {
 		
 		System.out.println("Trained finished!");
 		
+		
+		
 		fileProcessor = new RecursiveSimpleFileVisitor("txt");
 		Files.walkFileTree(testBase, fileProcessor);
-
 		
 		Map<String, Results> results = new HashMap<>();
 		results.put(Boolean.toString(true), new Results());
@@ -191,7 +194,9 @@ public class TextClassifierTestBigerExample {
 			for (Result result : results) {
 				sb.append(result).append(System.lineSeparator());
 			}
-			sb.delete(sb.length() -1, sb.length());
+			if (!results.isEmpty()) {
+				sb.delete(sb.lastIndexOf(System.lineSeparator())-1, sb.length());
+			}
 			return sb.toString();
 		}
 	}
@@ -205,6 +210,7 @@ public class TextClassifierTestBigerExample {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
+			sb.append(String.format("%-12s => %.5e ", "diff max touple: " , results.get(0).getValue() - results.get(1).getValue()));
 			for (Entry<String, Double> entry : results) {
 				sb.append(String.format("%-9s%.10e", entry.getKey() + ":", entry.getValue())).append(", ");
 			}
