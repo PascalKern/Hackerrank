@@ -3,6 +3,9 @@ package info.pkern.sandbox.ai.statistic_ml.documentClassification.localClasses;
 import static org.junit.Assert.assertFalse;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.BagOfWords;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.DocumentClass;
+import info.pkern.ai.statistic_ml.documentClassification.localClasses.DocumentTokanizer;
+import info.pkern.ai.statistic_ml.documentClassification.localClasses.ENStopwordFilter;
+import info.pkern.ai.statistic_ml.documentClassification.localClasses.MinLengthFilter;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.SimpleTable;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.SimpleTableNamedColumnAdapter;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.TextClassifier;
@@ -35,6 +38,8 @@ public class TextClassifierTestBigerExample {
 //	private Path basePath = Paths.get("/Users/pkern/Google Drive/BOW/smallset");
 	private Path basePath = Paths.get("/Users/pkern/Google Drive/BOW");
 //	private Path basePath = Paths.get("C:/Users/pascal/Google Drive/BOW");
+	
+	private DocumentTokanizer tokanizer;
 	
 	private String learn = "learn_and_test/learn";
 	private String test = "learn_and_test/test";
@@ -94,6 +99,9 @@ public class TextClassifierTestBigerExample {
 		FileVisitor<Path> fileProcessor = new RecursiveSimpleFileVisitor("txt");
 		Files.walkFileTree(learnBase, fileProcessor);
 		
+		tokanizer = new DocumentTokanizer();
+		tokanizer.addFilter(new ENStopwordFilter());
+		
 		Long start = System.nanoTime();
 		
 		for (Path file : ((RecursiveSimpleFileVisitor) fileProcessor).getFiles()) {
@@ -143,8 +151,8 @@ public class TextClassifierTestBigerExample {
 		System.out.println(results.get(Boolean.toString(false)));
 		int failures = results.get(Boolean.toString(false)).results.size();
 		float total = right + failures;
-		System.out.println("Total right: " + right + " " + new Double((total / 100)*right) + "%");
-		System.out.println("Total failures: " + failures + " " + new Double((total / 100)*failures) + "%");
+		System.out.println("Total right: " + right + " " + new Double((100 / total)*right) + "%");
+		System.out.println("Total failures: " + failures + " " + new Double((100 / total)*failures) + "%");
 		
 		
 		StringBuilder sb = new StringBuilder();
@@ -171,15 +179,8 @@ public class TextClassifierTestBigerExample {
 			IOException {
 		String fileContent;
 		fileContent = new String(Files.readAllBytes(file), "UTF-8"); // readAllLines(file, Charset.defaultCharset());
-		fileContent = fileContent.replaceAll("[\\r\\n\\t\",;:?!.\\(\\){}]", " ");	//\p{Punct} or \\W
-		fileContent = fileContent.replaceAll("'s", "");
-		fileContent = fileContent.replaceAll("\\b-\\b", "");
-		fileContent = fileContent.replaceAll("[0-9]", "");
-		fileContent = fileContent.replaceAll("[_-]", " ");
-		fileContent = fileContent.replaceAll(" {2,}", " ");
-		fileContent = fileContent.trim();
-		fileContent = fileContent.toLowerCase(Locale.ENGLISH);
-		return Arrays.asList(fileContent.split("[\\s]"));
+		
+		return tokanizer.tokanize(fileContent);
 	}
 	
 	private class Results {
