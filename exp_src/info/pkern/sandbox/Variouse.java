@@ -43,10 +43,10 @@ public class Variouse {
 		
 		
 		
-		DocumentTokanizer tokanizer = new DocumentTokanizer(text);
-		System.out.println(tokanizer.getTokens());
+		DocumentTokanizer tokanizer = new DocumentTokanizer();
+		System.out.println(tokanizer.tokanize(text));
 		NGrammCreator creator = new NGrammCreator(5);
-		System.out.println(creator.process(tokanizer.getTokens()));
+		System.out.println(creator.process(tokanizer.tokanize(text)));
 	}
 	
 	@Test

@@ -10,59 +10,23 @@ import java.util.regex.Pattern;
 
 public class DocumentTokanizer {
 
-	private final String text;
-	private List<String> tokens;
-	private Integer nextToken = 0;
 	private List<WordFilter> filters = new ArrayList<>();
 	//Punctuation: One of !"#$%&'()*+,-./:;<=>?@[\]^_`{|}~
+	//Space: A whitespace character: [ \t\n\x0B\f\r]
+	//Digit: A decimal digit: [0-9]
 	private Pattern removeCharPattern = Pattern.compile("\\p{Punct}\\p{Space}\\p{Digit}");
 	//Exclude: One of
 	private Pattern excludedRemoveCharPattern = Pattern.compile("'-");
 	
-	public DocumentTokanizer(String text) {
-		this.text = text;
-	}
-	
-	@Deprecated
-	public DocumentTokanizer() {
-		this("");
-	}
-	
 	public void addFilter(WordFilter filter) {
 		filters.add(filter);
-		tokens = filterWords(tokens);
-	}
-	
-	public void replaceFilters(List<WordFilter> filters) {
-		this.filters = filters;
-		tokens = tokanize(text);
 	}
 	
 	public List<WordFilter> getFilters() {
-		return new ArrayList<>(filters);
+		return filters;
 	}
 
-	public String nextToken() {
-		checkTokanizerIsInitialized();
-		if (tokens.size() == nextToken) {
-			return null;
-		}
-		String token = tokens.get(nextToken);
-		nextToken += 1;
-		return token;
-	}
-
-	public List<String> getTokens() {
-		checkTokanizerIsInitialized();
-		return new ArrayList<>(tokens);
-	}
-	
-	public Integer getNumberOfTokens() {
-		checkTokanizerIsInitialized();
-		return tokens.size();
-	}
-	
-	private List<String> tokanize(String text) {
+	public List<String> tokanize(String text) {
 		
 		//Remove unwanted chars like punctuation and more.
 		text = text.replaceAll("["+removeCharPattern+"&&[^"+excludedRemoveCharPattern+"]]", " ");
@@ -96,11 +60,5 @@ public class DocumentTokanizer {
 			}
 		}
 		return tokens;
-	}
-	
-	private void checkTokanizerIsInitialized() {
-		if (null == tokens) {
-			tokens = tokanize(text);
-		}
 	}
 }
