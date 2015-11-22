@@ -36,6 +36,7 @@ public class DocumentTokanizer {
 		text = text.replaceAll("\\b-\\b(?!\\p{Upper})", "");	
 		//positive lookahead = Word boundary followed by a upper case char.
 		text = text.replaceAll("\\b-\\b(?=\\p{Upper})", " ");
+		text = text.replaceAll("-", "");
 		
 		//Normalize spacings and case
 		text = text.replaceAll("\\p{Space}{2,}", " ");
