@@ -65,7 +65,7 @@ public class TextClassifier {
 			docClass.add(bag);
 			docClasses.put(docClassName, docClass);
 		}
-		docClass.setTrained(false);
+		docClass.setWeighted(false);
 		trainingFinished = false;
 	}
 	
@@ -100,8 +100,10 @@ public class TextClassifier {
 				Double classificationProbability = null;
 				try {
 					classificationProbability = VectorMath.cosineSimilarityEuclideanNorm(
-							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()), 
-							VectorMath.normlizeVectorEuclideanNorm(docClass.getTfIdfWeightedFrequencies()));
+							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()),
+//							VectorMath.normlizeVectorEuclideanNorm(docClass.getTfIdfWeightedFrequencies())
+							VectorMath.normlizeVectorEuclideanNorm(docClass.getTermFrequencies().getFrequencies())
+							);
 				} catch (InvalidObjectException e) {
 					e.printStackTrace();
 				}
@@ -173,7 +175,7 @@ public class TextClassifier {
 		}
 	}
 	
-	
+	//Should deep copy the doc classes list!
 	public List<DocumentClass> getDocumenClasses() {
 		List<DocumentClass> docClasses = new ArrayList<>();
 		docClasses.addAll(this.docClasses.values());

@@ -1,26 +1,15 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
-import info.pkern.hackerrank.commons.ListTypeConverter;
-import info.pkern.hackerrank.commons.MapUtil;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Scanner;
 import java.util.Set;
-
-import javax.print.attribute.standard.MediaSize.Other;
 
 public class DocumentClass {
 
 	private final String name;
 	private BagOfWords termFrequencies = new BagOfWords();
-	private boolean trained = false;
+	private boolean isWeighted = false;
 	private Map<String, Double> weightedFrequencies = new HashMap<>();
 	
 	private Integer totalNumberOfBags = 0;
@@ -33,12 +22,12 @@ public class DocumentClass {
 		this.name = name;
 	}
 	
-	public boolean isTrained() {
-		return trained;
+	public boolean isWeighted() {
+		return isWeighted;
 	}
 
-	public void setTrained(boolean trained) {
-		this.trained = trained;
+	public void setWeighted(boolean trained) {
+		this.isWeighted = trained;
 	}
 
 	public void add(BagOfWords bagOfWords) {
@@ -46,10 +35,11 @@ public class DocumentClass {
 		totalNumberOfBags++;
 		bagFrequencies.addTerms(bagOfWords.getTerms());
 		
-		tfPerBag.extendTableColumns(bagOfWords.getTerms());
-//		tfPerBag.addRow(VectorMath.normlizeVectorEuclideanNorm(bagOfWords.getFrequencies()));
-		tfPerBag.addRow(bagOfWords.getFrequencies());
-		trained = false;
+		//Very expensive!!! Should create a subclass (ExtendedDocumentClass) which keeps this information only.
+		//The text classifier then must have a switch to signal which DocClass should be used!
+//		tfPerBag.extendTableColumns(bagOfWords.getTerms());
+//		tfPerBag.addRow(bagOfWords.getFrequencies());
+		isWeighted = false;
 		tfPerBagNormalized = null;
 	}
 
@@ -87,6 +77,12 @@ public class DocumentClass {
 		return termFrequencies.contains(term);
 	}
 
+	public BagOfWords getTermFrequencies() {
+		BagOfWords bagCopy = new BagOfWords();
+		bagCopy.add(termFrequencies);
+		return bagCopy;
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -102,19 +98,19 @@ public class DocumentClass {
 	}
 	
 	public void calculateWeightedFrequenciesWithIDF(Map<String, Double> inverseDocumentFrequency) {
-		if (!trained) {
+		if (!isWeighted) {
 			for (String term : inverseDocumentFrequency.keySet()) {
 				Double idf = inverseDocumentFrequency.get(term);
 				Double tfidf = termFrequencies.getFrequency(term) * ((null == idf)?0d:idf);
 				weightedFrequencies.put(term, tfidf);
 			}
 //			weightedFrequencies = VectorMath.normlizeVectorEuclideanNorm(weightedFrequencies);
-			trained = true;
+			isWeighted = true;
 		}
 	}
 	
 	private void checkIsTrained() {
-		if (!trained) {
+		if (!isWeighted) {
 			throw new IllegalStateException("Document class not yet trained with a IDF vector! Use weigthFrequencies() first.");
 		}
 	}
