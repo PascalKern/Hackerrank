@@ -36,9 +36,7 @@ import org.junit.Test;
 public class TextClassifierTestBigerExample {
 	
 	private TextClassifier textClassifier;
-//	private Path basePath = Paths.get("/Users/pkern/Google Drive/BOW/smallset");
-	private Path basePath = Paths.get("/Users/pkern/Google Drive/BOW");
-//	private Path basePath = Paths.get("C:/Users/pascal/Google Drive/BOW");
+	private Path basePath = Paths.get("exp_src/info/pkern/sandbox/ai/statistic_ml/documentClassification/localClasses/bowPythonTestdata");
 	
 	private DocumentTokanizer tokanizer;
 	
