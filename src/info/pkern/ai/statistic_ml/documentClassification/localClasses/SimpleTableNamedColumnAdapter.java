@@ -15,8 +15,12 @@ import java.util.Set;
 public class SimpleTableNamedColumnAdapter<T extends Number> {
 
 	private SimpleTable<T> table;
-	private List<String> header;
+//	private List<String> header;
 	private Integer maxHeaderNameLength = 0;
+
+	private int lastIndex = 0;
+	private Map<String, Integer> headerToIndex;
+	private Map<Integer, String> indexToHeader;
 	
 	public SimpleTableNamedColumnAdapter(Class<T> type) {
 		this(new SimpleTable<T>(0, 0, type), new ArrayList<String>());
@@ -28,32 +32,50 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 					+ "[table="+table.getColumnsCount()+", columnNames="+columnNames.size()+"]");
 		}
 		this.table = table.copy();
-		List<String> header = new ArrayList<>();
-		header.addAll(columnNames);
-		this.header = header;
-		for (String name : columnNames) {
+		headerToIndex = new HashMap<>();
+		indexToHeader = new HashMap<>();
+		for (int i = 0; i < columnNames.size(); i++) {
+			String name = columnNames.get(i);
+			headerToIndex.put(name, i);
+			indexToHeader.put(i, name);
+			lastIndex = i;
 			setMaxHeaderNameLength(name);
 		}
 	}
 	
-	private Integer addToHeaderAndGetIndex(String name) {
-		checkColumnNotExists(name);
-		if (! header.contains(name)) {
-			header.add(name);
-			setMaxHeaderNameLength(name);
+	private Integer addToHeaderAndOrGetIndex(String name) {
+		Integer index = headerToIndex.get(name);
+		if (null == index) {
+			index = lastIndex + 1;
+			headerToIndex.put(name, index);
+			indexToHeader.put(index, name);
+			lastIndex = index;
 		}
-		return getIndexOf(name);
+		return index;
+	}
+	
+	private String getHeaderFor(Integer index) {
+		checkIndexExists(index);
+		return indexToHeader.get(index);
 	}
 	
 	private Integer getIndexOf(String name) {
 		checkColumnExists(name);
-		return header.indexOf(name);
+		return headerToIndex.get(name);
 	}
 	
 	private Integer removeIndexFor(String name) {
-		Integer index = getIndexOf(name);
-		header.remove((int)index);
-		return index;
+		Integer indexToRemove = headerToIndex.remove(name);
+		indexToHeader.remove(indexToRemove);
+		int index = indexToRemove + 1;
+		while (lastIndex >= index) {
+			String nameToMove = indexToHeader.remove(index); 
+			indexToHeader.put(index-1, nameToMove);
+			headerToIndex.put(nameToMove, index-1);
+			index++;
+		};
+		lastIndex--;
+		return indexToRemove;
 	}
 	
 	private void setMaxHeaderNameLength(String name) {
@@ -61,30 +83,32 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	}
 	
 	public void addRow(Map<String, T> row) {
-		Set<String> names = new HashSet<>(row.keySet());
-		names.removeAll(header);
-		if (! names.isEmpty()) {
+		if (!headerToIndex.keySet().containsAll(row.keySet())) {
+			Set<String> different = new HashSet<>(row.keySet());
+			different.removeAll(headerToIndex.keySet());	//Expensive operation but because to be thrown not a issue! 
 			throw new IllegalArgumentException("One or more column names are not yet in this table! Extend the table "
-					+ "first with extendTableColumns(). [new names="+names+"]");
+					+ "first with extendTableColumns() or use addRowAutoExtendTable() instead. "
+					+ "[differneces="+different+"]");
 		}
 		List<T> orderedRow = new ArrayList<>();
-		ListIterator<String> headerIter = header.listIterator();
-		while (headerIter.hasNext()) {
-			String name = headerIter.next();
+		int columnCounter = 0;
+		while (columnCounter <= lastIndex) {
+			String name = indexToHeader.get(columnCounter);
 			T value = row.get(name);
 			if (null == value) {
 				value = NumberUtil.<T>zeroValueCreator(table.getType());
 			}
 			orderedRow.add(value);
+			columnCounter++;
 		}
 		table.addRow(orderedRow);
 	}
-
+	
 	public Map<String, T> getRow(Integer rowIndex) {
 		Map<String, T> newRow = new HashMap<>();
-		List<T> valueRow = table.getRow(rowIndex); 
-		for (int i = 0; i < header.size(); i++) {
-			newRow.put(header.get(i), valueRow.get(i));
+		List<T> valueRow = table.getRow(rowIndex);
+		for (int i = 0; i <= lastIndex; i++) {			
+			newRow.put(indexToHeader.get(i), valueRow.get(i));
 		}
 		return newRow;
 	}
@@ -94,7 +118,8 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	}
 
 	public void addColumn(List<T> column, String name) {
-		table.addColumn(column, addToHeaderAndGetIndex(name));
+		checkColumnNotExists(name);
+		table.addColumn(column, addToHeaderAndOrGetIndex(name));
 	}
 
 	public List<T> setColumn(List<T> column, String name) {
@@ -110,15 +135,14 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	}
 
 	/**
-	 * Should return a new {@link SimpleTableNamedColumnAdapter} with only the given columns.
+	 * Filters the table by removing all columns from this table which where not in the given columns. The removed<br/>
+	 * are returned as a new {@link SimpleTableNamedColumnAdapter} with only the given columns.
 	 * @param columnNames
 	 * @return
 	 */
-	//TODO TEST!!! Was with List<String> before! Order doesn't matter? Yes if one will track the old index/position outside this class!
 	public SimpleTableNamedColumnAdapter<T> filterColumns(Collection<String> columnNames) {
 		SimpleTableNamedColumnAdapter<T> copy = copy();
-		List<String> toRemove = new ArrayList<>();
-		toRemove.addAll(copy.header);
+		Set<String> toRemove = new HashSet<>(headerToIndex.keySet());
 		toRemove.removeAll(columnNames);
 		copy.removeColumns(toRemove);
 		return copy;
@@ -129,14 +153,15 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	 * @param columnNames
 	 * @return
 	 */
-	//TODO TEST!!! ALso with Collection as above?! Order doesn't matter? Yes? if one will track the old index/position outside this class!
-	public SimpleTableNamedColumnAdapter<T> removeColumns(List<String> columnNames) {
+	public SimpleTableNamedColumnAdapter<T> removeColumns(Collection<String> columnNames) {
 		List<Integer> indicesToRemove = new ArrayList<>();
+		List<String> removedColumnHeaders = new ArrayList<>();
 		for (String name : columnNames) {
+			removedColumnHeaders.add(name);
 			indicesToRemove.add(removeIndexFor(name));
 		}
 		SimpleTable<T> removedTable = table.removeColumns(indicesToRemove); 
-		return new SimpleTableNamedColumnAdapter<T>(removedTable, columnNames);
+		return new SimpleTableNamedColumnAdapter<T>(removedTable, removedColumnHeaders);
 	}
 
 	public T get(Integer row, String columnName) {
@@ -159,14 +184,14 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 		table.extendTableRows(newRowCount);
 	}
 
+	//TODO Ok to start by 1?!?
 	public void extendTableColumns(Collection<String> headerNames) {
-		List<String> newNames = new ArrayList<>();
-		newNames.addAll(headerNames);
-		newNames.removeAll(header);
-		for (String name : newNames) {
-			addToHeaderAndGetIndex(name);
+		int newColumnCounter = 1;
+		for (String name : headerNames) {
+			newColumnCounter += (null == headerToIndex.get(name))?1:0;
+			addToHeaderAndOrGetIndex(name);
 		}
-		table.extendTabltColumnsBy(newNames.size());
+		table.extendTabltColumnsBy(newColumnCounter);
 	}
 
 	public SimpleTable<T> getSimpleTable() {
@@ -174,19 +199,23 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	}
 	
 	public Collection<String> getHeader() {
-		List<String> headerCopy = new ArrayList<>();
-		headerCopy.addAll(header);
-		return headerCopy;
+		return new HashSet<>(headerToIndex.keySet());
 	}
 
 	private void checkColumnExists(String name) {
-		if (! header.contains(name)) {
+		if (null == headerToIndex.get(name)) {
 			throw new IllegalArgumentException("The table does not contain a column with this name! [name="+name+"]");
 		}
 	}
 
+	private void checkIndexExists(Integer index) {
+		if (null == indexToHeader.get(index)) {
+			throw new IllegalArgumentException("The table does not contain a column for the index! [index="+index+"]");
+		}
+	}
+	
 	private void checkColumnNotExists(String name) {
-		if (header.contains(name)) {
+		if (null != headerToIndex.get(name)) {
 			throw new IllegalArgumentException("The table already contains a column with this name! [name="+name+"]");
 		}
 	}
@@ -194,7 +223,8 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	public StringBuilder dumpTableWithHeader(Integer precision) {
 		StringBuilder sbHeader = new StringBuilder();
 		Integer fieldWith = Math.max((6+precision), maxHeaderNameLength);
-		for (String term : header) {
+		for (int i = 0; i <= lastIndex; i++) {
+			String term = indexToHeader.get(i);
 			sbHeader.append(String.format("%-"+ fieldWith +"s", term)).append(", ");
 		}
 		sbHeader.delete(sbHeader.lastIndexOf(","),sbHeader.length());
@@ -203,10 +233,16 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	
 	@Override
 	public String toString() {
-		return table.toString() + System.lineSeparator() + "header= " + header;
+		return table.toString() + System.lineSeparator() + "headerToIndex= " + headerToIndex;
 	}
 
 	public SimpleTableNamedColumnAdapter<T> copy() {
-		return new SimpleTableNamedColumnAdapter<>(table, header);
+		SimpleTableNamedColumnAdapter<T> copy = new SimpleTableNamedColumnAdapter<>(table.getType());
+		copy.table = table.copy();
+		copy.headerToIndex = new HashMap<>(headerToIndex);
+		copy.indexToHeader = new HashMap<>(indexToHeader);
+		copy.lastIndex = lastIndex;
+		copy.maxHeaderNameLength = maxHeaderNameLength;
+		return copy;
 	}
 }
