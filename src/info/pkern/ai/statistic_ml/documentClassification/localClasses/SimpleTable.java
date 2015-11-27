@@ -3,10 +3,13 @@ package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 import info.pkern.hackerrank.commons.NumberUtil;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+//TODO Maby use Collections.nCopies() to create list to be used as base list when extending or so (see TODOs bellow)!
 
 /**
  * Row and column indices are always <strong>zero based</strong>!</br></br>
@@ -153,22 +156,23 @@ public class SimpleTable<T extends Number> {
 		throw new RuntimeException("Not yet implemented!");
 	}
 	
+	//TODO Optimize. When the columnIndices are incrementing numbers remove subList = avoid nested for iteration!
 	/**
 	 * Removes all given columns from this table and return the "deleted" columns as a new table. The order of the
 	 * columns in the returned table is the same as within the given list of indices. 
 	 * @param columnIndices
 	 * @return
 	 */
-	public SimpleTable<T> removeColumns(List<Integer> columnIndices) {
+	public SimpleTable<T> removeColumns(Collection<Integer> columnIndices) {
 		checkTableColumnSize(columnIndices);
 		List<List<T>> removedColumns = new ArrayList<>();
 		for (List<T> row : table) {
 			List<T> removedElements = new ArrayList<>();
 			for (Integer column : columnIndices) {
-				removedElements.add(row.remove((int)column));
+				removedElements.add(row.remove(column.intValue()));
 			}
 		}
-		SimpleTable<T> table = copy();
+		SimpleTable<T> table = new SimpleTable<>(type);
 		table.table = removedColumns;
 		table.columns = columnIndices.size();
 		table.rows = rows;
@@ -256,7 +260,7 @@ public class SimpleTable<T extends Number> {
 		}
 	}
 	
-	private void checkTableColumnSize(List<Integer> columnIndices) {
+	private void checkTableColumnSize(Collection<Integer> columnIndices) {
 		Throwable throwable = new Throwable();
 		for (Integer index : columnIndices) {
 			try {
