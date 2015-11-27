@@ -78,6 +78,23 @@ public class Variouse {
 	}
 	
 	@Test
+	public void listAddAll() {
+		List<Integer> baseList = Arrays.asList(1,2,3,4,5);
+		List<Integer> listA = new ArrayList<>();
+		List<Integer> listB = new ArrayList<>();
+		
+		listA.addAll(baseList);
+		listB.addAll(baseList);
+		
+		baseList.set(1, 20);
+		baseList.set(2, 30);
+		
+		System.out.println(baseList);
+		System.out.println(listA);
+		System.out.println(listB);
+	}
+	
+	@Test
 	public void copyList() {
 		List<List<Integer>> baseList = new ArrayList<>();
 		List<Integer> listA = Arrays.asList(1,2,3,4);

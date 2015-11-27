@@ -28,6 +28,7 @@ public class SimpleTable<T extends Number> {
 	
 	public SimpleTable(Integer initColumnSize, Integer initRowSize, Class<T> type) {
 		this.type = type;
+		//TODO Replace with baseList!
 		List<T> baseRow = NumberUtil.populateZeroedList(initColumnSize, type);
 		for (int i = 0; i < initRowSize; i++) {
 			List<T> row = new ArrayList<>();
@@ -38,17 +39,17 @@ public class SimpleTable<T extends Number> {
 		columns = initColumnSize;
 	}
 	
-	public Integer addRow(List<T> row) {
-		return addRow(row, rows);
+	public void addRow(List<T> row) {
+		addRow(row, rows);
 	}
 	
-	public Integer addRow(List<T> row, Integer index) {
+	public void addRow(List<T> row, Integer index) {
 		checkColumnsInRow(row);
 		checkTableRowSize(index);
+		//TODO Replace with local baseRow?
 		List<T> newRow = NumberUtil.extendListToFixElementCountWithZeroedValues(row, columns);
 		table.add(index, newRow);
 		rows++;
-		return table.size();
 	}
 
 	public List<T> setRow(List<T> row, Integer index) {
@@ -60,12 +61,18 @@ public class SimpleTable<T extends Number> {
 	
 	public List<T> getRow(Integer rowIndex) {
 		checkTableRowSize(rowIndex);
+		List<T> rowCopy = new ArrayList<>();
+		rowCopy.addAll(getRowMutable(rowIndex));
+		return rowCopy;
+	}
+	
+	private List<T> getRowMutable(Integer rowIndex) {
 		return table.get(rowIndex);
 	}
 	
 	public List<T> removeRow(Integer rowIndex) {
 		checkTableRowSize(rowIndex);
-		List<T> oldRow = table.remove((int)rowIndex);
+		List<T> oldRow = table.remove(rowIndex.intValue());
 		rows--;
 		return oldRow;
 	}
@@ -74,32 +81,44 @@ public class SimpleTable<T extends Number> {
 		addColumn(column, columns);
 	}
 
-	public void addColumn(List<T> column, Integer index) {
+	public void addColumn(List<T> column, Integer columnIndex) {
 		checkRowsInColumn(column);
-		checkTableColumnSize(index);
+		checkTableColumnSize(columnIndex);
 		List<T> newColumn;
+		//TODO Replace with local baseRow?
 		if (0 == rows) {
 			newColumn = NumberUtil.populateZeroedList(rows, type);
 		} else {
 			newColumn = NumberUtil.extendListToFixElementCountWithZeroedValues(column, rows);
 		}
 		for (int i = 0; i < newColumn.size(); i++) {
-			getRow(i).add(index, newColumn.get(i));
+			if (columns == columnIndex) {
+				getRowMutable(i).add(newColumn.get(i));
+			} else {
+				List<T> oldRow = getRowMutable(i);
+				List<T> bellowIndex = oldRow.subList(0, columnIndex);
+				List<T> aboveIndex = oldRow.subList(columnIndex, oldRow.size());
+				bellowIndex.add(newColumn.get(i));
+				bellowIndex.addAll(aboveIndex);
+				setRow(bellowIndex, i);
+			}
 		}
 		columns++;
 	}
 	
 	public List<T> setColumn(List<T> column, Integer index) {
 		checkRowsInColumn(column);
-		List<T> oldColumn = removeColumn(index);
-		addColumn(column, index);
+		List<T> oldColumn = new ArrayList<>();
+		for (int i = 0; i < rows; i++) {
+			oldColumn.add(set(i, index, column.get(i)));
+		}
 		return oldColumn;
 	}
 	
 	public List<T> getColumn(Integer columnIndex) {
 		checkTableColumnSize(columnIndex);
 		List<T> column = new ArrayList<>();
-		for (int i = 0; i < table.size(); i++) {
+		for (int i = 0; i < rows; i++) {
 			column.add(get(i, columnIndex));
 		}
 		return column;
@@ -108,8 +127,17 @@ public class SimpleTable<T extends Number> {
 	public List<T> removeColumn(Integer columnIndex) {
 		checkTableColumnSize(columnIndex);
 		List<T> oldColumn = new ArrayList<>();
-		for (List<T> row : table) {
-			oldColumn.add(row.remove((int)columnIndex));
+		for (int i = 0; i < rows; i++) {
+			List<T> row = table.get(i);
+			if (columns == columnIndex) {
+				oldColumn.add(row.remove(columnIndex.intValue()));
+			} else {
+				List<T> bellowIndex = row.subList(0, columnIndex);
+				List<T> aboveIndex = row.subList(columnIndex +1, row.size());
+				oldColumn.add(row.get(columnIndex));
+				bellowIndex.addAll(aboveIndex);
+				table.set(i, bellowIndex);
+			}
 		}
 		columns--;
 		return oldColumn;
@@ -134,7 +162,7 @@ public class SimpleTable<T extends Number> {
 	public SimpleTable<T> removeColumns(List<Integer> columnIndices) {
 		checkTableColumnSize(columnIndices);
 		List<List<T>> removedColumns = new ArrayList<>();
-		for (List<T> row : this.table) {
+		for (List<T> row : table) {
 			List<T> removedElements = new ArrayList<>();
 			for (Integer column : columnIndices) {
 				removedElements.add(row.remove((int)column));
@@ -154,9 +182,9 @@ public class SimpleTable<T extends Number> {
 		return table.get(row).get(column);
 	}
 	
-	public void set(Integer row, Integer column, T value) {
+	public T set(Integer row, Integer column, T value) {
 		checkTableSize(row, column);
-		table.get(row).set(column, value);
+		return table.get(row).set(column, value);
 	}
 	
 	public Integer getRowsCount() {
@@ -178,6 +206,7 @@ public class SimpleTable<T extends Number> {
 
 	public void extendTableRows(Integer newRowCount) {
 		if (newRowCount > rows) {
+			//TODO Replace with baseList!
 			List<T> zeroedRow = NumberUtil.populateZeroedList(columns, type);
 			while (rows < newRowCount) {
 				List<T> newRow = new ArrayList<>();
@@ -192,13 +221,19 @@ public class SimpleTable<T extends Number> {
 	}
 	
 	public void extendTableToColumnsCount(Integer newColumnCount) {
-		if (newColumnCount > columns) {
-			List<T> zeroedColumn = NumberUtil.populateZeroedList(rows, type);
-			while (columns < newColumnCount) {
-				List<T> newColumn = new ArrayList<>();
-				newColumn.addAll(zeroedColumn);
-				addColumn(newColumn);
+		int additionalColumns = newColumnCount - columns;
+		if (additionalColumns > 0) {
+			//TODO Replace with baseList!
+			List<T> zeroedNewColumns = NumberUtil.populateZeroedList(additionalColumns, type);
+			for (List<T> row : table) {
+				row.addAll(zeroedNewColumns);
 			}
+			columns += additionalColumns;
+		} else if (additionalColumns == 0) {
+			/*Do nothing*/
+		} else {
+			throw new IllegalArgumentException("Can not shrink the table columns by extending with value smaller than"
+					+ "current columns count! [newColumnCount="+newColumnCount+", columns="+columns+"]");
 		}
 	}
 	
