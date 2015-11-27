@@ -140,7 +140,6 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	 * @param columnNames
 	 * @return
 	 */
-	//TODO TEST!!! Was with List<String> before! Order doesn't matter? Yes if one will track the old index/position outside this class!
 	public SimpleTableNamedColumnAdapter<T> filterColumns(Collection<String> columnNames) {
 		SimpleTableNamedColumnAdapter<T> copy = copy();
 		Set<String> toRemove = new HashSet<>(headerToIndex.keySet());
@@ -154,7 +153,6 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 	 * @param columnNames
 	 * @return
 	 */
-	//TODO TEST!!! ALso with Collection as above?! Order doesn't matter? Yes? if one will track the old index/position outside this class!
 	public SimpleTableNamedColumnAdapter<T> removeColumns(Collection<String> columnNames) {
 		List<Integer> indicesToRemove = new ArrayList<>();
 		List<String> removedColumnHeaders = new ArrayList<>();
@@ -186,8 +184,9 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 		table.extendTableRows(newRowCount);
 	}
 
+	//TODO Ok to start by 1?!?
 	public void extendTableColumns(Collection<String> headerNames) {
-		int newColumnCounter = 0;
+		int newColumnCounter = 1;
 		for (String name : headerNames) {
 			newColumnCounter += (null == headerToIndex.get(name))?1:0;
 			addToHeaderAndOrGetIndex(name);
