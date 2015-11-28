@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+//TODO Introduce a max term count value? Specially for the weighted frequencies.
 public class DocumentClass {
 
 	private final String name;
