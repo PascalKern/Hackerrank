@@ -4,6 +4,7 @@ import info.pkern.hackerrank.commons.NumberUtil;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,10 +64,7 @@ public class SimpleTable<T extends Number> {
 	}
 	
 	public List<T> getRow(Integer rowIndex) {
-		checkTableRowSize(rowIndex);
-		List<T> rowCopy = new ArrayList<>();
-		rowCopy.addAll(getRowMutable(rowIndex));
-		return rowCopy;
+		return Collections.unmodifiableList(getRowMutable(rowIndex));
 	}
 	
 	private List<T> getRowMutable(Integer rowIndex) {

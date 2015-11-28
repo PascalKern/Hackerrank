@@ -3,6 +3,7 @@ package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -74,7 +75,7 @@ public class BagOfWords {
 	 * @return the terms in this bag.
 	 */
 	public Set<String> getTerms() {
-		return new HashSet<>(this.termFrequencies.keySet());
+		return Collections.unmodifiableSet(termFrequencies.keySet());
 	}
 
 	public Integer getNumberOfTerms() {
@@ -104,7 +105,7 @@ public class BagOfWords {
 	}
 	
 	public Map<String, Integer> getFrequencies() {
-		return new HashMap<>(termFrequencies);
+		return Collections.unmodifiableMap(termFrequencies);
 	}
 	
 	@Override

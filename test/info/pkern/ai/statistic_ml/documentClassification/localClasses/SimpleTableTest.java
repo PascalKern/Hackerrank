@@ -136,7 +136,7 @@ public class SimpleTableTest {
 	}
 	
 	@Test
-	public void emptyTableInstantiation() {
+	public void testEmptyTableInstantiation() {
 		table = new SimpleTable<>(0, 0, Double.class);
 		assertTrue(0 == table.getColumnsCount());
 		assertTrue(0 == table.getRowsCount());

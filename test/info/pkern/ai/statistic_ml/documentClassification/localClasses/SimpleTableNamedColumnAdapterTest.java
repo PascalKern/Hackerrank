@@ -121,15 +121,12 @@ public class SimpleTableNamedColumnAdapterTest {
 
 	@Test
 	public void testRemoveColumn() throws Exception {
-		System.out.println(tableNamed.dumpTableWithHeader(3));
 		tableNamed.addRow(newRow);
-		System.out.println(tableNamed.dumpTableWithHeader(3));
 		tableNamed.removeColumn("one");
-		System.out.println(tableNamed.dumpTableWithHeader(3));
-		Map<String, Double> exptected = new HashMap<>();
-		exptected.put("two", 2d);
-		exptected.put("three", 3d);
-		assertEquals(exptected, tableNamed.getRow(2));
+		Map<String, Double> exptectedRow = new HashMap<>();
+		exptectedRow.put("two", 2d);
+		exptectedRow.put("three", 3d);
+		assertEquals(exptectedRow, tableNamed.getRow(2));
 		assertEquals(Arrays.asList(0d,0d,3d), tableNamed.getColumn("three"));
 		tableNamed.removeColumn("three");
 		tableNamed.removeRow(0);
