@@ -10,6 +10,7 @@ import info.pkern.ai.statistic_ml.documentClassification.localClasses.MinLengthF
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.SimpleTable;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.SimpleTableNamedColumnAdapter;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.TextClassifier;
+import info.pkern.ai.statistic_ml.documentClassification.localClasses.VectorMath;
 import info.pkern.hackerrank.commons.ListTypeConverter;
 import info.pkern.hackerrank.commons.MapUtil;
 import info.pkern.hackerrank.commons.RecursiveSimpleFileVisitor;
@@ -30,6 +31,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import javax.swing.plaf.ListUI;
 
 import org.junit.Test;
 
@@ -54,7 +57,8 @@ public class TextClassifierTestBigerExample {
 		for (DocumentClass docClass : testcase.textClassifier.getDocumenClasses()) {
 			if (docClass.hasDocClassDetials()) {
 				SimpleTableNamedColumnAdapter<Double> table = docClass.getDocClassDetails().getNormalizedTermFrequenciesOfAllBags();
-				table.filterColumns(docClass.getTfIdfWeightedFrequencies().keySet());
+				//TODO Maybe use the classifier dictionary or its idf or reduced idf?!
+//				table.filterColumns(docClass.getTfIdfWeightedFrequencies().keySet());
 				SimpleTable<Double> simpleTable = table.getSimpleTable();
 				simpleTable.extendTableToColumnsCount(testcase.textClassifier.getMaxNumberAllowedTerms());
 				String lable = docClass.getName().substring(0, 2);
@@ -75,8 +79,10 @@ public class TextClassifierTestBigerExample {
 		bagGood.addTerms(testcase.tokanize(testcase.basePath.resolve(testcase.test).resolve("lawyer/lawyer23.txt")));
 		BagOfWords bagBad = new BagOfWords();
 		bagBad.addTerms(testcase.tokanize(testcase.basePath.resolve(testcase.test).resolve("lawyer/lawyer303.txt")));
-		plotter.addVector("Laweyer23", testcase.textClassifier.normalizeBagWithIDFVocabulary(bagGood));
-		plotter.addVector("Laweyer303", testcase.textClassifier.normalizeBagWithIDFVocabulary(bagBad));
+//		plotter.addVector("Laweyer23", testcase.textClassifier.normalizeBagWithIDFVocabulary(bagGood));
+//		plotter.addVector("Laweyer303", testcase.textClassifier.normalizeBagWithIDFVocabulary(bagBad));
+		plotter.addVectorExtendedToCurrentPlotterSize("Laweyer23", ListTypeConverter.toPrimitive(VectorMath.normlizeVectorEuclideanNorm(bagGood.getFrequencies()).values().toArray(new Double[]{})));
+		plotter.addVectorExtendedToCurrentPlotterSize("Laweyer303", ListTypeConverter.toPrimitive(VectorMath.normlizeVectorEuclideanNorm(bagBad.getFrequencies()).values().toArray(new Double[]{})));
 		
 		Long writeData = System.nanoTime() - start;
 		System.out.println("Write data: " + writeData/10E6);

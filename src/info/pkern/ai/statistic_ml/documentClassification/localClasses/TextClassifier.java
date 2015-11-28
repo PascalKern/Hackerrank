@@ -29,7 +29,9 @@ public class TextClassifier {
 
 	private Map<String, Double> inverseDocumentFrequency;
 	private boolean trainingFinished = false;
+	//Dictionary of the clasifier
 	private  BagOfWords docClassFrequencies = new BagOfWords();
+	
 	private final boolean trackDocClassDetails;
 	
 	//For littlest caching
@@ -71,7 +73,6 @@ public class TextClassifier {
 			docClass.add(bag);
 			docClasses.put(docClassName, docClass);
 		}
-		docClass.setWeighted(false);
 		trainingFinished = false;
 	}
 	
@@ -108,11 +109,12 @@ public class TextClassifier {
 					classificationProbability = VectorMath.cosineSimilarityEuclideanNorm(
 							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()),
 							//Only used by BiggerExample - better result without StopWordFilter!
-							VectorMath.normlizeVectorEuclideanNorm(docClass.getTfIdfWeightedFrequencies())	//Result not perfect about 30% false
-//							VectorMath.normlizeVectorEuclideanNorm(docClass.getTermFrequencies().getFrequencies())	//Result better about 20% false
+							//Result better about 20% false
+//							VectorMath.normlizeVectorEuclideanNorm(docClass.getTermFrequencies().getFrequencies())
 							
 							//Used currently with best results
-//							VectorMath.normlizeVectorEuclideanNorm(docClass.getInternalWeightedFrequencies())	//Result better about 10-20% false. Only with stopWordFilter!
+							//Result better about 10-20% false. Only with stopWordFilter and on real trainings data?!
+							VectorMath.normlizeVectorEuclideanNorm(docClass.getWeightedFrequencies())
 							);
 				} catch (InvalidObjectException e) {
 					e.printStackTrace();
@@ -144,27 +146,20 @@ public class TextClassifier {
 		if (docClasses.isEmpty()) {
 			throw new IllegalStateException("Can not finish training! The classifier does not contain any document classes.");
 		}
+		//TODO Keep all frequencies - not reduced!
 		inverseDocumentFrequency = calculateIDF();
+		//TODO Keep separated
 		reduceIdfToMaxNumberOfTerms();
 		processDocumentClasses();
-		processDocumentClasses2();
 		trainingFinished = true;
 	}
 
-	private void processDocumentClasses2() {
+	private void processDocumentClasses() {
 		for (DocumentClass docClass : docClasses.values()) {
-			docClass.getInternalWeightedFrequencies();
+			docClass.getWeightedFrequencies();
 		}
 	}
 	
-	//Used currently only for the BigerExample for visualization.
-	@Deprecated
-	private void processDocumentClasses() {
-		for (DocumentClass docClass : docClasses.values()) {
-			docClass.calculateWeightedFrequenciesWithIDF(inverseDocumentFrequency);
-		}
-	}
-
 	private Map<String, Double> calculateIDF() {
 		Map<String, Double> inverseDocumentFrequency = new HashMap<>(docClassFrequencies.getNumberOfTerms());
 		for (String term : docClassFrequencies.getTerms()) {
@@ -197,27 +192,11 @@ public class TextClassifier {
 		}
 	}
 	
-	//Should deep copy the doc classes list!
+	//TODO Should deep copy the doc classes list!
 	public List<DocumentClass> getDocumenClasses() {
 		List<DocumentClass> docClasses = new ArrayList<>();
 		docClasses.addAll(this.docClasses.values());
 		return docClasses;
 	}
 	
-	//TODO Keep IDF in BagOfWords (Generic) and remove dependencies here with getter on this bag! At least the deps on ListTypeConverter!
-	//TODO Ordering matters?
-	public double[] normalizeBagWithIDFVocabulary(BagOfWords bag) {
-		List<Integer> bagVector = new ArrayList<>();
-		for (String term : inverseDocumentFrequency.keySet()) {
-			Integer value;
-			if (null != (value = bag.getFrequency(term))) {
-				bagVector.add(value);
-			} else {
-				bagVector.add(0);
-			}
-		}
-		List<Double> bagVectorNorm = VectorMath.normlizeVectorEuclideanNorm(bagVector);
-		return ListTypeConverter.toPrimitive(bagVectorNorm);
-	}
-
 }

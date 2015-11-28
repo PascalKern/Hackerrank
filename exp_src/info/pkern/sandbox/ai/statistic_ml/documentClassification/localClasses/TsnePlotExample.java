@@ -39,11 +39,34 @@ public class TsnePlotExample {
 	public void addVector(String label, double[] vector) {
 		labels.add(label.trim());
 		int isLength = 0;
-		if (!vertices.isEmpty() && (isLength = vertices.get(0).length) != vector.length) {
+		if (!vertices.isEmpty() && (isLength = getVerticesLength()) != vector.length) {
 			throw new IllegalArgumentException("The vectors to plot must have the same length! [existing="+isLength
 					+ ", vector= "+vector.length+"]");
 		}
 		vertices.add(vector);
+	}
+	
+	private int getVerticesLength() {
+		if (vertices.isEmpty()) {
+			return 0;
+		} else {
+			return vertices.get(0).length;
+		}
+	}
+	
+	public void addVectorExtendedToCurrentPlotterSize(String label, double[] vector) {
+		int currentPlotterSize = getVerticesLength();
+		if (0 == currentPlotterSize) {
+			addVector(label, vector);
+		} else {
+			if (!vertices.isEmpty() && currentPlotterSize < vector.length) {
+				throw new IllegalArgumentException("The vectors to plot must not be longer than the existing plotter"
+						+ "vertices! [existing="+currentPlotterSize +" , vector= "+vector.length+"]");
+			}
+			double[] extendedVector = new double[currentPlotterSize];
+			System.arraycopy(vector, 0, extendedVector, 0, vector.length);
+			addVector(label, extendedVector);
+		}
 	}
 	
 	public void addVertices(List<String> labels, List<double[]> vertices) {
@@ -104,8 +127,8 @@ public class TsnePlotExample {
     }
 
 	public static void main(String[] args) {
-			TSneDemo.main(new String[]{"./noGit/example.txt", "./noGit/labels_example.txt"});
-//			TsnePlotExample plotter = new TsnePlotExample();
-//			plotter.display("./noGit/example.txt", "./noGit/labels_example.txt");
-		}
+		TSneDemo.main(new String[]{"./noGit/example.txt", "./noGit/labels_example.txt"});
+//		TsnePlotExample plotter = new TsnePlotExample();
+//		plotter.display("./noGit/example.txt", "./noGit/labels_example.txt");
+	}
 }

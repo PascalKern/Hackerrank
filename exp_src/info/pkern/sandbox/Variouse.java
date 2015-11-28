@@ -23,6 +23,12 @@ import org.junit.Test;
 public class Variouse {
 
 	@Test
+	public void emptyArrayInitialized() {
+		double[] array = new double[5];
+		System.out.println(Arrays.toString(array));
+	}
+	
+	@Test
 	public void regexPatterns() {
 		String text = "A new text writen by me@gmail.com. This isn't a long text; so what! It should "
 				+ "be enought to (check) if all \"does what it should do\". Does it? Also this	tab should be done! "

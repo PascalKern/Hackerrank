@@ -16,8 +16,6 @@ public class DocumentClassDetails {
 	}
 	
 	public void add(BagOfWords bagOfWords) {
-		//Very expensive!!! Should create a subclass (ExtendedDocumentClass) which keeps this information only.
-		//The text classifier then must have a switch to signal which DocClass should be used!
 		tfPerBag.extendTableColumns(bagOfWords.getTerms());
 		tfPerBag.addRow(bagOfWords.getFrequencies());
 		tfPerBagNormalized = null;
