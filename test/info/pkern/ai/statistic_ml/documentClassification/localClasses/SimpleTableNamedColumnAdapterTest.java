@@ -1,11 +1,12 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,9 +17,11 @@ import org.junit.Test;
 
 public class SimpleTableNamedColumnAdapterTest {
 
-	private static SimpleTableNamedColumnAdapter<Double> tableNamed;
 	private static SimpleTable<Double> table;
 	private static Map<String, Double> newRow;
+	private static List<Double> column1 = Arrays.asList(0d,0d,1d);
+	private static List<Double> column2 = Arrays.asList(0d,0d,2d);
+	private static List<Double> column3 = Arrays.asList(0d,0d,3d);
 	private static List<String> header;
 	
 	@BeforeClass
@@ -36,52 +39,19 @@ public class SimpleTableNamedColumnAdapterTest {
 		header.add("two");
 		header.add("three");
 		table = new SimpleTable<>(3, 2, Double.class);
-		tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
 	}
 	
 	@Test
 	public void testHumanVisible() {
-		tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
+		SimpleTableNamedColumnAdapter<Double> tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
 		System.out.println(tableNamed);
 		System.out.println(tableNamed.dumpTableWithHeader(3));
 	}
 	
-//	@Test
-//	public void testAddRow() throws Exception {
-//		tableNamed = new SimpleTableNamedColumnAdapter(table, Arrays.asList("one","two","three"));
-//		List<Double> newRow = new ArrayList<>();
-//		newRow.add(1d);
-//		newRow.add(2d);
-//		newRow.add(3d);
-//		try {
-//			tableNamed.addRow(newRow);
-//			assertEquals(new Integer(3), tableNamed.getRowsCount());
-//			System.out.println(tableNamed.dumpTable(3));
-//		} catch (IllegalArgumentException ex) {
-//			fail(ex.getMessage());
-//		}
-//		newRow.add(4d);
-//		newRow.add(5d);
-//		try {
-//			tableNamed.addRow(newRow);
-//			assertEquals(new Integer(4), tableNamed.getRowsCount());
-//			System.out.println(tableNamed.dumpTable(3));
-//		} catch (IllegalArgumentException ex) {
-//			fail(ex.getMessage());
-//		}
-//		newRow.add(6d);
-//		try {
-//			tableNamed.addRow(newRow);
-//			System.out.println(tableNamed.dumpTable(3));
-//			fail("Should not reach here!");
-//		} catch (IllegalArgumentException ex) {
-//			assertEquals("Max elements/columns in row excteded! [Columns: row=6, table=5]", ex.getMessage());
-//		}
-//	}
-
 	
 	@Test
 	public void testAddColumn() throws Exception {
+		SimpleTableNamedColumnAdapter<Double> tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
 		List<Double> newColumn = new ArrayList<>();
 		newColumn.add(1d);
 		try {
@@ -111,6 +81,7 @@ public class SimpleTableNamedColumnAdapterTest {
 
 	@Test
 	public void testRemoveRow() throws Exception {
+		SimpleTableNamedColumnAdapter<Double> tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
 		tableNamed.removeRow(0);
 		assertEquals(new Integer(1), tableNamed.getRowsCount());
 		tableNamed.addRow(newRow);
@@ -120,7 +91,19 @@ public class SimpleTableNamedColumnAdapterTest {
 	}
 
 	@Test
+	public void testAddRow() {
+		SimpleTableNamedColumnAdapter<Double> tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
+		assertEquals(tableNamed.getRowsCount(), new Integer(2));
+		tableNamed.addRow(newRow);
+		assertEquals(new Integer(3), tableNamed.getRowsCount());
+		assertEquals(column1, tableNamed.getColumn("one"));
+		assertEquals(column2, tableNamed.getColumn("two"));
+		assertEquals(column3, tableNamed.getColumn("three"));
+	}
+	
+	@Test
 	public void testRemoveColumn() throws Exception {
+		SimpleTableNamedColumnAdapter<Double> tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
 		tableNamed.addRow(newRow);
 		tableNamed.removeColumn("one");
 		Map<String, Double> exptectedRow = new HashMap<>();
@@ -136,10 +119,24 @@ public class SimpleTableNamedColumnAdapterTest {
 
 	@Test
 	public void testSetColumn() throws Exception {
+		SimpleTableNamedColumnAdapter<Double> tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
 		tableNamed.addRow(newRow);
 		List<Double> newColumn = Arrays.asList(1d,2d,3d);
 		tableNamed.setColumn(newColumn, "two");
 		assertEquals(new Double(3d), tableNamed.get(2, "two"));
+	}
+
+	@Test
+	public void testExtendTableColumns() throws Exception {
+		SimpleTableNamedColumnAdapter<Double> tableNamed = new SimpleTableNamedColumnAdapter<>(table, header);
+		tableNamed.addRow(newRow);
+		tableNamed.extendTableColumns(Arrays.asList("four", "five"));
+		System.out.println(tableNamed.dumpTableWithHeader(3));
+		List<String> expectedHeader = Arrays.asList("one", "two", "three", "four", "five");
+		List<String> header = new ArrayList<>(tableNamed.getHeader());
+		Collections.sort(header);
+		Collections.sort(expectedHeader);
+		assertEquals(expectedHeader, header);
 	}
 
 }

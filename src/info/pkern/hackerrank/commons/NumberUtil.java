@@ -96,7 +96,8 @@ public class NumberUtil {
 		String[] result = new String[numbers.size()];
 		String formatString = "%";
 		formatString += (null == fieldWith)?"":fieldWith;
-		formatString += (null == precision)?".10":"." + precision + "E";
+//		formatString += (null == precision)?".10":"." + precision + "E";
+		formatString += (null == precision)?"":"." + precision + "E";
 		@SuppressWarnings("unchecked")
 		Class<T> type = (Class<T>) numbers.get(0).getClass().asSubclass(Number.class);
 		for (int i = 0; i < numbers.size(); i++) {

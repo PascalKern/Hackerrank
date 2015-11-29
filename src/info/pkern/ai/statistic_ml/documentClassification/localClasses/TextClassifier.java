@@ -32,10 +32,11 @@ public class TextClassifier {
 	//Dictionary of the clasifier
 	private  BagOfWords docClassFrequencies = new BagOfWords();
 	
-	private final boolean trackDocClassDetails;
+	private final boolean keepDetailsOfDocumentsInClasses;
 	
 	//For littlest caching
 	private List<Entry<String, Double>> lastClassificationResult;
+	//Better keep bag itselfe to use the equals() later!
 	private int lastClassifiedBag;
 	
 	public TextClassifier() {
@@ -43,28 +44,18 @@ public class TextClassifier {
 	}
 	
 	public TextClassifier(Integer maxNumberOfTerms) {
-		this(null, false);
+		this(maxNumberOfTerms, false);
 	}
 
-	public TextClassifier(Integer maxNumberOfTerms, boolean trackDocClassDetails) {
-		this.trackDocClassDetails = trackDocClassDetails;
-		if (null == maxNumberOfTerms) {
-			this.maxNumberAllowedTerms = Integer.MAX_VALUE;
-		} else {
-			this.maxNumberAllowedTerms = maxNumberOfTerms;
-		}
+	public TextClassifier(Integer maxNumberOfTerms, boolean keepDetailsOfDocumentsInClasses) {
+		this.keepDetailsOfDocumentsInClasses = keepDetailsOfDocumentsInClasses;
+		this.maxNumberAllowedTerms = maxNumberOfTerms;
 	}
-	
-
-	public void train(DocumentClass docClass) {
-		throw new RuntimeException("Not yet implemented!");
-	}
-	
 
 	public void train(BagOfWords bag, String docClassName) {
 		DocumentClass docClass = docClasses.get(docClassName);
 		if (null == docClass) {
-			docClass = new DocumentClass(docClassName, trackDocClassDetails);
+			docClass = new DocumentClass(docClassName, keepDetailsOfDocumentsInClasses);
 			docClass.add(bag);
 			docClasses.put(docClassName, docClass);
 			docClassFrequencies.addTerms(docClass.getTerms());
@@ -75,6 +66,16 @@ public class TextClassifier {
 		}
 		trainingFinished = false;
 	}
+	
+	//Due to issues with the keepDocClassDetails state of the classifier! 
+	public void train(DocumentClass documentClass) {
+		throw new RuntimeException("Not yet implemented!");
+	}
+	
+	//TODO Create external analyzer component(s) to be used for this analyzer (create Interface). 
+	// CosinSimilarity (VSM), KNN, ...
+	// If more than one analyzer merge results to the best fitting probability!
+	// Interface: getProbabilities(), analyze(). Use a set/list/map of DocumentClasses as input dataSet's.
 	
 	public Entry<String, Double> classify(BagOfWords queryBag) {
 		checkReadyForClassification();
@@ -115,7 +116,7 @@ public class TextClassifier {
 							//Used currently with best results
 							//Result better about 10-20% false. Only with stopWordFilter and on real trainings data?!
 							VectorMath.normlizeVectorEuclideanNorm(docClass.getWeightedFrequencies())
-							);
+						);
 				} catch (InvalidObjectException e) {
 					e.printStackTrace();
 				}
@@ -127,8 +128,20 @@ public class TextClassifier {
 		return classifications;
 	}
 	
+	
+	
+	
+	
 	public Integer getMaxNumberAllowedTerms() {
 		return maxNumberAllowedTerms;
+	}
+
+	public Integer getDictionarySize() {
+		if (null != maxNumberAllowedTerms) {
+			return maxNumberAllowedTerms;
+		} else {
+			return docClassFrequencies.getNumberOfTerms();
+		}
 	}
 
 	public Double getIDFOrZero(String term) {
@@ -163,19 +176,16 @@ public class TextClassifier {
 	private Map<String, Double> calculateIDF() {
 		Map<String, Double> inverseDocumentFrequency = new HashMap<>(docClassFrequencies.getNumberOfTerms());
 		for (String term : docClassFrequencies.getTerms()) {
-			inverseDocumentFrequency.put(term, calculateIDF(term));
+			Integer docFrequency = docClassFrequencies.getFrequency(term);
+			Double docFraction = docClasses.size() / (1 + docFrequency.doubleValue());
+			inverseDocumentFrequency.put(term, Math.log10(docFraction));
 		}
 		return inverseDocumentFrequency;
 	}
 
-	private Double calculateIDF(String term) {
-		Integer docFrequency = docClassFrequencies.getFrequency(term);
-		Double docFraction = docClasses.size() / (1 + docFrequency.doubleValue());
-		return Math.log10(docFraction);
-	}
-
+	//TODO Should also be used to filter the frequency vectors from the docClasses used for the probability calculation!
 	private void reduceIdfToMaxNumberOfTerms() {
-		if (! maxNumberAllowedTerms.equals(Integer.MAX_VALUE)) {
+		if (null != maxNumberAllowedTerms) {
 			int maxTerms = Math.min(maxNumberAllowedTerms, inverseDocumentFrequency.size());
 			List<Entry<String, Double>> sortedList = MapUtil.sortAsListByValuesDescending(inverseDocumentFrequency);
 			Map<String, Double> reducedMap = new HashMap<>(maxTerms);
@@ -198,5 +208,30 @@ public class TextClassifier {
 		docClasses.addAll(this.docClasses.values());
 		return docClasses;
 	}
-	
+
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("TextClassifier [maxNumberAllowedTerms=");
+		builder.append(maxNumberAllowedTerms);
+		builder.append(", docClasses=");
+		builder.append(docClasses.keySet());
+		builder.append(", trainingFinished=");
+		builder.append(trainingFinished);
+		builder.append(", keepDetailsOfDocumentsInClasses=");
+		builder.append(keepDetailsOfDocumentsInClasses);
+		builder.append(",").append(System.lineSeparator());
+		builder.append("docClassFrequencies=");
+		builder.append(docClassFrequencies);
+		builder.append(",").append(System.lineSeparator());
+		builder.append("inverseDocumentFrequency=");
+		builder.append(inverseDocumentFrequency);
+		builder.append(",").append(System.lineSeparator());
+		builder.append("lastClassificationResult=");
+		builder.append(lastClassificationResult);
+		builder.append(", lastClassifiedBag=");
+		builder.append(lastClassifiedBag);
+		builder.append("]");
+		return builder.toString();
+	}
 }

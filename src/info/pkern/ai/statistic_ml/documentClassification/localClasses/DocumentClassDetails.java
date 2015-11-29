@@ -8,7 +8,6 @@ import java.util.Set;
 public class DocumentClassDetails {
 
 	private SimpleTableNamedColumnAdapter<Integer> tfPerBag = new SimpleTableNamedColumnAdapter<>(Integer.class);
-	private SimpleTableNamedColumnAdapter<Double> tfPerBagNormalized;
 	private DocumentClass docClass;
 	
 	public DocumentClassDetails(DocumentClass docClass) {
@@ -18,23 +17,16 @@ public class DocumentClassDetails {
 	public void add(BagOfWords bagOfWords) {
 		tfPerBag.extendTableColumns(bagOfWords.getTerms());
 		tfPerBag.addRow(bagOfWords.getFrequencies());
-		tfPerBagNormalized = null;
 	}
 
-	public SimpleTableNamedColumnAdapter<Integer> getTermFrequenciesOfAllBags() {
-		return tfPerBag.copy();
+	public void merge(DocumentClassDetails details) {
+		if (null != details) {
+			tfPerBag.merge(details.tfPerBag);
+		}
 	}
 	
-	public SimpleTableNamedColumnAdapter<Double> getNormalizedTermFrequenciesOfAllBags() {
-		if (null == tfPerBagNormalized) {
-			tfPerBagNormalized = new SimpleTableNamedColumnAdapter<Double>(Double.class);
-			tfPerBagNormalized.extendTableColumns(tfPerBag.getHeader());
-			for (int rowIndex = 0; rowIndex < tfPerBag.getRowsCount(); rowIndex++) {
-				Map<String,Double> rowNormalized = VectorMath.normlizeVectorEuclideanNorm(tfPerBag.getRow(rowIndex));
-				tfPerBagNormalized.addRow(rowNormalized);
-			}
-		}
-		return tfPerBagNormalized;
+	public SimpleTableNamedColumnAdapter<Integer> getTermFrequenciesOfAllBags() {
+		return tfPerBag.copy();
 	}
 	
 	public DocumentClass getDocumentClass() {

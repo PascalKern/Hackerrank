@@ -31,8 +31,25 @@ public class DocumentClass {
 		}
 	}
 
+	public void merge(DocumentClass documentClass) {
+		if (!documentClass.name.equals(name)) {
+			throw new IllegalStateException("To merge document classes theire name must be equal! [name="+name+", "
+					+ "documentClass.name="+documentClass.name+"]");
+		}
+		termFrequencies.merge(documentClass.termFrequencies);
+		totalNumberOfBags += documentClass.totalNumberOfBags;
+		bagFrequencies.merge(documentClass.bagFrequencies);	
+		
+		if (hasDocClassDetials()) {
+			documentClassDetails.merge(documentClass.documentClassDetails);
+		}
+		
+		weightedFrequencies = null;
+	}
+	
+	//TODO Rename to train?!
 	public void add(BagOfWords bagOfWords) {
-		termFrequencies.add(bagOfWords);
+		termFrequencies.merge(bagOfWords);
 		totalNumberOfBags++;
 		bagFrequencies.addTerms(bagOfWords.getTerms());
 		
@@ -63,10 +80,6 @@ public class DocumentClass {
 		return inverseDocumentFrequency;
 	}
 
-	public void add(DocumentClass anotherClass) {
-		throw new RuntimeException("Not yet implemented!");
-	}
-	
 	/**
 	 * Gets a copy of the terms in this document class. Changes to this set are <strong>not</strong> reflected</br>
 	 * to this document class!
@@ -83,7 +96,7 @@ public class DocumentClass {
 
 	public BagOfWords getTermFrequencies() {
 		BagOfWords bagCopy = new BagOfWords();
-		bagCopy.add(termFrequencies);
+		bagCopy.merge(termFrequencies);
 		return bagCopy;
 	}
 	
@@ -109,6 +122,10 @@ public class DocumentClass {
 	}
 	
 	public DocumentClassDetails getDocClassDetails() {
-		return documentClassDetails;
+		if (hasDocClassDetials()) {
+			return documentClassDetails;
+		} else {
+			throw new IllegalStateException("The document class didn't track the details of added bags!");
+		}
 	}
 }

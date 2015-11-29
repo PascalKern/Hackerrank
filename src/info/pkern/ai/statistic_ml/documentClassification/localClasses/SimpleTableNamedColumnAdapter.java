@@ -18,7 +18,7 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 //	private List<String> header;
 	private Integer maxHeaderNameLength = 0;
 
-	private int lastIndex = 0;
+	private int lastIndex = -1;
 	private Map<String, Integer> headerToIndex;
 	private Map<Integer, String> indexToHeader;
 	
@@ -43,7 +43,20 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 		}
 	}
 	
-	private Integer addToHeaderAndOrGetIndex(String name) {
+	/**
+	 * Merges the headers and then appends all rows from the table to this.
+	 * @param table
+	 */
+	public void merge(SimpleTableNamedColumnAdapter<T> table) {
+		Collection<String> newColumns = table.getHeader();
+		newColumns.removeAll(getHeader());
+		extendTableColumns(newColumns);
+		for (int i = 0; i < table.getRowsCount(); i++) {
+			addRow(table.getRow(i));
+		}
+	}
+	
+	private Integer addToHeader(String name) {
 		Integer index = headerToIndex.get(name);
 		if (null == index) {
 			index = lastIndex + 1;
@@ -119,7 +132,7 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 
 	public void addColumn(List<T> column, String name) {
 		checkColumnNotExists(name);
-		table.addColumn(column, addToHeaderAndOrGetIndex(name));
+		table.addColumn(column, addToHeader(name));
 	}
 
 	public List<T> setColumn(List<T> column, String name) {
@@ -184,12 +197,11 @@ public class SimpleTableNamedColumnAdapter<T extends Number> {
 		table.extendTableRows(newRowCount);
 	}
 
-	//TODO Ok to start by 1?!?
 	public void extendTableColumns(Collection<String> headerNames) {
-		int newColumnCounter = 1;
+		int newColumnCounter = 0;
 		for (String name : headerNames) {
 			newColumnCounter += (null == headerToIndex.get(name))?1:0;
-			addToHeaderAndOrGetIndex(name);
+			addToHeader(name);
 		}
 		table.extendTabltColumnsBy(newColumnCounter);
 	}

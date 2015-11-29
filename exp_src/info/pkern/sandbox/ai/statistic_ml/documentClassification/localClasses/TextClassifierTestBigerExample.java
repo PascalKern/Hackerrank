@@ -13,6 +13,7 @@ import info.pkern.ai.statistic_ml.documentClassification.localClasses.TextClassi
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.VectorMath;
 import info.pkern.hackerrank.commons.ListTypeConverter;
 import info.pkern.hackerrank.commons.MapUtil;
+import info.pkern.hackerrank.commons.NumberUtil;
 import info.pkern.hackerrank.commons.RecursiveSimpleFileVisitor;
 
 import java.io.IOException;
@@ -50,45 +51,42 @@ public class TextClassifierTestBigerExample {
 		TextClassifierTestBigerExample testcase = new TextClassifierTestBigerExample();
 		testcase.testLearn();
 		
+		
+		/*Visualize some data*/
 		TsnePlotExample plotter = new TsnePlotExample();
 //		TsnePlotExample plotter = new TsnePlotExample(6);
 		
 		Long start = System.nanoTime();
 		for (DocumentClass docClass : testcase.textClassifier.getDocumenClasses()) {
 			if (docClass.hasDocClassDetials()) {
-				SimpleTableNamedColumnAdapter<Double> table = docClass.getDocClassDetails().getNormalizedTermFrequenciesOfAllBags();
+				SimpleTableNamedColumnAdapter<Integer> table = docClass.getDocClassDetails().getTermFrequenciesOfAllBags();
 				//TODO Maybe use the classifier dictionary or its idf or reduced idf?!
 //				table.filterColumns(docClass.getTfIdfWeightedFrequencies().keySet());
-				SimpleTable<Double> simpleTable = table.getSimpleTable();
-				simpleTable.extendTableToColumnsCount(testcase.textClassifier.getMaxNumberAllowedTerms());
+				SimpleTable<Integer> simpleTable = table.getSimpleTable();
+				simpleTable.extendTableToColumnsCount(testcase.textClassifier.getDictionarySize());
 				String lable = docClass.getName().substring(0, 2);
 				int rowIndex = simpleTable.getRowsCount();
 				while (rowIndex > 0) {
-					plotter.addVector(lable, ListTypeConverter.toPrimitive(simpleTable.getRow(rowIndex-1)));
+					List<Double> normalizedTermFrequencies = VectorMath.normlizeVectorEuclideanNorm(simpleTable.getRow(rowIndex-1));
+					plotter.addVector(lable, ListTypeConverter.toPrimitive(normalizedTermFrequencies));
 					rowIndex--;
 				}
 			}
-			/*//This "disturbs" the clustering of the visualisation
-			List<Double> weightedTerms = new ArrayList<>();
-			weightedTerms.addAll(docClass.getTfIdfWeightedFrequencies().values());		
-			plotter.addVector(docClass.getName().toUpperCase(), ListTypeConverter.getPrimitive(weightedTerms));
-			*/
+			//Not a big difference!
+			List<Double> weightedTerms = VectorMath.normlizeVectorEuclideanNorm(docClass.getTermFrequencies().getFrequencies().values());
+//			List<Double> weightedTerms = VectorMath.normlizeVectorEuclideanNorm(docClass.getWeightedFrequencies().values());
+			plotter.addVectorExtendedToCurrentPlotterSize(docClass.getName().toUpperCase(), ListTypeConverter.toPrimitive(weightedTerms));
 		}
-
 		BagOfWords bagGood = new BagOfWords();
 		bagGood.addTerms(testcase.tokanize(testcase.basePath.resolve(testcase.test).resolve("lawyer/lawyer23.txt")));
 		BagOfWords bagBad = new BagOfWords();
 		bagBad.addTerms(testcase.tokanize(testcase.basePath.resolve(testcase.test).resolve("lawyer/lawyer303.txt")));
-//		plotter.addVector("Laweyer23", testcase.textClassifier.normalizeBagWithIDFVocabulary(bagGood));
-//		plotter.addVector("Laweyer303", testcase.textClassifier.normalizeBagWithIDFVocabulary(bagBad));
 		plotter.addVectorExtendedToCurrentPlotterSize("Laweyer23", ListTypeConverter.toPrimitive(VectorMath.normlizeVectorEuclideanNorm(bagGood.getFrequencies()).values().toArray(new Double[]{})));
 		plotter.addVectorExtendedToCurrentPlotterSize("Laweyer303", ListTypeConverter.toPrimitive(VectorMath.normlizeVectorEuclideanNorm(bagBad.getFrequencies()).values().toArray(new Double[]{})));
 		
 		Long writeData = System.nanoTime() - start;
 		System.out.println("Write data: " + writeData/10E6);
-		
-		
-		
+
 		plotter.display();
 	}
 	
@@ -99,7 +97,7 @@ public class TextClassifierTestBigerExample {
 		Path learnBase = basePath.resolve(learn);
 		Path testBase = basePath.resolve(test);
 		
-//		textClassifier = new TextClassifier();
+//		textClassifier = new TextClassifier(null, true);
 		textClassifier = new TextClassifier(5000, true);
 		
 		FileVisitor<Path> fileProcessor = new RecursiveSimpleFileVisitor("txt");

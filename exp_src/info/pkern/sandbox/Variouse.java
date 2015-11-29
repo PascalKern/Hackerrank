@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.DocumentTokanizer;
 import info.pkern.ai.statistic_ml.documentClassification.localClasses.NGrammCreator;
+import info.pkern.hackerrank.commons.MapUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +23,20 @@ import org.junit.Test;
 
 public class Variouse {
 
+	@Test
+	public void sortMapByValue() {
+		Map<String, Integer> map = new HashMap<>();
+		map.put("One", 1);
+		map.put("Two", 2);
+		map.put("Three", 3);
+		map.put("Four", 4);
+		map.put("Five", 5);
+		System.out.println(map);
+		map = MapUtil.sortByValuesDescending(map);
+		System.out.println(map);
+	}
+	
+	
 	@Test
 	public void emptyArrayInitialized() {
 		double[] array = new double[5];

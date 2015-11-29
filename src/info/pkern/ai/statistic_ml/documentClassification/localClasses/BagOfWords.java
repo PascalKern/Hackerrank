@@ -17,7 +17,7 @@ public class BagOfWords {
 	private Map<String, Integer> termFrequencies = new HashMap<>();
 	
 	public void addTerm(String term, Integer frequency) {
-		int newFrequency = frequency;
+		Integer newFrequency = new Integer(frequency);
 		if (termFrequencies.keySet().contains(term)) {
 			newFrequency += termFrequencies.get(term);
 			termFrequencies.put(term, newFrequency);
@@ -37,7 +37,7 @@ public class BagOfWords {
 		}
 	}
 	
-	public void add(BagOfWords bagOfWords) {
+	public void merge(BagOfWords bagOfWords) {
 		for (Entry<String, Integer> entry : bagOfWords.termFrequencies.entrySet()) {
 			addTerm(entry.getKey(), entry.getValue());
 		}

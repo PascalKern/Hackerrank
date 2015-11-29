@@ -83,24 +83,24 @@ public class BagOfWordsTest {
 	
 	
 	@Test
-	public void testAdd() throws Exception {
-		BagOfWords testBag = new BagOfWords();
-		testBag.addTerms(words);
-		BagOfWords secondTestBag = new BagOfWords();
-		secondTestBag.addTerms(words);
-		
-		testBag.add(secondTestBag);
-		
-		Integer expectedNrOfWords = 9;
-		Double exptectedNormalizedFrequence = 0.471404520d;
-		Integer exptectedFrequency = 4;
-		
-		assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
-		assertEquals(exptectedFrequency, testBag.getFrequency("has"));
-		assertEquals(exptectedNormalizedFrequence, VectorMath.normlizeVectorEuclideanNorm(testBag.getFrequencies()).get("has"), 0.0000001d);
-		exptectedFrequency = 2;
-		assertEquals(exptectedFrequency, testBag.getFrequency("child"));
-	}
+		public void testMerge() throws Exception {
+			BagOfWords testBag = new BagOfWords();
+			testBag.addTerms(words);
+			BagOfWords secondTestBag = new BagOfWords();
+			secondTestBag.addTerms(words);
+			
+			testBag.merge(secondTestBag);
+			
+			Integer expectedNrOfWords = 9;
+			Double exptectedNormalizedFrequence = 0.471404520d;
+			Integer exptectedFrequency = 4;
+			
+			assertEquals(expectedNrOfWords, testBag.getNumberOfTerms());
+			assertEquals(exptectedFrequency, testBag.getFrequency("has"));
+			assertEquals(exptectedNormalizedFrequence, VectorMath.normlizeVectorEuclideanNorm(testBag.getFrequencies()).get("has"), 0.0000001d);
+			exptectedFrequency = 2;
+			assertEquals(exptectedFrequency, testBag.getFrequency("child"));
+		}
 
 	@Test
 	public void testHumanReadable() throws Exception {

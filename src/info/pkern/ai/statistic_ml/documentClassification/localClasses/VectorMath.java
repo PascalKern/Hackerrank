@@ -59,16 +59,16 @@ public class VectorMath {
 		checkIdenticalVectorElementCounts(vectorA, vectorB);
 		Double dotProd = dotProduct(vectorA, vectorB);
 		Double euclidianNormProduct = lengthEuclideanNorm(vectorA) * lengthEuclideanNorm(vectorB);
-		if (null != euclidianNormProduct && 0 != euclidianNormProduct) {
-			return dotProd / euclidianNormProduct;
-		} else {
-			throw new InvalidObjectException("Division by zero not allowed! [deonomiator euclidianLengthProduct="+euclidianNormProduct+"]");
-		}
+		return cosinSimilarity(dotProd, euclidianNormProduct);
 	}
 
 	public static Double cosineSimilarityEuclideanNorm(Map<String, Double> vectorA, Map<String, Double> vectorB) throws InvalidObjectException {
 		Double dotProd = dotProduct(vectorA, vectorB);
 		Double lengthProduct = lengthEuclideanNorm(vectorA.values()) * lengthEuclideanNorm(vectorB.values());
+		return cosinSimilarity(dotProd, lengthProduct);
+	}
+
+	private static Double cosinSimilarity(Double dotProd, Double lengthProduct) throws InvalidObjectException {
 		if (null != lengthProduct && 0 != lengthProduct) {
 			return dotProd / lengthProduct;
 		} else {
@@ -161,12 +161,7 @@ public class VectorMath {
 	 * @return the L2-Norm value.
 	 */
 	public static <T extends Number> Double lengthEuclideanNorm(Collection<T> vector) {
-		Double length= 0d;
-		for (T element : vector) {
-			if (null != element) {
-				length += Math.pow(doubleValueOrZero(element), 2d);
-			}
-		}
+		Double length = lengthSum(vector, 2);
 		return Math.sqrt(length);
 	}
 
@@ -179,19 +174,41 @@ public class VectorMath {
 	 * @return the length.
 	 */
 	public static <T extends Number> Double lengthWithNorm(Collection<T> vector, Integer norm) {
+		Double length = lengthSum(vector, norm);
+		return nthroot(norm, length, 0.0001);
+	}
+
+	private static <T extends Number> Double lengthSum(Collection<T> vector, Integer norm) {
 		Double length= 0d;
 		for (T element : vector) {
 			if (null != element) {
 				length += Math.pow(doubleValueOrZero(element), norm);
 			}
 		}
-		return nthroot(norm, length, 0.0001);
+		return length;
 	}
 
-	//http://rosettacode.org/wiki/Category:Java
+	/**
+	 * Returns the positive n-th root of a double value.<br/><br/>
+	 * Equals to the usage of {@link VectorMath#nthroot(int, double, double)} with 0.001 as third parameter!
+	 * @param n the power to be used for the calculation or the root.
+	 * @param A the value to calculate the root.
+	 * @return
+	 */
+	public static double nthroot(int n, double A) {
+		return nthroot(n, A, .001);
+	}
+	/**
+	 * Returns the positive n-th root of a double value.<br/><br/>
+	 * Source: {@link http://rosettacode.org/wiki/Category:Java}
+	 * @param n the power to be used for the calculation or the root.
+	 * @param A the value to calculate the root.
+	 * @param p the maximum precision which should be used to calculate
+	 * @return
+	 */
 	private static double nthroot(int n, double A, double p) {
 		if(A < 0) {
-			System.err.println("A < 0");// we handle only real positive numbers
+			System.err.println("Only possitive numbers allowed as value (A < 0)! [A="+A+"]");// we handle only real positive numbers
 			return -1;
 		} else if(A == 0) {
 			return 0;
