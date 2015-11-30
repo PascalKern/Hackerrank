@@ -27,7 +27,7 @@ public class MapUtil {
 	public static enum SORT_ORDER{ASC, DESC};
 	
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValuesDescending(Map<K, V> map) {
-		return sortByValues(map, null);
+		return sortByValues(map, SORT_ORDER.DESC);
 	}
 	public static <K, V extends Comparable<? super V>> Map<K, V> sortByValues(Map<K, V> map, final SORT_ORDER sortOrder) {
 		List<Entry<K, V>> sorted = sortAsListByValues(map, sortOrder);
@@ -39,15 +39,16 @@ public class MapUtil {
 		return sortedMap;
 	}
 	
+	
 	public static <K, V extends Comparable<? super V>> List<Entry<K, V>> sortAsListByValuesDescending(Map<K, V> map) {
-		return sortAsListByValues(map, null);
+		return sortAsListByValues(map, SORT_ORDER.DESC);
 	}
 	public static <K, V extends Comparable<? super V>> List<Entry<K, V>> sortAsListByValues(Map<K, V> map, final SORT_ORDER sortOrder) {
 		List<Entry<K, V>> sortedEntries = new ArrayList<Entry<K, V>>(map.entrySet());
 		Collections.sort(sortedEntries, new Comparator<Entry<K, V>>() {
 			@Override
 			public int compare(Entry<K, V> e1, Entry<K, V> e2) {
-				if (sortOrder != null && sortOrder.equals(SORT_ORDER.ASC)) {
+				if (sortOrder.equals(SORT_ORDER.ASC)) {
 					return e1.getValue().compareTo(e2.getValue());
 				} else {
 					return e2.getValue().compareTo(e1.getValue());
@@ -57,14 +58,15 @@ public class MapUtil {
 		return sortedEntries;
 	}
 	
+	
 	public static <K, V extends Comparable<? super V>> void sortByValueDescending(List<Entry<K, V>> list) {
-		sortByValue(list, null);
+		sortByValue(list, SORT_ORDER.DESC);
 	}
 	public static <K, V extends Comparable<? super V>> void sortByValue(List<Entry<K, V>> list, final SORT_ORDER sortOrder) {
 		Collections.sort(list, new Comparator<Entry<K, V>>() {
 			@Override
 			public int compare(Entry<K, V> o1, Entry<K, V> o2) {
-				if (sortOrder != null && sortOrder.equals(SORT_ORDER.ASC)) {
+				if (sortOrder.equals(SORT_ORDER.ASC)) {
 					return o1.getValue().compareTo(o2.getValue());
 				} else {
 					return o2.getValue().compareTo(o1.getValue());
@@ -86,7 +88,7 @@ public class MapUtil {
 		}
 		@Override
 		public int compare(Entry<K, V> o1, Entry<K, V> o2) {
-			if (sortOrder != null && sortOrder.equals(SORT_ORDER.ASC)) {
+			if (sortOrder.equals(SORT_ORDER.ASC)) {
 				return o1.getValue().compareTo(o2.getValue());
 			} else {
 				return o2.getValue().compareTo(o1.getValue());

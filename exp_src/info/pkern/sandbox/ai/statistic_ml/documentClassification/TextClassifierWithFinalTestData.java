@@ -48,9 +48,10 @@ public class TextClassifierWithFinalTestData {
 	public void simulateSolutionTest() throws IOException {
 		
 		DocumentTokanizer tokanizer = new DocumentTokanizer();
-		tokanizer.addFilter(new ENStopwordFilter());
+//		tokanizer.addFilter(new ENStopwordFilter());
 		
-		TextClassifier classifier = new TextClassifier(5000);
+//		TextClassifier classifier = new TextClassifier(5000);
+		TextClassifier classifier = new TextClassifier();
 		
 		System.out.println("Start training...");
 		InputStream is = Solution.class.getResourceAsStream(TRAININGS_DATA_FILE);
@@ -76,7 +77,7 @@ public class TextClassifierWithFinalTestData {
 			testBag.addTerms(tokanizer.tokanize(testEntry.text));
 			
 			List<Entry<String, Double>> probabilities = classifier.getClassificationProbabilities(testBag);
-			MapUtil.sortByValueDescending(probabilities);
+//			MapUtil.sortByValueDescending(probabilities);
 			
 			Result res = new Result();
 			res.exptected = testEntry.docClass.toString();
@@ -122,7 +123,7 @@ public class TextClassifierWithFinalTestData {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			sb.append(String.format("%-12s%.5e ", "diff max touple: " , results.get(0).getValue() - results.get(1).getValue()));
+			sb.append(String.format("%-12s%f ", "diff max touple: " , results.get(0).getValue() - results.get(1).getValue()));
 			for (Entry<String, Double> entry : results) {
 				sb.append(String.format("%-9s%.10e", entry.getKey() + ":", entry.getValue())).append(", ");
 			}
