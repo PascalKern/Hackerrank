@@ -15,6 +15,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -38,6 +40,7 @@ public class TextClassifier {
 	private List<Entry<String, Double>> lastClassificationResult;
 	//Better keep bag itselfe to use the equals() later!
 	private int lastClassifiedBag;
+	private Map<String, Double> termIDFs;
 	
 	public TextClassifier() {
 		this(null, false);
@@ -103,19 +106,34 @@ public class TextClassifier {
 		} else {
 			classifications = new ArrayList<>(docClasses.size());
 			
+			//TODO IMPLEMENT
+			//Test only! But seems very impressive improvememnt of the results. Also without stopWordFilter!
+			Map<String, Double> weighted = new HashMap<>();
+			for (Entry<String, Integer> entry : queryBag.getFrequencies().entrySet()) {
+				String term = entry.getKey();
+				Double classifierCorpusIDF = termIDFs.get(term);
+				weighted.put(entry.getKey(), (null == classifierCorpusIDF)?0d:classifierCorpusIDF * queryBag.getFrequency(term));
+			}
+			
 			for (DocumentClass docClass : docClasses.values()) {
 
 				Double classificationProbability = null;
 				try {
 					classificationProbability = VectorMath.cosineSimilarityEuclideanNorm(
-							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()),
+//							VectorMath.normlizeVectorEuclideanNorm(queryBag.getFrequencies()),
+							//Without stopWordFilter much better precision ~+25% better
+							VectorMath.normlizeVectorEuclideanNorm(weighted),
+
 							//Only used by BiggerExample - better result without StopWordFilter!
 							//Result better about 20% false
 //							VectorMath.normlizeVectorEuclideanNorm(docClass.getTermFrequencies().getFrequencies())
 							
 							//Used currently with best results
 							//Result better about 10-20% false. Only with stopWordFilter and on real trainings data?!
-							VectorMath.normlizeVectorEuclideanNorm(docClass.getWeightedFrequencies())
+//							VectorMath.normlizeVectorEuclideanNorm(docClass.getWeightedFrequencies())
+							
+							//Trial
+							VectorMath.normlizeVectorEuclideanNorm(docClass.getWeightedFrequenciesFiltered())
 						);
 				} catch (InvalidObjectException e) {
 					e.printStackTrace();
@@ -132,10 +150,9 @@ public class TextClassifier {
 	
 	
 	
-	public Integer getMaxNumberAllowedTerms() {
-		return maxNumberAllowedTerms;
-	}
 
+	//TODO IMPLEMENT Use the new IDF created when trainFinished!
+	@Deprecated
 	public Integer getDictionarySize() {
 		if (null != maxNumberAllowedTerms) {
 			return maxNumberAllowedTerms;
@@ -144,6 +161,7 @@ public class TextClassifier {
 		}
 	}
 
+	@Deprecated
 	public Double getIDFOrZero(String term) {
 		checkReadyForClassification();
 		Double idf = inverseDocumentFrequency.get(term);
@@ -159,20 +177,80 @@ public class TextClassifier {
 		if (docClasses.isEmpty()) {
 			throw new IllegalStateException("Can not finish training! The classifier does not contain any document classes.");
 		}
+		//TODO IMPLEMENT
+		termIDFs = calculateTermIDF();
+		//If too deep the result is inAccurate! (ie. in the experiment with real data!)
+//		termIDFs = reduceTo(5000, termIDFs);
+		//Good solution if no maxCount is set!
+		termIDFs = reduceTo(null, termIDFs);
+		processDocumentClasses(termIDFs);
 		//TODO Keep all frequencies - not reduced!
-		inverseDocumentFrequency = calculateIDF();
+//		inverseDocumentFrequency = calculateIDF();
 		//TODO Keep separated
-		reduceIdfToMaxNumberOfTerms();
-		processDocumentClasses();
+//		reduceIdfToMaxNumberOfTerms();
 		trainingFinished = true;
 	}
 
-	private void processDocumentClasses() {
+	private Map<String, Double> calculateTermIDF() {
+		
+//		SimpleTableNamedColumnAdapter<Double> docClassesWeightedTerms = new SimpleTableNamedColumnAdapter<>(Double.class);
+		BagOfWords docClassFrequencies = new BagOfWords();
+		
+		for (DocumentClass docClass : docClasses.values()) {
+			docClassFrequencies.addTerms(docClass.getTerms());
+//			docClassesWeightedTerms.extendTableColumns(docClass.getTerms());
+//			docClassesWeightedTerms.addRow(docClass.getWeightedFrequencies());
+		}
+		
+		Map<String, Double> termIDFs = new HashMap<>();
+		for (String term : docClassFrequencies.getTerms()) {
+			Integer docFrequency = docClassFrequencies.getFrequency(term);
+			Double docFraction = docClasses.size() / (1 + docFrequency.doubleValue());
+			termIDFs.put(term, Math.log10(docFraction));
+		}
+		
+		return termIDFs;
+	}
+
+	private Map<String, Double> reduceTo(Integer count, Map<String, Double> idf) {
+		Map<String, Double> termIDFsReduced = new HashMap<>();
+		List<Entry<String, Double>> sortedMap = MapUtil.sortAsListByValuesDescending(termIDFs);
+		
+		int countUnused = 0;
+		int counter = 0;
+		for (Entry<String, Double> entry : sortedMap) {
+			
+			if (null == count) {
+				if (entry.getValue() > 0) {	//Maybe better: x >= 0!?
+					termIDFsReduced.put(entry.getKey(), entry.getValue());
+				} else {
+					countUnused++;
+				}
+			} else {
+				if (counter < count) {
+					termIDFsReduced.put(entry.getKey(), entry.getValue());
+				} else {
+					countUnused++;
+				}
+			}
+			counter++;
+		}
+		
+		System.out.println("All idf's=" + idf.size()+", countUnused="+countUnused+", termIDFsReduced="+termIDFsReduced.size());
+		
+		return termIDFsReduced;
+	}
+	
+	private void processDocumentClasses(Map<String, Double> termIDFs) {
 		for (DocumentClass docClass : docClasses.values()) {
 			docClass.getWeightedFrequencies();
+			if (null != termIDFs) {
+				docClass.setTermFilter(termIDFs.keySet());
+			}
 		}
 	}
 	
+	@Deprecated
 	private Map<String, Double> calculateIDF() {
 		Map<String, Double> inverseDocumentFrequency = new HashMap<>(docClassFrequencies.getNumberOfTerms());
 		for (String term : docClassFrequencies.getTerms()) {
@@ -183,6 +261,7 @@ public class TextClassifier {
 		return inverseDocumentFrequency;
 	}
 
+	@Deprecated
 	//TODO Should also be used to filter the frequency vectors from the docClasses used for the probability calculation!
 	private void reduceIdfToMaxNumberOfTerms() {
 		if (null != maxNumberAllowedTerms) {
@@ -209,6 +288,7 @@ public class TextClassifier {
 		return docClasses;
 	}
 
+	//TODO IMPLEMENT
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();

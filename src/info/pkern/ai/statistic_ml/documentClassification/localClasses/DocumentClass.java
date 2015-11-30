@@ -1,8 +1,10 @@
 package info.pkern.ai.statistic_ml.documentClassification.localClasses;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 //TODO Introduce a max term count value? Specially for the weighted frequencies.
@@ -12,6 +14,9 @@ public class DocumentClass {
 	private BagOfWords termFrequencies = new BagOfWords();
 	
 	private Map<String, Double> weightedFrequencies = new HashMap<>();
+	
+	private Map<String, Double> filteredWeightedFrequencies = new HashMap<>();
+	private Collection<String> filter;
 	
 	private Integer totalNumberOfBags = 0;
 	private BagOfWords bagFrequencies = new BagOfWords();
@@ -44,7 +49,9 @@ public class DocumentClass {
 			documentClassDetails.merge(documentClass.documentClassDetails);
 		}
 		
+		filter = null;
 		weightedFrequencies = null;
+		filteredWeightedFrequencies = null;
 	}
 	
 	//TODO Rename to train?!
@@ -56,6 +63,7 @@ public class DocumentClass {
 		updateDocClassDetails(bagOfWords);
 
 		weightedFrequencies = null;
+		filteredWeightedFrequencies = null;
 	}
 
 	//TODO Find a way to keep weighting rolling up to date?!
@@ -111,6 +119,32 @@ public class DocumentClass {
 		return weightedFrequencies;
 	}
 	
+	public Map<String, Double> getWeightedFrequenciesFiltered() {
+		if (null == filter) {
+			throw new IllegalStateException("Yet no filter is set or the merge method was called which resets the "
+					+ "filter! Set first a filter with setTermFilter()!");
+		}
+		if (null == filteredWeightedFrequencies || filteredWeightedFrequencies.isEmpty()) {
+			filterWeight();
+		}
+		return filteredWeightedFrequencies;
+	}
+	
+	public void setTermFilter(Collection<String> filter) {
+		if (!filter.equals(this.filter)) {
+			this.filter = filter;
+			filteredWeightedFrequencies = filterWeight();
+		}
+	}
+
+	private Map<String, Double> filterWeight() {
+		Map<String, Double> filteredWeightedFrequencies = new HashMap<>();
+		for (Entry<String, Double> entry : getWeightedFrequencies().entrySet()) {
+			filteredWeightedFrequencies.put(entry.getKey(), entry.getValue());
+		}
+		return filteredWeightedFrequencies;
+	}
+
 	private void updateDocClassDetails(BagOfWords bagOfWords) {
 		if (null != documentClassDetails) {
 			documentClassDetails.add(bagOfWords);

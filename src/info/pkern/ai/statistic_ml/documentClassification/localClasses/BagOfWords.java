@@ -18,8 +18,9 @@ public class BagOfWords {
 	
 	public void addTerm(String term, Integer frequency) {
 		Integer newFrequency = new Integer(frequency);
-		if (termFrequencies.keySet().contains(term)) {
-			newFrequency += termFrequencies.get(term);
+		Integer currentFrequency;
+		if (null != (currentFrequency = termFrequencies.get(term))) {
+			newFrequency += currentFrequency;
 			termFrequencies.put(term, newFrequency);
 		} else {
 			termFrequencies.put(term, newFrequency);
@@ -38,11 +39,15 @@ public class BagOfWords {
 	}
 	
 	public void merge(BagOfWords bagOfWords) {
-		for (Entry<String, Integer> entry : bagOfWords.termFrequencies.entrySet()) {
+		merge(bagOfWords.getFrequencies());
+	}
+
+	public void merge(Map<String, Integer> termsWithFrequency) {
+		for (Entry<String, Integer> entry : termsWithFrequency.entrySet()) {
 			addTerm(entry.getKey(), entry.getValue());
 		}
 	}
-
+	
 	public Integer removeTerm(String term) {
 		Integer frequency = termFrequencies.remove(term);
 		if (null == frequency) {

@@ -212,7 +212,7 @@ public class TextClassifierTestBigerExample {
 		@Override
 		public String toString() {
 			StringBuilder sb = new StringBuilder();
-			sb.append(String.format("%-12s => %.5e ", "diff max touple: " , results.get(0).getValue() - results.get(1).getValue()));
+			sb.append(String.format("%-12s => %f ", "diff max touple: " , results.get(0).getValue() - results.get(1).getValue()));
 			for (Entry<String, Double> entry : results) {
 				sb.append(String.format("%-9s%.10e", entry.getKey() + ":", entry.getValue())).append(", ");
 			}
