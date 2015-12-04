@@ -76,12 +76,12 @@ public class VectorMath {
 		}
 	}
 	
-	public static <T extends Number, E extends Number> Double distanceBetweenEuclideanNorm(Map<String, T> vectorA, Map<String, E> vectorB) {
+	public static <T extends Number, E extends Number> Double distanceEuclideanNorm(Map<String, T> sourceVector, Map<String, E> targetVector) {
 		Double elementDiffSum = 0d;
-		for (String term : vectorA.keySet()) {
-			Double elementA = doubleValueOrZero(vectorA.get(term));
-			Double elementB = doubleValueOrZero(vectorB.get(term));
-			elementDiffSum +=  Math.pow(elementA - elementB, 2);
+		for (String term : sourceVector.keySet()) {
+			Double source = doubleValueOrZero(sourceVector.get(term));
+			Double target = doubleValueOrZero(targetVector.get(term));
+			elementDiffSum +=  Math.pow(source - target, 2);
 		}
 		return Math.sqrt(elementDiffSum);
 	}

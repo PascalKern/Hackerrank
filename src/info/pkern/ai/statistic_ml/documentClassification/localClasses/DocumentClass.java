@@ -119,32 +119,30 @@ public class DocumentClass {
 		return weightedFrequencies;
 	}
 	
-	public Map<String, Double> getWeightedFrequenciesFiltered() {
+	public Map<String, Double> getWeightedFrequencies(Collection<String> filter) {
 		if (null == filter) {
 			throw new IllegalStateException("Yet no filter is set or the merge method was called which resets the "
 					+ "filter! Set first a filter with setTermFilter()!");
 		}
-		if (null == filteredWeightedFrequencies || filteredWeightedFrequencies.isEmpty()) {
-			filterWeight();
+		if (!filter.equals(this.filter)) {
+			this.filter = filter;
+			filteredWeightedFrequencies = filterMapByKey(weightedFrequencies, filter);
 		}
 		return filteredWeightedFrequencies;
 	}
 	
-	public void setTermFilter(Collection<String> filter) {
-		if (!filter.equals(this.filter)) {
-			this.filter = filter;
-			filteredWeightedFrequencies = filterWeight();
+	//TODO Make generic and move into the MapUtil class.
+	private Map<String, Double> filterMapByKey(Map<String, Double> map, Collection<String> filter) {
+		Map<String, Double> filteredMap = new HashMap<String, Double>();
+		Double value = null;
+		for (String term : filter) {
+			if (null != (value = map.get(term))) {
+				filteredMap.put(term, value);
+			}
 		}
+		return filteredMap;
 	}
-
-	private Map<String, Double> filterWeight() {
-		Map<String, Double> filteredWeightedFrequencies = new HashMap<>();
-		for (Entry<String, Double> entry : getWeightedFrequencies().entrySet()) {
-			filteredWeightedFrequencies.put(entry.getKey(), entry.getValue());
-		}
-		return filteredWeightedFrequencies;
-	}
-
+	
 	private void updateDocClassDetails(BagOfWords bagOfWords) {
 		if (null != documentClassDetails) {
 			documentClassDetails.add(bagOfWords);
