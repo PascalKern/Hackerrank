@@ -97,8 +97,8 @@ public class TextClassifierTestBigerExample {
 		Path learnBase = basePath.resolve(learn);
 		Path testBase = basePath.resolve(test);
 		
-//		textClassifier = new TextClassifier(null, true);
-//		textClassifier = new TextClassifier(5000, true);
+//		textClassifier = new TextClassifier(true);
+//		textClassifier = new TextClassifier(0.625, true);
 		textClassifier = new TextClassifier(true, true);
 		
 		FileVisitor<Path> fileProcessor = new RecursiveSimpleFileVisitor("txt");

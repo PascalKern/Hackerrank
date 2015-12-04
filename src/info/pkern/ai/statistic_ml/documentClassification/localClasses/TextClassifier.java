@@ -26,9 +26,10 @@ import java.util.Set;
 public class TextClassifier {
 
 	//Maybe make changeable?
-	private final Integer maxNumberAllowedTerms;
-	private int lowerInteresstingIDFIndex = 0;
-	private int lastInteresstingIDFIndex = 0;
+	private Integer maxNumberAllowedTerms;
+	private final Double percentageOfCorpusForAllowedTerms;
+	private int calculatedInteresstingIDFIndexForFilter = 0;
+	private Integer firstIDFIndexForTermInAllDocClasses = 0;
 	private boolean calculateMaxTermFromIDF = false;
 	
 	private final boolean keepDetailsOfDocumentsInClasses;
@@ -50,31 +51,30 @@ public class TextClassifier {
 	private List<Entry<String, Double>> lastClassificationResult;
 	//Better keep bag itself to use the equals() later!
 	private int lastClassifiedBag;
-	private Map<String, Double> termIDFs;
 	
 	public TextClassifier() {
-		this(null, false, true);
+		this(1d, false, true);
 	}
 	
-	public TextClassifier(boolean calculateMaxTermFromIDF) {
-		this(calculateMaxTermFromIDF, false);
-	}
-	
-	public TextClassifier(Integer maxNumberOfTerms) {
-		this(maxNumberOfTerms, false);
+	public TextClassifier(Double percentageOfCorpusForAllowedTerms) {
+		this(percentageOfCorpusForAllowedTerms, false);
 	}
 
-	public TextClassifier(Integer maxNumberOfTerms, boolean keepDetailsOfDocumentsInClasses) {
-		this(maxNumberOfTerms, keepDetailsOfDocumentsInClasses, false);
+	public TextClassifier(boolean keepDetailsOfDocumentsInClasses) {
+		this(1d, true, keepDetailsOfDocumentsInClasses);
+	}
+
+	public TextClassifier(Double percentageOfCorpusForAllowedTerms, boolean keepDetailsOfDocumentsInClasses) {
+		this(percentageOfCorpusForAllowedTerms, keepDetailsOfDocumentsInClasses, false);
 	}
 
 	public TextClassifier(boolean calculateMaxTermFromIDF, boolean keepDetailsOfDocumentsInClasses) {
-		this(null, keepDetailsOfDocumentsInClasses, calculateMaxTermFromIDF);
+		this(1d, keepDetailsOfDocumentsInClasses, calculateMaxTermFromIDF);
 	}
 
-	private TextClassifier(Integer maxNumberOfTerms, boolean keepDetailsOfDocumentsInClasses, boolean calculateMaxTermFromIDF) {
+	private TextClassifier(Double percentageOfCorpusForAllowedTerms, boolean keepDetailsOfDocumentsInClasses, boolean calculateMaxTermFromIDF) {
 		this.keepDetailsOfDocumentsInClasses = keepDetailsOfDocumentsInClasses;
-		this.maxNumberAllowedTerms = maxNumberOfTerms;
+		this.percentageOfCorpusForAllowedTerms = percentageOfCorpusForAllowedTerms;
 		this.calculateMaxTermFromIDF = calculateMaxTermFromIDF;
 	}
 
@@ -110,6 +110,7 @@ public class TextClassifier {
 		for (DocumentClass docClass : docClasses.values()) {
 			docClass.getWeightedFrequencies();
 		}
+		maxNumberAllowedTerms = new Integer((int) (getCorpusSize() * percentageOfCorpusForAllowedTerms));
 		trainingFinished = true;
 	}
 
@@ -126,19 +127,23 @@ public class TextClassifier {
 		docClassTermIDFsOrdered = new ArrayList<>();
 		List<Entry<String, Double>> sortedMap = MapUtil.sortAsListByValuesDescending(docClassTermIDFs);
 		
+		//Must never be higher than docClasses.size()! Best it will also not be the same size!
+		double maxNumberOfDocClassesContainingTermX = docClasses.size() - 2;//* 0.85d;
+		double minIDFToKeep = Math.log10(docClasses.size() / maxNumberOfDocClassesContainingTermX);
+		
 		int counter = 0;
 		for (Entry<String, Double> entry : sortedMap) {
 			docClassTermIDFsOrdered.add(entry.getKey());
-			if (entry.getValue() > 0) {	//Maybe better: x >= 0!?
-				lowerInteresstingIDFIndex = counter;
+			if (entry.getValue() >= minIDFToKeep) {
+				calculatedInteresstingIDFIndexForFilter = counter;
 			}
-			if (entry.getValue() == 0) {
-				lastInteresstingIDFIndex = counter;
+			//Keep only the first index which is smaller than 0 which means the term apears in all document classes!
+			if (entry.getValue() < 0) {
+				firstIDFIndexForTermInAllDocClasses = counter;
+				break;
 			}
 			counter++;
 		}
-		System.out.println("Total terms="+docClassTermIDFs.size()+", lowerInteresstingIDFIndex="+lowerInteresstingIDFIndex
-				+ ", lastInteresstingIDFIndex="+lastInteresstingIDFIndex);
 	}
 
 	public Entry<String, Double> classify(BagOfWords queryBag) {
@@ -265,7 +270,7 @@ public class TextClassifier {
 	
 	public Integer getTermCountInIDFFilter() {
 		checkFinishedTraining();
-		int targetFilterIndex = (calculateMaxTermFromIDF)?lowerInteresstingIDFIndex:maxNumberAllowedTerms;
+		int targetFilterIndex = (calculateMaxTermFromIDF)?calculatedInteresstingIDFIndexForFilter:maxNumberAllowedTerms;
 		return Math.min(docClassTermIDFsOrdered.size(), targetFilterIndex);
 	}
 
@@ -297,22 +302,15 @@ public class TextClassifier {
 		}
 	}
 	
-	//TODO Should deep copy the doc classes list!
-	public List<DocumentClass> getDocumenClasses() {
-		List<DocumentClass> docClasses = new ArrayList<>();
-		docClasses.addAll(this.docClasses.values());
-		return docClasses;
-	}
-
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("TextClassifier [maxNumberAllowedTerms=");
 		builder.append(maxNumberAllowedTerms);
-		builder.append(", lastInteresstingBoarder=");
-		builder.append(lastInteresstingIDFIndex);
-		builder.append(", lowerInteresstingBoarder=");
-		builder.append(lowerInteresstingIDFIndex);
+		builder.append(", calculatedInteresstingIDFIndexForFilter=");
+		builder.append(calculatedInteresstingIDFIndexForFilter);
+		builder.append(", firstIDFIndexForTermInAllDocClasses=");
+		builder.append(firstIDFIndexForTermInAllDocClasses);
 		builder.append(", docClasses=");
 		builder.append(docClasses.keySet());
 		builder.append(", trainingFinished=");

@@ -39,6 +39,8 @@ public class TextClassifierWithFinalTestData {
 	private static List<TestDataEntry> testData;
 	private static Path tempTrainingsData;
 
+	private boolean runMultipleTimes = false;
+	
 	@BeforeClass
 	public static void init() throws IOException {
 		prepareTestData();
@@ -49,25 +51,29 @@ public class TextClassifierWithFinalTestData {
 	
 	@Test
 	public void simulateMultiTest() throws IOException {
-		int counter = 30;
+		runMultipleTimes = true;
+		int counter = 10;
 		while (counter > 0) {
+			System.out.println("Test run #"+counter);
 			prepareTestData();
 			simulateSolutionTest();
 			counter--;
 		}
 		float total = overAllRight + overAllFalse;
+		System.out.println("------------------------------------------------------");
 		System.out.println("Over all results:");
 		System.out.println("Total right: " + overAllRight + " = " + new Double((100 / total)*overAllRight) + "%");
 		System.out.println("Total failures: " + overAllFalse + " = " + new Double((100 / total)*overAllFalse) + "%");
+		System.out.println("------------------------------------------------------");
 	}
 	
 	@Test
 	public void simulateSolutionTest() throws IOException {
 		
 		DocumentTokanizer tokanizer = new DocumentTokanizer();
-//		tokanizer.addFilter(new ENStopwordFilter());	//Increases accuracy of the classifier from 96 to 98% with ten test-entries and ten testruns.
+//		tokanizer.addFilter(new ENStopwordFilter());	//Increases accuracy of the classifier only from 97 to 98% with ten test-entries and ten testruns.
 		
-//		TextClassifier classifier = new TextClassifier(5000);
+//		TextClassifier classifier = new TextClassifier(0.85);
 		TextClassifier classifier = new TextClassifier();
 		
 		System.out.println("Start training...");
@@ -104,7 +110,7 @@ public class TextClassifierWithFinalTestData {
 			results.get(Boolean.toString(res.isRight)).results.add(res);
 		}
 
-		if (false) {
+		if (!runMultipleTimes) {
 			System.out.println(results.get(Boolean.toString(true)));
 			System.out.println(results.get(Boolean.toString(false)));
 		}
