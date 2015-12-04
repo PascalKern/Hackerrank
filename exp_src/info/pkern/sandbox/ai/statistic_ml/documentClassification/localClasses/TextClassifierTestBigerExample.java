@@ -63,7 +63,7 @@ public class TextClassifierTestBigerExample {
 				//TODO Maybe use the classifier dictionary or its idf or reduced idf?!
 //				table.filterColumns(docClass.getTfIdfWeightedFrequencies().keySet());
 				SimpleTable<Integer> simpleTable = table.getSimpleTable();
-				simpleTable.extendTableToColumnsCount(testcase.textClassifier.getDictionarySize());
+				simpleTable.extendTableToColumnsCount(testcase.textClassifier.getTermCountInIDFFilter());
 				String lable = docClass.getName().substring(0, 2);
 				int rowIndex = simpleTable.getRowsCount();
 				while (rowIndex > 0) {
@@ -98,7 +98,8 @@ public class TextClassifierTestBigerExample {
 		Path testBase = basePath.resolve(test);
 		
 //		textClassifier = new TextClassifier(null, true);
-		textClassifier = new TextClassifier(5000, true);
+//		textClassifier = new TextClassifier(5000, true);
+		textClassifier = new TextClassifier(true, true);
 		
 		FileVisitor<Path> fileProcessor = new RecursiveSimpleFileVisitor("txt");
 		Files.walkFileTree(learnBase, fileProcessor);
@@ -139,7 +140,7 @@ public class TextClassifierTestBigerExample {
 			testBag.addTerms(tokanize(file));
 			
 			List<Entry<String, Double>> probabilities = textClassifier.getClassificationProbabilities(testBag);
-			MapUtil.sortByValueDescending(probabilities);
+//			MapUtil.sortByValueDescending(probabilities);
 			
 			Result res = new Result();
 			res.fileName = file.getFileName().toString();

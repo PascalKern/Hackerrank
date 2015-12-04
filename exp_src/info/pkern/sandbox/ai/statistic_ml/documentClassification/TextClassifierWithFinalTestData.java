@@ -36,7 +36,7 @@ public class TextClassifierWithFinalTestData {
 	private final static String TRAININGS_DATA_FILE = "orig_trainingdata.txt";
 	private final static Integer TESTS_COUNT = 10;
 
-	private static List<TestDataEntry> testData = new ArrayList<>(TESTS_COUNT);
+	private static List<TestDataEntry> testData;
 	private static Path tempTrainingsData;
 
 	@BeforeClass
@@ -44,11 +44,28 @@ public class TextClassifierWithFinalTestData {
 		prepareTestData();
 	}
 	
+	private int overAllRight = 0;
+	private int overAllFalse = 0;
+	
+	@Test
+	public void simulateMultiTest() throws IOException {
+		int counter = 30;
+		while (counter > 0) {
+			prepareTestData();
+			simulateSolutionTest();
+			counter--;
+		}
+		float total = overAllRight + overAllFalse;
+		System.out.println("Over all results:");
+		System.out.println("Total right: " + overAllRight + " = " + new Double((100 / total)*overAllRight) + "%");
+		System.out.println("Total failures: " + overAllFalse + " = " + new Double((100 / total)*overAllFalse) + "%");
+	}
+	
 	@Test
 	public void simulateSolutionTest() throws IOException {
 		
 		DocumentTokanizer tokanizer = new DocumentTokanizer();
-//		tokanizer.addFilter(new ENStopwordFilter());
+//		tokanizer.addFilter(new ENStopwordFilter());	//Increases accuracy of the classifier from 96 to 98% with ten test-entries and ten testruns.
 		
 //		TextClassifier classifier = new TextClassifier(5000);
 		TextClassifier classifier = new TextClassifier();
@@ -86,14 +103,18 @@ public class TextClassifierWithFinalTestData {
 			res.results = probabilities;
 			results.get(Boolean.toString(res.isRight)).results.add(res);
 		}
-		
-		System.out.println(results.get(Boolean.toString(true)));
+
+		if (false) {
+			System.out.println(results.get(Boolean.toString(true)));
+			System.out.println(results.get(Boolean.toString(false)));
+		}
 		int right = results.get(Boolean.toString(true)).results.size();
-		System.out.println(results.get(Boolean.toString(false)));
+		overAllRight += right;
 		int failures = results.get(Boolean.toString(false)).results.size();
+		overAllFalse += failures;
 		float total = right + failures;
-		System.out.println("Total right: " + right + " " + new Double((100 / total)*right) + "%");
-		System.out.println("Total failures: " + failures + " " + new Double((100 / total)*failures) + "%");
+		System.out.println("Total right: " + right + " = " + new Double((100 / total)*right) + "%");
+		System.out.println("Total failures: " + failures + " = " + new Double((100 / total)*failures) + "%");
 		
 	}
 
@@ -137,14 +158,8 @@ public class TextClassifierWithFinalTestData {
 	
 	
 	private static void prepareTestData() throws IOException {
-		// Path tempTrainingsData =
-		// Files.createTempFile("trainingsdata_documentClassification", null,
-		// PosixFilePermissions.asFileAttribute(PosixFilePermissions.fromString("rw-r--r--")));
 		Set<PosixFilePermission> perms = PosixFilePermissions.fromString("rw-r--r--");
 		FileAttribute<Set<PosixFilePermission>> attributes = PosixFilePermissions.asFileAttribute(perms);
-		// tempTrainingsData =
-		// Files.createTempFile("trainingsdata_documentClassification", null,
-		// attributes);
 		String solutionClassPath = Solution.class.getPackage().getName().replace(".", "/");
 		Path trainingsDataBin = Paths.get("bin", solutionClassPath, "trainingdata.txt");
 		Files.deleteIfExists(trainingsDataBin);
@@ -161,6 +176,7 @@ public class TextClassifierWithFinalTestData {
 			testLines.add(random.nextInt(origLineCount));
 		}
 
+		testData = new ArrayList<>();
 		try (FileWriter tempTrainingsdataDataWriter = new FileWriter(tempTrainingsData.toFile())) {
 			tempTrainingsdataDataWriter.write(newLineCount + "\n");
 
